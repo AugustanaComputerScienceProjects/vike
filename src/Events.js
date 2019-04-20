@@ -36,14 +36,15 @@ class Events extends Component {
         organization: '',
         tags: [],
         description: '',
-        picId: '',
+        picId: 'default',
         uploading: false,
-        message: ''
+        message: 'Event Added',
+        image64: null,
     };
 
     handleOpen = () => {
         this.setState({ open: true });
-      };
+    };
     
     handleClose = (event, reason) => {
         if (reason === 'clickaway') {
@@ -56,70 +57,73 @@ class Events extends Component {
         this.setState({ date: new Date(event) });
     };
 
+    // Save image to Firebase
     saveImage(ref, image, imageName, onSuccess, onError) {
-        this.setState({ uploading: true });
-        this.setState({ message: "Uploading Image" });
-        this.handleClose();
-        this.handleOpen();
-        var firebaseStorageRef = storage.ref(ref);
-        const id = uuidv4();
-        const imageRef = firebaseStorageRef.child(id + ".jpg");
-        this.setState({ picId: id });
-
-        const i = image.indexOf('base64,');
-        const buffer = Buffer.from(image.slice(i + 7), 'base64');
-        const file = new File([buffer], id);
-    
         let self = this;
-        imageRef.put(file).then(function(){
-            return imageRef.getDownloadURL();
-        }).then(function(url){
-            self.setState({ uploading: false });
-            self.handleClose();
-            self.state.message = "Image Uploaded Successfully";
-            self.handleOpen();
-            console.log(url);
-        }).catch(function(error){
-            self.setState({ uploading: false });
-            self.handleClose();
-            self.state.message = "Failed to Upload Image";
-            self.handleOpen();
-            console.log(error);
+        if (this.state.image64 != null) {
+            this.setState({ uploading: true });
+            self.displayMessage(self, "Uploading Image");
+            var firebaseStorageRef = storage.ref(ref);
+            const id = uuidv4();
+            const imageRef = firebaseStorageRef.child(id + ".jpg");
+            this.setState({ picId: id }); 
+
+            const i = image.indexOf('base64,');
+            const buffer = Buffer.from(image.slice(i + 7), 'base64');
+            const file = new File([buffer], id);
+    
+            imageRef.put(file).then(function(){
+                return imageRef.getDownloadURL();
+            }).then(function(url){
+                console.log(url);
+                self.pushEvent(self);
+            }).catch(function(error){
+                console.log(error);
+                self.displayMessage(self, "Error Uploading Image");
+            });
+        } else {
+            self.pushEvent(self);
+        }
+    }
+
+    // Push event to Firebase
+    pushEvent(self) {
+        // Adding leading 0s
+        var month = (1 + self.state.date.getMonth()).toString();
+        month = month.length > 1 ? month : '0' + month;
+        var day = self.state.date.getDate().toString();
+        day = day.length > 1 ? day : '0' + day;
+        var hours = self.state.date.getHours().toString();
+        hours = hours.length > 1 ? hours : '0' + hours;
+        var minutes = self.state.date.getMinutes().toString();
+        minutes = minutes.length > 1 ? minutes : '0' + minutes;
+        db.ref('/current-events').push({
+            name: self.state.name,
+            startDate: month + '-' + day + '-' + self.state.date.getFullYear() + " " + hours + ":" + minutes,
+            duration: self.state.duration,
+            location: self.state.location,
+            organization: self.state.organization,
+            imgid: self.state.picId,
+            description: self.state.description,
+            tags: self.state.tags.toString(),
         });
+        self.resetState(self);
+        self.setState({ uploading: false });
+        self.displayMessage(self, "Event Added");
     }
 
     submitAction = event => {
         // Check inputs
         if (this.state.name != '' && this.state.location != '' && this.state.organization != '' && this.state.duration != '') {
+            this.saveImage('Images', this.state.image64);
+        } else {
+            alert("Required fields are not filled in.");
+        }
+    };
 
-        // Adding leading 0s
-        var month = (1 + this.state.date.getMonth()).toString();
-        month = month.length > 1 ? month : '0' + month;
-        var day = this.state.date.getDate().toString();
-        day = day.length > 1 ? day : '0' + day;
-        var hours = this.state.date.getHours().toString();
-        hours = hours.length > 1 ? hours : '0' + hours;
-        var minutes = this.state.date.getMinutes().toString();
-        minutes = minutes.length > 1 ? minutes : '0' + minutes;
-
-        // Push event to Firebase
-        db.ref('/current-events').push({
-            name: this.state.name,
-            startDate: month + '-' + day + '-' + this.state.date.getFullYear() + " " + hours + ":" + minutes,
-            duration: this.state.duration,
-            location: this.state.location,
-            organization: this.state.organization,
-            imgid: this.state.picId,
-            description: this.state.description,
-            tags: this.state.tags.toString(),
-        });
-
-        this.handleClose();
-        this.setState({ message: "Event Added" });
-        this.handleOpen();
-
-        // Reset the state
-        this.setState({
+    resetState(self) {
+        self.setState({
+            open: false,
             name: '',
             date: new Date(),
             duration: '',
@@ -127,11 +131,18 @@ class Events extends Component {
             organization: '',
             tags: [],
             description: '',
-            picId: '' });
-        } else {
-            alert("Required fields are not filled in.");
-        }
-    };
+            picId: 'default',
+            uploading: false,
+            message: '',
+            image64: null,
+        });
+    }
+
+    displayMessage(self, message) {
+        self.handleClose();
+        self.setState({ message: message });
+        self.handleOpen();
+    }
 
     render() {
         return (
@@ -230,13 +241,13 @@ class Events extends Component {
                             <ImagePicker
                             extensions={['jpg', 'jpeg', 'png']}
                             dims={{minWidth: 100, maxWidth: 10000, minHeight: 100, maxHeight: 10000}}
-                            onChange={base64 => (this.saveImage('Images', base64))}
+                            onChange={base64 => this.setState({ image64: base64 })}
                             maxSize={10}
-                            onError={errMsg => console.log(errMsg)} >
+                            onError={errMsg => this.displayMessage(this, errMsg)} >
                             <Button variant="contained"
                                 className="create-event"
                                 disabled={this.state.uploading}>
-                                Upload Image    
+                                Select Image    
                             </Button>
                             </ImagePicker>
                         </Grid>
