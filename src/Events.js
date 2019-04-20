@@ -14,6 +14,7 @@ import FormControl from '@material-ui/core/FormControl';
 import { db, storage, Firebase } from './config';
 import Snackbar from '@material-ui/core/Snackbar';  
 import { ImagePicker } from 'react-file-picker'
+import { View, Image } from 'react-native';
 
 const uuidv4 = require('uuid/v4');
 
@@ -71,7 +72,7 @@ class Events extends Component {
             const i = image.indexOf('base64,');
             const buffer = Buffer.from(image.slice(i + 7), 'base64');
             const file = new File([buffer], id);
-    
+
             imageRef.put(file).then(function(){
                 return imageRef.getDownloadURL();
             }).then(function(url){
@@ -148,8 +149,8 @@ class Events extends Component {
         return (
             <div>
                 <MuiPickersUtilsProvider utils={MomentUtils}>
-                <Grid container spacing={24}>
-                    <Grid item container direction="column" xs>
+                <Grid container>
+                    <Grid item container direction="column" spacing={8}>
                         <Grid item>
                             <TextField
                                     label="Event Title"
@@ -161,7 +162,7 @@ class Events extends Component {
                         <Grid item>
                             <DatePicker
                                 margin="normal"
-                                label="Date Picker"
+                                label="Start Date"
                                 value={this.state.date}
                                 onChange={this.handleDateChange}
                                 />
@@ -169,7 +170,7 @@ class Events extends Component {
                         <Grid item>
                             <TimePicker
                                 margin="normal"
-                                label="Time Picker"
+                                label="Start Time"
                                 value={this.state.date}
                                 onChange={this.handleDateChange}
                                 />
@@ -177,10 +178,11 @@ class Events extends Component {
                         <Grid item>
                             <TextField
                                 id="event-dur"
-                                label="Duration"
+                                label="Duration (minutes)"
                                 margin="normal"
                                 value={this.state.duration}
-                                onChange={e => this.setState({ duration: parseInt(e.target.value) })}
+                                type="number"
+                                onChange={e => this.setState({ duration: e.target.value })}
                                 />
                         </Grid>
                         <Grid item>
@@ -237,27 +239,31 @@ class Events extends Component {
                                 onChange={e => this.setState({ description: e.target.value })}
                                 />
                         </Grid>
+                        <Grid item container direction="row" spacing={16}>
                         <Grid item>
-                            <ImagePicker
+                        <ImagePicker
                             extensions={['jpg', 'jpeg', 'png']}
                             dims={{minWidth: 100, maxWidth: 10000, minHeight: 100, maxHeight: 10000}}
                             onChange={base64 => this.setState({ image64: base64 })}
                             maxSize={10}
                             onError={errMsg => this.displayMessage(this, errMsg)} >
                             <Button variant="contained"
-                                className="create-event"
+                                className="get-image"
                                 disabled={this.state.uploading}>
                                 Select Image    
                             </Button>
                             </ImagePicker>
-                        </Grid>
-                        <Grid item>
                             <Button variant="contained"
                                 className="create-event"
                                 disabled={this.state.uploading}
                                 onClick={this.submitAction}>
                                 Submit Event    
                             </Button>
+                        </Grid>
+                        <Image
+                            style={{width: 200, height: 200}}
+                            source={{uri: this.state.image64}}
+                            />
                         </Grid>
                     </Grid>
                 </Grid>
@@ -285,8 +291,6 @@ class Events extends Component {
                 ]}
                 />
             </div>
-
-
         );
     }
 }
