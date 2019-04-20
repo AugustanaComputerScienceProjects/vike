@@ -27,7 +27,7 @@ const testTags = [
     'performance',
 ];
 
-class Events extends Component {
+class AddEvent extends Component {
     state = {
         open: false,
         name: '',
@@ -295,4 +295,4 @@ class Events extends Component {
     }
 }
 
-export default Events;
+export default AddEvent;

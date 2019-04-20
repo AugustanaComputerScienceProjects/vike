@@ -13,14 +13,17 @@ class NavDrawer extends Component {
     constructor(props) {
         super(props);
         this.eventClicked = this.eventClicked.bind(this);
+        this.currentClicked = this.currentClicked.bind(this);
         this.pastClicked = this.pastClicked.bind(this);
         this.tagsClicked = this.tagsClicked.bind(this);
-
-
     }
 
     eventClicked() {
-        this.props.navChanged("Events");
+        this.props.navChanged("Add Event");
+    }
+
+    currentClicked() {
+        this.props.navChanged("Current Events");
     }
 
     pastClicked() {
@@ -39,7 +42,8 @@ class NavDrawer extends Component {
                 variant="permanent"
                 anchor="left">
                 <MenuList>
-                    <MenuItem name="Events" onClick={this.eventClicked}>Events</MenuItem>
+                    <MenuItem name="Add Event" onClick={this.eventClicked}>Add Event</MenuItem>
+                    <MenuItem name="CurrentEvents" onClick={this.currentClicked}>Current Events</MenuItem>
                     <MenuItem name="PastEvents" onClick={this.pastClicked}>Past Events</MenuItem>
                     <MenuItem name="Tags" onClick={this.tagsClicked}>Tags/Groups</MenuItem>
 
