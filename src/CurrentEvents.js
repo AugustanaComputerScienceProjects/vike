@@ -74,9 +74,36 @@ class CurrentEvents extends Component {
     handleOpen = () => {
         this.setState({ open: true });
     };
-    
-    handleClose = () => {
+
+    handleDelete = () => {
         this.setState({ open: false });
+        let event = this.state.popUpEvent;
+        db.ref('/current-events').child(event["key"]).remove();
+        let newEvents = this.arrayRemove(this.state.events, this.state.popUpEvent);
+        this.setState({events: newEvents});
+    }
+    
+    arrayRemove(arr, value) {
+        return arr.filter(function(ele){
+            return ele != value;
+        });
+     }
+     
+
+    handleClose = () => {
+        console.log("closing");
+        this.setState({ open: false });
+        let event = this.state.popUpEvent;
+        db.ref('/current-events').child(event["key"]).set({
+            name: event["name"],
+            startDate: event["startDate"],
+            duration: event["duration"],
+            location: event["location"],
+            organization: event["organization"],
+            imgid: event["imgid"],
+            description: event["description"],
+            tags: event["tags"],
+        });
     };
 
     readCurrentEvents() {
@@ -88,7 +115,9 @@ class CurrentEvents extends Component {
             snapshot.forEach(function(childSnapshot) {
                 storage.ref('Images').child(childSnapshot.child('imgid').val() + '.jpg').getDownloadURL().then((url) => {
                     index = index + 1;
-                    listEvents.push(childSnapshot.val());
+                    let event = childSnapshot.val();
+                    event["key"] = childSnapshot.key;
+                    listEvents.push(event);
                     listURLS.push(url);
                     if (snapshot.numChildren() == index) {
                         self.setState({ events: listEvents, urls: listURLS });
@@ -110,10 +139,6 @@ class CurrentEvents extends Component {
         console.log('Editing: ' + event["name"]);
         this.setState({ popUpEvent: event, tags: event["tags"].split(','), date: new Date(event["startDate"])});
         this.handleOpen();
-    }
-
-    handleDelete() {
-
     }
 
     handleNameChange = e => {
