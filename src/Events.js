@@ -11,8 +11,11 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
-import { db } from './config';
-import Snackbar from '@material-ui/core/Snackbar';
+import { db, storage, Firebase } from './config';
+import Snackbar from '@material-ui/core/Snackbar';  
+import { ImagePicker } from 'react-file-picker'
+
+const uuidv4 = require('uuid/v4');
 
 const testTags = [
     'comedy',
@@ -33,9 +36,12 @@ class Events extends Component {
         organization: '',
         tags: [],
         description: '',
+        picId: '',
+        uploading: false,
+        message: ''
     };
 
-    handleClick = () => {
+    handleOpen = () => {
         this.setState({ open: true });
       };
     
@@ -49,6 +55,38 @@ class Events extends Component {
     handleDateChange = event => {
         this.setState({ date: new Date(event) });
     };
+
+    saveImage(ref, image, imageName, onSuccess, onError) {
+        this.setState({ uploading: true });
+        this.setState({ message: "Uploading Image" });
+        this.handleClose();
+        this.handleOpen();
+        var firebaseStorageRef = storage.ref(ref);
+        const id = uuidv4();
+        const imageRef = firebaseStorageRef.child(id + ".jpg");
+        this.setState({ picId: id });
+
+        const i = image.indexOf('base64,');
+        const buffer = Buffer.from(image.slice(i + 7), 'base64');
+        const file = new File([buffer], id);
+    
+        let self = this;
+        imageRef.put(file).then(function(){
+            return imageRef.getDownloadURL();
+        }).then(function(url){
+            self.setState({ uploading: false });
+            self.handleClose();
+            self.state.message = "Image Uploaded Successfully";
+            self.handleOpen();
+            console.log(url);
+        }).catch(function(error){
+            self.setState({ uploading: false });
+            self.handleClose();
+            self.state.message = "Failed to Upload Image";
+            self.handleOpen();
+            console.log(error);
+        });
+    }
 
     submitAction = event => {
         // Check inputs
@@ -71,12 +109,14 @@ class Events extends Component {
             duration: this.state.duration,
             location: this.state.location,
             organization: this.state.organization,
-            imgid: '2000',
+            imgid: this.state.picId,
             description: this.state.description,
             tags: this.state.tags.toString(),
         });
 
-        this.state.open = true;
+        this.handleClose();
+        this.setState({ message: "Event Added" });
+        this.handleOpen();
 
         // Reset the state
         this.setState({
@@ -86,7 +126,8 @@ class Events extends Component {
             location: '',
             organization: '',
             tags: [],
-            description: '' });
+            description: '',
+            picId: '' });
         } else {
             alert("Required fields are not filled in.");
         }
@@ -186,8 +227,23 @@ class Events extends Component {
                                 />
                         </Grid>
                         <Grid item>
+                            <ImagePicker
+                            extensions={['jpg', 'jpeg', 'png']}
+                            dims={{minWidth: 100, maxWidth: 10000, minHeight: 100, maxHeight: 10000}}
+                            onChange={base64 => (this.saveImage('Images', base64))}
+                            maxSize={10}
+                            onError={errMsg => console.log(errMsg)} >
                             <Button variant="contained"
                                 className="create-event"
+                                disabled={this.state.uploading}>
+                                Upload Image    
+                            </Button>
+                            </ImagePicker>
+                        </Grid>
+                        <Grid item>
+                            <Button variant="contained"
+                                className="create-event"
+                                disabled={this.state.uploading}
                                 onClick={this.submitAction}>
                                 Submit Event    
                             </Button>
@@ -206,7 +262,7 @@ class Events extends Component {
                     ContentProps={{
                         'aria-describedby': 'message-id',
                     }}
-                    message={<span id="message-id">Event Added</span>}
+                    message={this.state.message}
                 action={[
                     <Button
                         key="close"

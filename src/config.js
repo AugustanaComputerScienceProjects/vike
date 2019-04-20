@@ -1,4 +1,5 @@
 import Firebase from 'firebase';
+import 'firebase/storage';
 let config = {
     apiKey: "AIzaSyBFTh3ZprCrzReAlVDeGcNN8WzijuDU6DI",
     authDomain: "osl-events-app.firebaseapp.com",
@@ -8,4 +9,8 @@ let config = {
     messagingSenderId: "559059413195"
 };
 let app = Firebase.initializeApp(config);  
-export const db = app.database();  
+const db = app.database(); 
+const storage = Firebase.storage();
+export {
+    db, storage, Firebase as default
+}
