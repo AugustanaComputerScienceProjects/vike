@@ -116,6 +116,52 @@ class CurrentEvents extends Component {
 
     }
 
+    handleNameChange = e => {
+        this.handleEventChange("name", e.target.value);
+    };
+
+    handleDateChange = e => {
+        // Adding leading 0s
+        let date = new Date(e);
+        var month = (1 + date.getMonth()).toString();
+        month = month.length > 1 ? month : '0' + month;
+        var day = date.getDate().toString();
+        day = day.length > 1 ? day : '0' + day;
+        var hours = date.getHours().toString();
+        hours = hours.length > 1 ? hours : '0' + hours;
+        var minutes = date.getMinutes().toString();
+        minutes = minutes.length > 1 ? minutes : '0' + minutes;
+        let startDate = month + '-' + day + '-' + date.getFullYear() + " " + hours + ":" + minutes;
+        this.handleEventChange("startDate", startDate);
+        this.setState({date: startDate});
+    };
+
+    handleDurationChange = e => {
+        this.handleEventChange("duration", e.target.value);
+    };
+
+    handleLocationChange = e => {
+        this.handleEventChange("location", e.target.value);
+    };
+
+    handleOrganizationChange = e => {
+        this.handleEventChange("organization", e.target.value);
+    };
+
+    handleTagChange = e => {
+        this.handleEventChange("tags", e.target.value);
+    };
+
+    handleDescriptionChange = e => {
+        this.handleEventChange("description", e.target.value);
+    };
+
+    handleEventChange(key, value) {
+        let event = this.state.popUpEvent;
+        event[key] = value;
+        this.setState({popUpEvent: event});
+    }
+
     render() {
         const { classes } = this.props;
         const children = [];
@@ -149,21 +195,22 @@ class CurrentEvents extends Component {
                                     label="Event Title"
                                     id="event-name"
                                     margin="normal"
-                                    value={this.state.popUpEvent["name"]} />                        
+                                    value={this.state.popUpEvent["name"]}
+                                    onChange={this.handleNameChange} />                        
                         </Grid>
                         <Grid item>
                             <DatePicker
                                 margin="normal"
                                 label="Start Date"
                                 value={this.state.date}
-                                />
+                                onChange={this.handleDateChange} />
                         </Grid>
                         <Grid item>
                             <TimePicker
                                 margin="normal"
                                 label="Start Time"
                                 value={this.state.date}
-                                />
+                                onChange={this.handleDateChange} />
                         </Grid>
                         <Grid item>
                             <TextField
@@ -172,7 +219,7 @@ class CurrentEvents extends Component {
                                 margin="normal"
                                 value={this.state.popUpEvent["duration"]}
                                 type="number"
-                                />
+                                onChange={this.handleDurationChange} />
                         </Grid>
                         <Grid item>
                             <TextField
@@ -180,7 +227,7 @@ class CurrentEvents extends Component {
                                 label="Location"
                                 margin="normal"
                                 value={this.state.popUpEvent["location"]}
-                                />
+                                onChange={this.handleLocationChange} />
                         </Grid>
                         <Grid item>
                             <TextField
@@ -188,7 +235,7 @@ class CurrentEvents extends Component {
                                 label="Organization"
                                 margin="normal"
                                 value={this.state.popUpEvent["organization"]}
-                                />
+                                onChange={this.handleOrganizationChange} />
                         </Grid>
                         <Grid item container direction="row">
                             <FormControl className="selects">
@@ -198,6 +245,7 @@ class CurrentEvents extends Component {
                                     displayEmpty
                                     input={<Input id="select-multiple"/>}
                                     value={this.state.tags}
+                                    onChange={this.handleTagChange}
                                     variant='outlined'
                                     style={{minWidth: '150px',maxWidth: '150px'}}
                                     >
@@ -221,7 +269,7 @@ class CurrentEvents extends Component {
                                 margin="normal"
                                 variant="outlined"
                                 value={this.state.popUpEvent["description"]}
-                                />
+                                onChange={this.handleDescriptionChange} />
                         </Grid>
                         <Grid item>
                         <ImagePicker
