@@ -90,8 +90,14 @@ class CurrentEvents extends Component {
         this.setState({ editing: false });
         let event = this.state.popUpEvent;
         db.ref('/current-events').child(event["key"]).remove();
+        var firebaseStorageRef = storage.ref("Images");
+        if (event["imgid"] != "default") {
+            firebaseStorageRef.child(event["imgid"] + ".jpg").delete();
+        }
         let newEvents = this.arrayRemove(this.state.events, this.state.popUpEvent);
         this.setState({events: newEvents});
+        let newURLs = this.arrayRemove(this.state.urls, this.state.urls[this.state.index]);
+        this.setState({urls: newURLs});
     }
     
     arrayRemove(arr, value) {
@@ -125,7 +131,9 @@ class CurrentEvents extends Component {
                 images[self.state.index] = url;
                 self.setState({urls: images});
                 self.pushEvent(self, event);
-                firebaseStorageRef.child(oldId + ".jpg").delete();
+                if (oldId != "default") {
+                    firebaseStorageRef.child(oldId + ".jpg").delete();
+                }
             }).catch(function(error){
                 console.log(error);
                 self.displayMessage(self, "Error Uploading Image");
