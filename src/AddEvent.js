@@ -254,10 +254,11 @@ class AddEvent extends Component {
                             </Button>
                             </ImagePicker>
                             <Button variant="contained"
+                                color="primary"
                                 className="create-event"
                                 disabled={this.state.uploading}
                                 onClick={this.submitAction}>
-                                Submit Event    
+                                Add Event    
                             </Button>
                         </Grid>
                         <Image

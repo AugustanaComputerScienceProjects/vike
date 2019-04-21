@@ -15,7 +15,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
 import Typography from '@material-ui/core/Typography';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
@@ -29,6 +29,10 @@ import { View, Image } from 'react-native';
 import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
+import { red, blue } from '@material-ui/core/colors';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
+const redTheme = createMuiTheme({ palette: { primary: red } })
 
 const testTags = [
     'comedy',
@@ -135,9 +139,13 @@ class CurrentEvents extends Component {
         this.readCurrentEvents();
     }
 
-    editAction(event) {
+    editAction(event) { 
         console.log('Editing: ' + event["name"]);
-        this.setState({ popUpEvent: event, tags: event["tags"].split(','), date: new Date(event["startDate"])});
+        let tags = event["tags"].split(',');
+        if (tags[0] == '') {
+            tags = []
+        }
+        this.setState({ popUpEvent: event, tags: tags, date: new Date(event["startDate"])});
         this.handleOpen();
     }
 
@@ -174,7 +182,8 @@ class CurrentEvents extends Component {
     };
 
     handleTagChange = e => {
-        this.handleEventChange("tags", e.target.value);
+        this.handleEventChange("tags", e.target.value.toString());
+        this.setState({ tags: e.target.value });
     };
 
     handleDescriptionChange = e => {
@@ -193,7 +202,24 @@ class CurrentEvents extends Component {
 
         for (var i = 0; i < this.state.events.length; i += 1) {
             let event = this.state.events[i];
-            children.push(<ChildComponent key={i} name={event["name"]} date={event["startDate"] + " " + event["duration"]} location={'Location: ' + event["location"]} 
+            let date = new Date(event["startDate"]);
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            var hours = date.getHours().toString();
+            hours = hours.length > 1 ? hours : '0' + hours;
+            var minutes = date.getMinutes().toString();
+            minutes = minutes.length > 1 ? minutes : '0' + minutes;
+            let startDate = month + '-' + day + '-' + date.getFullYear() + " " + hours + ":" + minutes;
+            date.setMilliseconds(date.getMilliseconds() + (event["duration"] * 60000));
+            console.log(date);
+            hours = date.getHours().toString();
+            hours = hours.length > 1 ? hours : '0' + hours;
+            minutes = date.getMinutes().toString();
+            minutes = minutes.length > 1 ? minutes : '0' + minutes;
+            let fullDate = startDate + "-" + hours + ":" + minutes;
+            children.push(<ChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
             organization={'Organization: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[i]}
             editAction={() => this.editAction(event)} />);
         };
@@ -312,13 +338,13 @@ class CurrentEvents extends Component {
                 </Grid>
                 </MuiPickersUtilsProvider>
           </DialogContent>
-          <DialogActions>
-          <Button onClick={this.handleDelete} color="primary">
+          <DialogActions style={{justifyContent: 'center'}}>
+          <MuiThemeProvider theme={redTheme}>
+          <Button variant="contained" onClick={this.handleDelete} color="primary">
               Delete Event
+              <DeleteIcon/>
             </Button>
-            <Button onClick={this.handleClose} color="primary">
-              Save changes
-            </Button>
+            </MuiThemeProvider>
           </DialogActions>
         </Dialog>
             </div>
