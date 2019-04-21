@@ -63,7 +63,7 @@ class AddEvent extends Component {
         let self = this;
         if (this.state.image64 != null) {
             this.setState({ uploading: true });
-            self.displayMessage(self, "Uploading Image");
+            self.displayMessage(self, "Uploading Image...");
             var firebaseStorageRef = storage.ref(ref);
             const id = uuidv4();
             const imageRef = firebaseStorageRef.child(id + ".jpg");

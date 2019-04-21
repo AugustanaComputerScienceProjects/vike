@@ -32,6 +32,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { red, blue } from '@material-ui/core/colors';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Snackbar from '@material-ui/core/Snackbar'; 
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const uuidv4 = require('uuid/v4');
 const redTheme = createMuiTheme({ palette: { primary: red } })
@@ -79,7 +80,8 @@ class CurrentEvents extends Component {
         uploading: false,
         image64: null,
         urls: [],
-        index: -1
+        index: -1,
+        hidden: "visible"
     }
 
     handleBeginEdit = () => {
@@ -113,7 +115,7 @@ class CurrentEvents extends Component {
         let self = this;
         if (this.state.image64 != null) {
             this.setState({ uploading: true });
-            self.displayMessage(self, "Uploading Image");
+            self.displayMessage(self, "Uploading Image...");
             var firebaseStorageRef = storage.ref("Images");
             const id = uuidv4();
             const imageRef = firebaseStorageRef.child(id + ".jpg");
@@ -189,7 +191,7 @@ class CurrentEvents extends Component {
                     listEvents.push(event);
                     listURLS.push(url);
                     if (snapshot.numChildren() == index) {
-                        self.setState({ events: listEvents, urls: listURLS });
+                        self.setState({ events: listEvents, urls: listURLS, hidden: "hidden" });
                     }
                   }).catch((error) => {
                     // Handle any errors
@@ -289,6 +291,9 @@ class CurrentEvents extends Component {
 
         return (
             <div>
+                <div style={{position: "absolute", top: "50%", left: "50%", margintop: "-50px", marginleft: "-50px", width: "100px", height: "100px"}}>
+                <CircularProgress style={{visibility: this.state.hidden}}></CircularProgress>
+            </div>
                 <ParentComponent>
                     {children}
                 </ParentComponent>
