@@ -31,7 +31,9 @@ import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import { red, blue } from '@material-ui/core/colors';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import Snackbar from '@material-ui/core/Snackbar'; 
 
+const uuidv4 = require('uuid/v4');
 const redTheme = createMuiTheme({ palette: { primary: red } })
 
 const testTags = [
@@ -69,18 +71,23 @@ class CurrentEvents extends Component {
 
     state = {
         events: [],
+        editing: false,
         open: false,
         popUpEvent: [],
         tags: [],
-        date: new Date()
+        date: new Date(),
+        uploading: false,
+        image64: null,
+        urls: [],
+        index: -1
     }
 
-    handleOpen = () => {
-        this.setState({ open: true });
+    handleBeginEdit = () => {
+        this.setState({ editing: true });
     };
 
     handleDelete = () => {
-        this.setState({ open: false });
+        this.setState({ editing: false });
         let event = this.state.popUpEvent;
         db.ref('/current-events').child(event["key"]).remove();
         let newEvents = this.arrayRemove(this.state.events, this.state.popUpEvent);
@@ -94,10 +101,41 @@ class CurrentEvents extends Component {
      }
      
 
-    handleClose = () => {
-        console.log("closing");
-        this.setState({ open: false });
+    handleStopEdit = () => {
+        this.setState({ editing: false });
         let event = this.state.popUpEvent;
+        let self = this;
+        if (this.state.image64 != null) {
+            this.setState({ uploading: true });
+            self.displayMessage(self, "Uploading Image");
+            var firebaseStorageRef = storage.ref("Images");
+            const id = uuidv4();
+            const imageRef = firebaseStorageRef.child(id + ".jpg");
+            const oldId = event["imgid"];
+            this.handleEventChange("imgid", id);
+
+            const i = this.state.image64.indexOf('base64,');
+            const buffer = Buffer.from(this.state.image64.slice(i + 7), 'base64');
+            const file = new File([buffer], id);
+
+            imageRef.put(file).then(function(){
+                return imageRef.getDownloadURL();
+            }).then(function(url){
+                let images = self.state.urls;
+                images[self.state.index] = url;
+                self.setState({urls: images});
+                self.pushEvent(self, event);
+                firebaseStorageRef.child(oldId + ".jpg").delete();
+            }).catch(function(error){
+                console.log(error);
+                self.displayMessage(self, "Error Uploading Image");
+            });
+        } else {
+            self.pushEvent(self, event);
+        }
+    };
+
+    pushEvent(self, event) {
         db.ref('/current-events').child(event["key"]).set({
             name: event["name"],
             startDate: event["startDate"],
@@ -108,6 +146,25 @@ class CurrentEvents extends Component {
             description: event["description"],
             tags: event["tags"],
         });
+        self.setState({ uploading: false });
+        self.displayMessage(self, "Event Updated");
+    }
+
+    displayMessage(self, message) {
+        self.handleClose();
+        self.setState({ message: message });
+        self.handleOpen();
+    }
+
+    handleOpen = () => {
+        this.setState({ open: true });
+    };
+    
+    handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+        this.setState({ open: false });
     };
 
     readCurrentEvents() {
@@ -125,8 +182,6 @@ class CurrentEvents extends Component {
                     listURLS.push(url);
                     if (snapshot.numChildren() == index) {
                         self.setState({ events: listEvents, urls: listURLS });
-                        console.log(listEvents);
-                        console.log(listURLS);
                     }
                   }).catch((error) => {
                     // Handle any errors
@@ -139,14 +194,14 @@ class CurrentEvents extends Component {
         this.readCurrentEvents();
     }
 
-    editAction(event) { 
+    editAction(event, i) { 
         console.log('Editing: ' + event["name"]);
         let tags = event["tags"].split(',');
         if (tags[0] == '') {
             tags = []
         }
-        this.setState({ popUpEvent: event, tags: tags, date: new Date(event["startDate"])});
-        this.handleOpen();
+        this.setState({ popUpEvent: event, tags: tags, date: new Date(event["startDate"]), index: i, image64: null });
+        this.handleBeginEdit();
     }
 
     handleNameChange = e => {
@@ -202,6 +257,7 @@ class CurrentEvents extends Component {
 
         for (var i = 0; i < this.state.events.length; i += 1) {
             let event = this.state.events[i];
+            let index = i;
             let date = new Date(event["startDate"]);
             var month = (1 + date.getMonth()).toString();
             month = month.length > 1 ? month : '0' + month;
@@ -213,7 +269,6 @@ class CurrentEvents extends Component {
             minutes = minutes.length > 1 ? minutes : '0' + minutes;
             let startDate = month + '-' + day + '-' + date.getFullYear() + " " + hours + ":" + minutes;
             date.setMilliseconds(date.getMilliseconds() + (event["duration"] * 60000));
-            console.log(date);
             hours = date.getHours().toString();
             hours = hours.length > 1 ? hours : '0' + hours;
             minutes = date.getMinutes().toString();
@@ -221,7 +276,7 @@ class CurrentEvents extends Component {
             let fullDate = startDate + "-" + hours + ":" + minutes;
             children.push(<ChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
             organization={'Organization: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[i]}
-            editAction={() => this.editAction(event)} />);
+            editAction={() => this.editAction(event, index)} />);
         };
 
         return (
@@ -230,11 +285,11 @@ class CurrentEvents extends Component {
                     {children}
                 </ParentComponent>
                 <Dialog
-          onClose={this.handleClose}
+          onClose={this.handleStopEdit}
           aria-labelledby="customized-dialog-title"
-          open={this.state.open}
+          open={this.state.editing}
         >
-          <DialogTitle id="customized-dialog-title" onClose={this.handleClose}>
+          <DialogTitle id="customized-dialog-title" onClose={this.handleStopEdit}>
             Edit Event
           </DialogTitle>
           <DialogContent>
@@ -327,6 +382,7 @@ class CurrentEvents extends Component {
                             extensions={['jpg', 'jpeg', 'png']}
                             dims={{minWidth: 100, maxWidth: 10000, minHeight: 100, maxHeight: 10000}}
                             maxSize={10}
+                            onChange={base64 => this.setState({ image64: base64 })}
                             onError={errMsg => this.displayMessage(this, errMsg)} >
                             <Button variant="contained"
                                 className="get-image">
@@ -347,6 +403,28 @@ class CurrentEvents extends Component {
             </MuiThemeProvider>
           </DialogActions>
         </Dialog>
+        <Snackbar
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                    }}
+                    open={this.state.open}
+                    autoHideDuration={6000}
+                    onClose={this.handleClose}
+                    ContentProps={{
+                        'aria-describedby': 'message-id',
+                    }}
+                    message={this.state.message}
+                action={[
+                    <Button
+                        key="close"
+                        aria-label="Close"
+                        color="inherit"
+                        onClick={this.handleClose}
+                        > X
+                    </Button>,
+                ]}
+                />
             </div>
             
         );
