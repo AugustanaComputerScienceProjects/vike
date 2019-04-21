@@ -79,6 +79,7 @@ class CurrentEvents extends Component {
         date: new Date(),
         uploading: false,
         image64: null,
+        image64Old: null,
         urls: [],
         index: -1,
         hidden: "visible",
@@ -121,7 +122,7 @@ class CurrentEvents extends Component {
         this.setState({ editing: false });
         let event = this.state.popUpEvent;
         let self = this;
-        if (this.state.image64 != null) {
+        if (this.state.image64 != this.state.image64Old) {
             this.setState({ uploading: true });
             self.displayMessage(self, "Uploading Image...");
             var firebaseStorageRef = storage.ref("Images");
@@ -221,7 +222,7 @@ class CurrentEvents extends Component {
             tags = []
         }
         let date = this.getFormattedDate(event);
-        this.setState({ popUpEvent: event, tags: tags, date: date, index: i, image64: null });
+        this.setState({ popUpEvent: event, tags: tags, date: date, index: i, image64: this.state.urls[i], image64Old: this.state.urls[i] });
         this.handleBeginEdit();
     }
 
@@ -410,6 +411,7 @@ class CurrentEvents extends Component {
                                 value={this.state.popUpEvent["description"]}
                                 onChange={this.handleDescriptionChange} />
                         </Grid>
+                        <Grid item container direction="row" spacing={16}>
                         <Grid item>
                         <ImagePicker
                             extensions={['jpg', 'jpeg', 'png']}
@@ -422,6 +424,13 @@ class CurrentEvents extends Component {
                                 Select Image    
                             </Button>
                             </ImagePicker>
+                        </Grid>
+                        <Grid item>
+                        <Image
+                            style={{width: 192, height: 108}}
+                            source={{uri: this.state.image64}}
+                            />
+                        </Grid>
                         </Grid>
                     </Grid>
                 </Grid>
@@ -489,7 +498,7 @@ const ParentComponent = props => (
     </div>
 );
   
-const ChildComponent = props => <Grid item><Card style={{maxWidth: 400}}><CardActionArea onClick={props.editAction}>
+const ChildComponent = props => <Grid item><Card style={{minHeight: 400, maxHeight: 400, minWidth: 300, maxWidth: 300}}><CardActionArea onClick={props.editAction}>
     <CardHeader title={props.name} subheader={props.date}></CardHeader>
     <CardMedia style = {{ height: 0, paddingTop: '56.25%'}} image={props.image} title={props.name}/><CardContent>
     <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.description}<br/>{props.tags}</Typography></CardContent></CardActionArea></Card></Grid>;
