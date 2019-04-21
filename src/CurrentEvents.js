@@ -157,7 +157,7 @@ class CurrentEvents extends Component {
         db.ref('/current-events').child(event["key"]).set({
             name: event["name"],
             startDate: event["startDate"],
-            duration: event["duration"],
+            duration: parseInt(event["duration"]),
             location: event["location"],
             organization: event["organization"],
             imgid: event["imgid"],
@@ -189,7 +189,9 @@ class CurrentEvents extends Component {
         let self = this;
         let listEvents = [];
         let listURLS = [];
-        db.ref('/current-events').once('value').then(function(snapshot) {
+        db.ref('/current-events').on('value', function(snapshot) {
+            listEvents = [];
+            listURLS = [];
             let index = 0;
             snapshot.forEach(function(childSnapshot) {
                 storage.ref('Images').child(childSnapshot.child('imgid').val() + '.jpg').getDownloadURL().then((url) => {
@@ -218,7 +220,8 @@ class CurrentEvents extends Component {
         if (tags[0] == '') {
             tags = []
         }
-        this.setState({ popUpEvent: event, tags: tags, date: new Date(event["startDate"]), index: i, image64: null });
+        let date = this.getFormattedDate(event);
+        this.setState({ popUpEvent: event, tags: tags, date: date, index: i, image64: null });
         this.handleBeginEdit();
     }
 
@@ -239,7 +242,7 @@ class CurrentEvents extends Component {
         minutes = minutes.length > 1 ? minutes : '0' + minutes;
         let startDate = month + '-' + day + '-' + date.getFullYear() + " " + hours + ":" + minutes;
         this.handleEventChange("startDate", startDate);
-        this.setState({date: startDate});
+        this.setState({date: date});
     };
 
     handleDurationChange = e => {
@@ -269,6 +272,15 @@ class CurrentEvents extends Component {
         this.setState({popUpEvent: event});
     }
 
+    getFormattedDate(event) {
+        let arr = event["startDate"].split(' ');
+        let arr2 = arr[0].split('-');
+        let arr3 = arr[1].split(':');
+        let date = new Date(arr2[2] + '-' + arr2[0] + '-' + arr2[1] + 'T' + arr3[0] + ':' + arr3[1] + '-05:00');
+        console.log(date);
+        return date;
+    }
+
     render() {
         const { classes } = this.props;
         const children = [];
@@ -276,7 +288,7 @@ class CurrentEvents extends Component {
         for (var i = 0; i < this.state.events.length; i += 1) {
             let event = this.state.events[i];
             let index = i;
-            let date = new Date(event["startDate"]);
+            let date = this.getFormattedDate(event);
             var month = (1 + date.getMonth()).toString();
             month = month.length > 1 ? month : '0' + month;
             var day = date.getDate().toString();
