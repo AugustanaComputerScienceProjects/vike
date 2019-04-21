@@ -81,10 +81,12 @@ class CurrentEvents extends Component {
         image64: null,
         urls: [],
         index: -1,
-        hidden: "visible"
+        hidden: "visible",
+        openDelete: false
     }
 
     handleBeginEdit = () => {
+        this.handleClose();
         this.setState({ editing: true });
     };
 
@@ -97,9 +99,8 @@ class CurrentEvents extends Component {
             firebaseStorageRef.child(event["imgid"] + ".jpg").delete();
         }
         let newEvents = this.arrayRemove(this.state.events, this.state.popUpEvent);
-        this.setState({events: newEvents});
-        let newURLs = this.arrayRemove(this.state.urls, this.state.urls[this.state.index]);
-        this.setState({urls: newURLs});
+        this.state.urls.splice(this.state.index, 1);
+        this.setState({ events: newEvents, openDelete: false });
     }
     
     arrayRemove(arr, value) {
@@ -108,6 +109,13 @@ class CurrentEvents extends Component {
         });
      }
      
+    handleDeleteClose = () => {
+        this.setState({ openDelete: false });
+    }
+
+    handleDeleteOpen = () => {
+        this.setState({ openDelete: true });
+    }
 
     handleStopEdit = () => {
         this.setState({ editing: false });
@@ -409,9 +417,27 @@ class CurrentEvents extends Component {
           </DialogContent>
           <DialogActions style={{justifyContent: 'center'}}>
           <MuiThemeProvider theme={redTheme}>
-          <Button variant="contained" onClick={this.handleDelete} color="primary">
+          <Button variant="contained" onClick={this.handleDeleteOpen} color="primary">
               Delete Event
               <DeleteIcon/>
+            </Button>
+            </MuiThemeProvider>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={this.state.openDelete}
+          onClose={this.handleDeleteClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the event?"}</DialogTitle>
+          <DialogActions>
+            <Button onClick={this.handleDeleteClose} color="primary">
+              Cancel
+            </Button>
+            <MuiThemeProvider theme={redTheme}>
+            <Button onClick={this.handleDelete} color="primary" autoFocus>
+              Confirm
             </Button>
             </MuiThemeProvider>
           </DialogActions>
@@ -438,8 +464,7 @@ class CurrentEvents extends Component {
                     </Button>,
                 ]}
                 />
-            </div>
-            
+            </div> 
         );
     }
 }
