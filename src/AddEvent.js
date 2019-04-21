@@ -15,6 +15,14 @@ import { db, storage, Firebase } from './config';
 import Snackbar from '@material-ui/core/Snackbar';  
 import { ImagePicker } from 'react-file-picker'
 import { View, Image } from 'react-native';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
+import Typography from '@material-ui/core/Typography';
+import defaultImage from './default.jpg';
+
+var QRCode = require('qrcode');
 
 const uuidv4 = require('uuid/v4');
 
@@ -40,7 +48,7 @@ class AddEvent extends Component {
         picId: 'default',
         uploading: false,
         message: 'Event Added',
-        image64: null,
+        image64: defaultImage,
     };
 
     handleOpen = () => {
@@ -61,7 +69,7 @@ class AddEvent extends Component {
     // Save image to Firebase
     saveImage(ref, image, imageName, onSuccess, onError) {
         let self = this;
-        if (this.state.image64 != null) {
+        if (this.state.image64 != defaultImage) {
             this.setState({ uploading: true });
             self.displayMessage(self, "Uploading Image...");
             var firebaseStorageRef = storage.ref(ref);
@@ -89,6 +97,9 @@ class AddEvent extends Component {
 
     // Push event to Firebase
     pushEvent(self) {
+        QRCode.toDataURL('I am a pony!', function (err, url) {
+            console.log(url)
+        })
         // Adding leading 0s
         var month = (1 + self.state.date.getMonth()).toString();
         month = month.length > 1 ? month : '0' + month;
@@ -134,8 +145,8 @@ class AddEvent extends Component {
             description: '',
             picId: 'default',
             uploading: false,
-            message: '',
-            image64: null,
+            message: 'Event Added',
+            image64: defaultImage,
         });
     }
 
@@ -145,19 +156,49 @@ class AddEvent extends Component {
         self.handleOpen();
     }
 
+    componentDidMount() {
+        let self = this;
+        QRCode.toDataURL('Event URL', function (err, url) {
+            console.log(url)
+            self.setState({ qr64: url });
+        })
+    }
+
     render() {
+        const { classes } = this.props;
+        const child = [];
+        
+        let date = new Date(this.state.date);
+        var month = (1 + date.getMonth()).toString();
+        month = month.length > 1 ? month : '0' + month;
+        var day = date.getDate().toString();
+        day = day.length > 1 ? day : '0' + day;
+        var hours = date.getHours().toString();
+        hours = hours.length > 1 ? hours : '0' + hours;
+        var minutes = date.getMinutes().toString();
+        minutes = minutes.length > 1 ? minutes : '0' + minutes;
+        let startDate = month + '-' + day + '-' + date.getFullYear() + " " + hours + ":" + minutes;
+        date.setMilliseconds(date.getMilliseconds() + (this.state.duration * 60000));
+        hours = date.getHours().toString();
+        hours = hours.length > 1 ? hours : '0' + hours;
+        minutes = date.getMinutes().toString();
+        minutes = minutes.length > 1 ? minutes : '0' + minutes;
+        let fullDate = startDate + "-" + hours + ":" + minutes;
+        child.push(<ChildComponent key={0} name={this.state.name} date={fullDate} location={'Location: ' + this.state.location} 
+        organization={'Organization: ' + this.state.organization} description={'Description: ' + this.state.description} tags={'Tags: ' + this.state.tags} image={this.state.image64} />);
+        
         return (
             <div>
                 <MuiPickersUtilsProvider utils={MomentUtils}>
                 <Grid container>
-                    <Grid item container direction="column" spacing={8}>
+                    <Grid item container direction="column" spacing={8} style={{width: 200}}>
                         <Grid item>
                             <TextField
                                     label="Event Title"
                                     id="event-name"
                                     margin="normal"
                                     value={this.state.name}
-                                    onChange={e => this.setState({ name: e.target.value })} />                        
+                                    onChange={e => this.setState({ name: e.target.value })} />                 
                         </Grid>
                         <Grid item>
                             <DatePicker
@@ -225,7 +266,6 @@ class AddEvent extends Component {
                                     ))}    
                                 </Select>
                             </FormControl>
-                            <Paper style={{marginLeft: '20px'}}>QR Code</Paper>
                         </Grid>
                         <Grid item>
                             <TextField
@@ -239,7 +279,6 @@ class AddEvent extends Component {
                                 onChange={e => this.setState({ description: e.target.value })}
                                 />
                         </Grid>
-                        <Grid item container direction="row" spacing={16}>
                         <Grid item>
                         <ImagePicker
                             extensions={['jpg', 'jpeg', 'png']}
@@ -261,12 +300,11 @@ class AddEvent extends Component {
                                 Add Event    
                             </Button>
                         </Grid>
-                        <Image
-                            style={{width: 200, height: 200}}
-                            source={{uri: this.state.image64}}
-                            />
-                        </Grid>
                     </Grid>
+                <ParentComponent style={{marginLeft: 50, width: 300, height: 400}}>
+                    {child}
+                </ParentComponent>
+                <Image style={{marginLeft: 50, width: 200, height: 200}} source={{uri: this.state.qr64}}></Image>
                 </Grid>
                 </MuiPickersUtilsProvider>
                 <Snackbar
@@ -297,3 +335,16 @@ class AddEvent extends Component {
 }
 
 export default AddEvent;
+
+const ParentComponent = props => (
+    <div className="card calculator">
+      <Grid container id="children-pane" direction="row" spacing={8}>
+        {props.children}
+      </Grid>
+    </div>
+);
+  
+const ChildComponent = props => <Grid item><Card style={{minHeight: 400, maxHeight: 400, minWidth: 300, maxWidth: 300}}>
+    <CardHeader title={props.name} subheader={props.date}></CardHeader>
+    <CardMedia style = {{ height: 0, paddingTop: '56.25%'}} image={props.image} title={props.name}/><CardContent>
+    <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}</Typography></CardContent></Card></Grid>;

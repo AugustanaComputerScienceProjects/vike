@@ -411,7 +411,6 @@ class CurrentEvents extends Component {
                                 value={this.state.popUpEvent["description"]}
                                 onChange={this.handleDescriptionChange} />
                         </Grid>
-                        <Grid item container direction="row" spacing={16}>
                         <Grid item>
                         <ImagePicker
                             extensions={['jpg', 'jpeg', 'png']}
@@ -430,7 +429,6 @@ class CurrentEvents extends Component {
                             style={{width: 192, height: 108}}
                             source={{uri: this.state.image64}}
                             />
-                        </Grid>
                         </Grid>
                     </Grid>
                 </Grid>
@@ -501,6 +499,6 @@ const ParentComponent = props => (
 const ChildComponent = props => <Grid item><Card style={{minHeight: 400, maxHeight: 400, minWidth: 300, maxWidth: 300}}><CardActionArea onClick={props.editAction}>
     <CardHeader title={props.name} subheader={props.date}></CardHeader>
     <CardMedia style = {{ height: 0, paddingTop: '56.25%'}} image={props.image} title={props.name}/><CardContent>
-    <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.description}<br/>{props.tags}</Typography></CardContent></CardActionArea></Card></Grid>;
+    <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}</Typography></CardContent></CardActionArea></Card></Grid>;
 
 export default CurrentEvents;
