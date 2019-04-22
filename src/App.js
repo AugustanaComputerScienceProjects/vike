@@ -6,8 +6,7 @@ import Events from './AddEvent';
 import CurrentEvents from './CurrentEvents';
 import PastEvents from './PastEvents';
 import Tags from './Tags';
-
-
+import NavBar from "./ButtonAppBar";
 
 
 class App extends Component {
@@ -53,13 +52,14 @@ class App extends Component {
      render() {
          return (
              <div className='fullPage'>
-                 <NavDrawer navChanged={this.onNavChanged} />
-
-                 <div style={{ paddingLeft: "160px" }}>
-                 {this.mainDisplay()}
-
-                   </div>  
-                
+             <div style={{width: "100%"}}>
+                <div style={{height: "10%"}}>
+                <NavBar navChanged={this.onNavChanged}></NavBar>
+                </div>
+                <div style={{ paddingLeft: 20, paddingRight: 20 }}>
+                {this.mainDisplay()}
+                </div>
+            </div>     
              </div>
 
     );

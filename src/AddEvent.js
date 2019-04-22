@@ -188,10 +188,12 @@ class AddEvent extends Component {
         organization={'Organization: ' + this.state.organization} description={'Description: ' + this.state.description} tags={'Tags: ' + this.state.tags} image={this.state.image64} />);
         
         return (
-            <div>
+            <div style={{textAlign: "center"}}>
+            <div style={{display: "inline-block"}}>
                 <MuiPickersUtilsProvider utils={MomentUtils}>
                 <Grid container>
                     <Grid item container direction="column" spacing={8} style={{width: 200}}>
+                        <Grid item><label style={{fontSize: 20}}>Add Event</label></Grid>
                         <Grid item>
                             <TextField
                                     label="Event Title"
@@ -301,10 +303,13 @@ class AddEvent extends Component {
                             </Button>
                         </Grid>
                     </Grid>
-                <ParentComponent style={{marginLeft: 50, width: 300, height: 400}}>
-                    {child}
-                </ParentComponent>
-                <Image style={{marginLeft: 50, width: 200, height: 200}} source={{uri: this.state.qr64}}></Image>
+                    <div style={{marginTop: 50, marginLeft: 50}}>
+                    <label style={{fontSize: 18}}>Preview:</label>
+                    <ParentComponent style={{marginLeft: 50, width: 300, height: 400}}>
+                        {child}
+                    </ParentComponent>
+                    <div style={{marginTop: 20}}><Image style={{width: 200, height: 200}} source={{uri: this.state.qr64}}></Image></div>
+                    </div>
                 </Grid>
                 </MuiPickersUtilsProvider>
                 <Snackbar
@@ -329,6 +334,7 @@ class AddEvent extends Component {
                     </Button>,
                 ]}
                 />
+            </div>
             </div>
         );
     }

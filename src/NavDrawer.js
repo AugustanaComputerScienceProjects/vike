@@ -38,9 +38,13 @@ class NavDrawer extends Component {
     render() {
         return (
             <Drawer
-                className="navDrawer"
-                variant="permanent"
+                open={this.props.drawerOpened}
+                onClose={this.props.toggleDrawer(false)}
                 anchor="left">
+                <div
+          onClick={this.props.toggleDrawer(false)}
+          onKeyDown={this.props.toggleDrawer(false)}
+        >
                 <MenuList>
                     <MenuItem name="Add Event" onClick={this.eventClicked}>Add Event</MenuItem>
                     <MenuItem name="CurrentEvents" onClick={this.currentClicked}>Current Events</MenuItem>
@@ -48,6 +52,7 @@ class NavDrawer extends Component {
                     <MenuItem name="Tags" onClick={this.tagsClicked}>Tags/Groups</MenuItem>
 
                 </MenuList>
+                </div>
             </Drawer>
 
 
