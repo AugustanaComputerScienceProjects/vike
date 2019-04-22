@@ -19,7 +19,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import Typography from '@material-ui/core/Typography';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
-import { db, storage, Firebase } from './config';
+import firebase from './config';
 import { CardActionArea } from '@material-ui/core';
 import {MuiPickersUtilsProvider, TimePicker, DatePicker} from 'material-ui-pickers';
 import MomentUtils from '@date-io/moment';
@@ -94,8 +94,8 @@ class CurrentEvents extends Component {
     handleDelete = () => {
         this.setState({ editing: false });
         let event = this.state.popUpEvent;
-        db.ref('/current-events').child(event["key"]).remove();
-        var firebaseStorageRef = storage.ref("Images");
+        firebase.database.ref('/current-events').child(event["key"]).remove();
+        var firebaseStorageRef = firebase.storage.ref("Images");
         if (event["imgid"] != "default") {
             firebaseStorageRef.child(event["imgid"] + ".jpg").delete();
         }
@@ -125,7 +125,7 @@ class CurrentEvents extends Component {
         if (this.state.image64 != this.state.image64Old) {
             this.setState({ uploading: true });
             self.displayMessage(self, "Uploading Image...");
-            var firebaseStorageRef = storage.ref("Images");
+            var firebaseStorageRef = firebase.storage.ref("Images");
             const id = uuidv4();
             const imageRef = firebaseStorageRef.child(id + ".jpg");
             const oldId = event["imgid"];
@@ -155,7 +155,7 @@ class CurrentEvents extends Component {
     };
 
     pushEvent(self, event) {
-        db.ref('/current-events').child(event["key"]).set({
+        firebase.database.ref('/current-events').child(event["key"]).set({
             name: event["name"],
             startDate: event["startDate"],
             duration: parseInt(event["duration"]),
@@ -190,12 +190,12 @@ class CurrentEvents extends Component {
         let self = this;
         let listEvents = [];
         let listURLS = [];
-        db.ref('/current-events').on('value', function(snapshot) {
+        firebase.database.ref('/current-events').on('value', function(snapshot) {
             listEvents = [];
             listURLS = [];
             let index = 0;
             snapshot.forEach(function(childSnapshot) {
-                storage.ref('Images').child(childSnapshot.child('imgid').val() + '.jpg').getDownloadURL().then((url) => {
+                firebase.storage.ref('Images').child(childSnapshot.child('imgid').val() + '.jpg').getDownloadURL().then((url) => {
                     index = index + 1;
                     let event = childSnapshot.val();
                     event["key"] = childSnapshot.key;

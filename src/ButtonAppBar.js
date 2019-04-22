@@ -8,6 +8,7 @@ import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import Drawer from "@material-ui/core/Drawer";
 import NavDrawer from "./NavDrawer";
+import firebase from "./config";
 
 class NavBar extends React.Component {
   constructor(props) {
@@ -43,7 +44,7 @@ class NavBar extends React.Component {
             <Typography variant="h6" color="inherit">
               Augustana Events
             </Typography>
-            <Button color="inherit" style={{marginLeft: "auto"}}>Login</Button>
+            <Button color="inherit" style={{marginLeft: "auto"}} onClick={firebase.signIn} >Sign In</Button>
           </Toolbar>
         </AppBar>
 

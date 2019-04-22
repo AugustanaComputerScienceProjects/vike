@@ -11,7 +11,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
-import { db, storage, Firebase } from './config';
+import firebase from './config';
 import Snackbar from '@material-ui/core/Snackbar';  
 import { ImagePicker } from 'react-file-picker'
 import { View, Image } from 'react-native';
@@ -72,7 +72,7 @@ class AddEvent extends Component {
         if (this.state.image64 != defaultImage) {
             this.setState({ uploading: true });
             self.displayMessage(self, "Uploading Image...");
-            var firebaseStorageRef = storage.ref(ref);
+            var firebaseStorageRef = firebase.storage.ref(ref);
             const id = uuidv4();
             const imageRef = firebaseStorageRef.child(id + ".jpg");
             this.setState({ picId: id }); 
@@ -109,7 +109,7 @@ class AddEvent extends Component {
         hours = hours.length > 1 ? hours : '0' + hours;
         var minutes = self.state.date.getMinutes().toString();
         minutes = minutes.length > 1 ? minutes : '0' + minutes;
-        db.ref('/current-events').push({
+        firebase.database.ref('/current-events').push({
             name: self.state.name,
             startDate: month + '-' + day + '-' + self.state.date.getFullYear() + " " + hours + ":" + minutes,
             duration: self.state.duration,
