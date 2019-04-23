@@ -2,7 +2,7 @@ import React, { Component, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import NavDrawer from './NavDrawer';
-import Events from './Events';
+import AddEvent from './AddEvent';
 import PastEvents from './PastEvents';
 import Tags from './Tags';
 import { Grid } from '@material-ui/core';
