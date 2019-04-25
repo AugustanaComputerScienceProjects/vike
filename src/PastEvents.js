@@ -10,6 +10,10 @@ import MenuList from '@material-ui/core/MenuList';
 import Typography from '@material-ui/core/Typography';
 import PastEvent from './PastEvent';
 import PastEventObj from './PastEventObj';
+import { MuiPickersUtilsProvider, TimePicker, DatePicker } from 'material-ui-pickers';
+
+
+
 
 class PastEvents extends Component {
 
@@ -20,10 +24,18 @@ class PastEvents extends Component {
             sortDate2: "2017-05-24",
             displayedEvents: [new PastEventObj("title1", "2017-05-24", 1, 2, 3, 4, 5), new PastEventObj("title2", "2017-05-24", 1, 2, 3, 4, 5), new PastEventObj("title3", "2017-05-24", 1, 2, 3, 4, 5)]
         }
-
+        this.handleDate1Change = this.handleDate1Change.bind(this);
+        this.handleDate2Change = this.handleDate2Change.bind(this);
     }
-    //TODO update to date pickers and add onchanged stuff
+    //TODO hook up do firebase and alter display based on dates
 
+    handleDate1Change = event => {
+        this.setState({ sortDate1: event.target.value });
+    };
+
+    handleDate2Change = event => {
+        this.setState({ sortDate2: event.target.value });
+    };
 
     render() {
         return (
@@ -34,8 +46,10 @@ class PastEvents extends Component {
 
                     <Grid container direction="row" justify="center" alignItems="flex-start" >
                         <Grid item>
-                            <TextField type="date" defaultValue={this.state.sortDate1}> </TextField>
-                        </Grid>
+
+                            <TextField type="date" defaultValue={this.state.sortDate1} onChange={this.handleDate1Change}>  </TextField>
+                         </Grid>
+                  
 
                         <Grid item>
 
@@ -46,14 +60,10 @@ class PastEvents extends Component {
                         </Grid>
 
                         <Grid item>
-                            <TextField type="date" defaultValue={this.state.sortDate2}>
+                            <TextField type="date" defaultValue={this.state.sortDate2} onChange={this.handleDate2Change}>
 
                             </TextField>
                         </Grid>
-
-
-
-
                     </Grid>
 
 
@@ -63,8 +73,7 @@ class PastEvents extends Component {
 
                 </Grid>
 
-                {this.state.sortDate1}
-                {this.state.sortDate2}
+               
             </div>
 
 
