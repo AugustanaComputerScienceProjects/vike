@@ -158,7 +158,7 @@ class AddEvent extends Component {
 
     componentDidMount() {
         let self = this;
-        QRCode.toDataURL('Event URL', function (err, url) {
+        QRCode.toDataURL('https://osl-events-app.firebaseapp.com/', function (err, url) {
             console.log(url)
             self.setState({ qr64: url });
         })
