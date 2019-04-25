@@ -11,6 +11,11 @@ import Typography from '@material-ui/core/Typography';
 import PastEvent from './PastEvent';
 import PastEventObj from './PastEventObj';
 import { MuiPickersUtilsProvider, TimePicker, DatePicker } from 'material-ui-pickers';
+import MomentUtils from '@date-io/moment';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
 
 
 
@@ -44,36 +49,48 @@ class PastEvents extends Component {
 
                 <Grid container direction="column" justify="center" alignItems="center" >
 
-                    <Grid container direction="row" justify="center" alignItems="flex-start" >
-                        <Grid item>
+                    <MuiPickersUtilsProvider utils={MomentUtils}>
+                        <Grid container direction="row" justify="center" alignItems="flex-start" >
+                            <Grid item>
 
-                            <TextField type="date" defaultValue={this.state.sortDate1} onChange={this.handleDate1Change}>  </TextField>
-                         </Grid>
-                  
+                                <DatePicker
+                                    margin="normal"
+                                    label="Start Date"
+                                    value={this.state.sortDate1}
+                                    onChange={this.handleDate1Change}
+                                />                         </Grid>
 
-                        <Grid item>
 
-                            <Typography variant="subtitle1" style={{ padding: "3px" }}>
-                                To
+                            <Grid item>
+
+                                <Typography variant="subtitle1" style={{ padding: "30px" }}>
+                                    To
                         </Typography>
 
+                            </Grid>
+
+                            <Grid item>
+                            <DatePicker
+                                    margin="normal"
+                                    label="Start Date"
+                                    value={this.state.sortDate2}
+                                    onChange={this.handleDate2Change}
+                                />      
+                            </Grid>
                         </Grid>
 
-                        <Grid item>
-                            <TextField type="date" defaultValue={this.state.sortDate2} onChange={this.handleDate2Change}>
-
-                            </TextField>
-                        </Grid>
-                    </Grid>
-
+                    </MuiPickersUtilsProvider>
 
                     {this.state.displayedEvents.map(e => (
+                        <Card style={{margin : "10px", padding : "4px"}}>
                         <PastEvent parentEvent={e} />
+
+                        </Card>
                     ))}
 
                 </Grid>
 
-               
+
             </div>
 
 

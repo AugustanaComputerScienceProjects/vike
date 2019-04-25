@@ -26,12 +26,12 @@ class PastEvent extends Component {
 
     render() {
         return (
-            <div className='fullPage' style={{ width: "300px"}}>
+            <div className='fullPage' style={{ width: "400px"}}>
 
                 <Grid container direction="column" style={{margin : "10px"}}>
 
-                    <Typography variant="subtitle1">
-                        {this.state.parentEvent.getTitle()} - {this.state.parentEvent.getDate()}
+                    <Typography variant="h6">
+                        {this.state.parentEvent.getTitle()} : {this.state.parentEvent.getDate()}
                     </Typography>
 
                     <Grid container item direction="column" direction="row"
@@ -40,18 +40,13 @@ class PastEvent extends Component {
 
                         <Grid item>
                         
-                        <Typography variant="subtitle2">
+                        <Typography variant="subtitle1">
                                     Total Attendence : {this.state.parentEvent.getAttend()}
                                 </Typography>
                         
                         </Grid>
 
-                        <Grid item>
-                        <Typography varient="subtitle1">
-                                        Number Freshman : {this.state.parentEvent.getFresh()}
-                                    </Typography>
                         
-                        </Grid>
     
     
     
@@ -61,20 +56,21 @@ class PastEvent extends Component {
                     <Grid container item direction="column" direction="row"
                         justify="space-between"
                         alignItems="flex-start">
+                        <Grid item>
+                        <Typography variant="subtitle2">
+                                        Number Freshman : {this.state.parentEvent.getFresh()}
+                                    </Typography>
+                        
+                        </Grid>
 
                         <Grid item>
-                        <Typography varient="subtitle1">
+                        <Typography variant="subtitle2">
                                     Number Sophmores : {this.state.parentEvent.getSoph()}
                                 </Typography>
                         
                         </Grid>
 
-                        <Grid item>
-                        <Typography varient="subtitle1">
-                                    Number Juniors : {this.state.parentEvent.getJun()}
-                                </Typography>
-                        
-                        </Grid>
+                       
     
     
     
@@ -85,11 +81,18 @@ class PastEvent extends Component {
                         alignItems="flex-start">
 
                         <Grid item>
-                        <Typography varient="subtitle1">
+                        <Typography variant="subtitle2">
+                                    Number Juniors : {this.state.parentEvent.getJun()}
+                                </Typography>
+                        
+                        </Grid>
+                        <Typography variant="subtitle2">
                                     Number Seniors : {this.state.parentEvent.getSen()}
                                 </Typography>
                         
                         </Grid>
+                        <Grid item>
+                        
 
     
     
