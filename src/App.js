@@ -56,7 +56,7 @@ class App extends Component {
                 <div style={{height: "10%"}}>
                 <NavBar navChanged={this.onNavChanged}></NavBar>
                 </div>
-                <div style={{ paddingLeft: 20, paddingRight: 20 }}>
+                <div style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 20 }}>
                 {this.mainDisplay()}
                 </div>
             </div>     

@@ -190,25 +190,30 @@ class CurrentEvents extends Component {
         let self = this;
         let listEvents = [];
         let listURLS = [];
-        firebase.database.ref('/current-events').on('value', function(snapshot) {
+        firebase.database.ref('/current-events').orderByChild('name').on('value', function(snapshot) {
             listEvents = [];
-            listURLS = [];
-            let index = 0;
+            listURLS = self.state.urls;
+            let index = -1;
             snapshot.forEach(function(childSnapshot) {
-                firebase.storage.ref('Images').child(childSnapshot.child('imgid').val() + '.jpg').getDownloadURL().then((url) => {
-                    index = index + 1;
-                    let event = childSnapshot.val();
-                    event["key"] = childSnapshot.key;
-                    listEvents.push(event);
-                    listURLS.push(url);
-                    if (snapshot.numChildren() == index) {
-                        self.setState({ events: listEvents, urls: listURLS, hidden: "hidden" });
-                    }
-                  }).catch((error) => {
-                    // Handle any errors
-                  })
+                let event = childSnapshot.val();
+                event["key"] = childSnapshot.key;
+                listEvents.push(event);
+                index = index + 1;
+                self.getImage(self, index, snapshot, childSnapshot, listEvents, listURLS);
             });
         });
+    }
+
+    getImage(self, index, snapshot, childSnapshot, listEvents, listURLS) {
+        firebase.storage.ref('Images').child(childSnapshot.child('imgid').val() + '.jpg').getDownloadURL().then((url) => {    
+            listURLS[index] = url;
+            console.log(index);
+            if (snapshot.numChildren() == listURLS.length) {
+                self.setState({ events: listEvents, urls: listURLS, hidden: "hidden" });
+            }
+          }).catch((error) => {
+            // Handle any errors
+          });
     }
 
     componentDidMount() {
@@ -278,7 +283,6 @@ class CurrentEvents extends Component {
         let arr2 = arr[0].split('-');
         let arr3 = arr[1].split(':');
         let date = new Date(arr2[2] + '-' + arr2[0] + '-' + arr2[1] + 'T' + arr3[0] + ':' + arr3[1] + '-05:00');
-        console.log(date);
         return date;
     }
 
@@ -306,7 +310,7 @@ class CurrentEvents extends Component {
             minutes = minutes.length > 1 ? minutes : '0' + minutes;
             let fullDate = startDate + "-" + hours + ":" + minutes;
             children.push(<ChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
-            organization={'Organization: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[i]}
+            organization={'Organization: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
             editAction={() => this.editAction(event, index)} />);
         };
 

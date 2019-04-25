@@ -112,7 +112,7 @@ class AddEvent extends Component {
         firebase.database.ref('/current-events').push({
             name: self.state.name,
             startDate: month + '-' + day + '-' + self.state.date.getFullYear() + " " + hours + ":" + minutes,
-            duration: self.state.duration,
+            duration: parseInt(self.state.duration),
             location: self.state.location,
             organization: self.state.organization,
             imgid: self.state.picId,
