@@ -9,6 +9,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 import Drawer from "@material-ui/core/Drawer";
 import NavDrawer from "./NavDrawer";
 import firebase from "./config";
+import Grid from "@material-ui/core/Grid";
 
 class NavBar extends React.Component {
   constructor(props) {
@@ -19,7 +20,8 @@ class NavBar extends React.Component {
       selected: "Add Event",
       btnText: "Sign In",
       signedIn: false,
-      title: "Augustana Events - Home"
+      title: "Augustana Events - Home",
+      userText: ""
     };
   }
 
@@ -43,12 +45,30 @@ class NavBar extends React.Component {
     }
   }
 
+  checkRole(user, role) {
+    let self = this;
+    firebase.database.ref(role).once('value').then(function(snapshot) {
+        if (snapshot.hasChild(user.email.replace('.', ','))) {
+            if (role === 'admin') {
+                self.setState({ adminSignedIn: true, userText: user.email + " (Admin)" });
+            } else if (role === 'leaders') {
+                self.setState({ leaderSignedIn: true, userText: user.email + " (Leader)" });
+            }
+        }
+      });
+}
+
   componentWillMount() {
     firebase.auth.onAuthStateChanged((user) => {
       if (user) {
+        this.checkRole(user, 'admin');
+        this.checkRole(user, 'leaders');
         this.setState({ btnText: "Sign Out", signedIn: true });
+        if (!this.state.adminSignedIn && !this.state.leaderSignedIn) {
+          this.setState({ userText: user.email + " (No Access)" });
+        }
       } else {
-        this.setState({ btnText: "Sign In", signedIn: false });  
+        this.setState({ btnText: "Sign In", signedIn: false, userText: "" });  
       }
     });
   }
@@ -65,10 +85,21 @@ class NavBar extends React.Component {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" color="inherit">
+            <Grid
+      justify="space-between" // Add it here :)
+      container 
+      spacing={24}>
+      <Grid item><Typography variant="h6" color="inherit">
               {this.state.title}
-            </Typography>
-            <Button color="inherit" style={{marginLeft: "auto"}} onClick={this.signInAction}>{this.state.btnText}</Button>
+            </Typography></Grid>
+      <Grid item style={{marginRight: 10, marginTop: 5}}>
+        <Typography variant="h7" color="inherit">
+          {this.state.userText}
+        </Typography>
+      </Grid>
+    </Grid>
+    <Button color="inherit" onClick={this.signInAction} style={{width: 100}}>{this.state.btnText}</Button>
+            
           </Toolbar>
         </AppBar>
 
