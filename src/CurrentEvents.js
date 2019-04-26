@@ -88,6 +88,7 @@ class CurrentEvents extends Component {
         openDelete: false,
         isInitial: true
     }
+    listener = null;
 
     handleBeginEdit = () => {
         this.handleClose();
@@ -199,7 +200,8 @@ class CurrentEvents extends Component {
         let self = this;
         let listEvents = [];
         let listURLS = [];
-        firebase.database.ref('/current-events').orderByChild('name').on('value', function(snapshot) {
+        this.listener = firebase.database.ref('/current-events').orderByChild('name');
+        this.listener.on('value', function(snapshot) {
             listEvents = [];
             listURLS = self.state.urls;
             let index = -1;
@@ -231,6 +233,10 @@ class CurrentEvents extends Component {
 
     componentDidMount() {
         this.readCurrentEvents();
+    }
+
+    componentWillUnmount() {
+        this.listener.off();
     }
 
     editAction(event, i) { 

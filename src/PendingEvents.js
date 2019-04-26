@@ -90,6 +90,7 @@ class PendingEvents extends Component {
         confirmBtn: "Accept Event",
         isInitial: true
     }
+    listener = null;
 
     handleBeginEdit = () => {
         this.handleClose();
@@ -218,7 +219,8 @@ class PendingEvents extends Component {
         let self = this;
         let listEvents = [];
         let listURLS = [];
-        firebase.database.ref('/pending-events').orderByKey().on('value', function(snapshot) {
+        this.listener = firebase.database.ref('/pending-events').orderByKey();
+        this.listener.on('value', function(snapshot) {
             listEvents = [];
             listURLS = self.state.urls;
             let index = -1;
@@ -250,7 +252,8 @@ class PendingEvents extends Component {
         let self = this;
         let listEvents = [];
         let listURLS = [];
-        firebase.database.ref(ref).orderByChild('name').on('value', function(snapshot) {
+        this.listener = firebase.database.ref(ref).orderByChild('name');
+        this.listener.on('value', function(snapshot) {
             listEvents = [];
             listURLS = self.state.urls;
             let index = -1;
@@ -373,6 +376,10 @@ class PendingEvents extends Component {
             this.setState({ adminSignedIn: false });  
           }
         });
+    }
+
+    componentWillUnmount() {
+        this.listener.off();
     }
 
     render() {
