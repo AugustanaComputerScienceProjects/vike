@@ -3,6 +3,7 @@ import app from 'firebase/app';
 import 'firebase/database';
 import 'firebase/storage';
 import 'firebase/auth';
+
 let config = {
     apiKey: "AIzaSyBFTh3ZprCrzReAlVDeGcNN8WzijuDU6DI",
     authDomain: "osl-events-app.firebaseapp.com",
@@ -18,7 +19,7 @@ class Firebase {
       this.database = app.database();
       this.storage = app.storage();
       this.auth = app.auth();
-      this.signedIn = false;
+      this.adminSignedIn = false;
     }
 
     signIn = () => {
@@ -29,7 +30,8 @@ class Firebase {
             // The signed-in user info.
             var user = result.user;
             // ...
-            this.signedIn = true;
+            this.adminSignedIn = true;
+            console.log(user.email);
           }).catch(function(error) {
             // Handle Errors here.
             var errorCode = error.code;
@@ -42,7 +44,7 @@ class Firebase {
           });
     }
 
-    doSignOut = () => this.auth.signOut();
+    signOut = () => this.auth.signOut();
 }
 
 const firebase = new Firebase();

@@ -16,9 +16,12 @@ class NavBar extends React.Component {
     this.onNavChanged = this.onNavChanged.bind(this);
     this.state = {
       drawerOpened: false,
-      selected: "Add Event"
+      selected: "Add Event",
+      btnText: "Sign In",
+      signedIn: false
     };
   }
+
   toggleDrawer = booleanValue => () => {
     this.setState({
       drawerOpened: booleanValue
@@ -27,7 +30,25 @@ class NavBar extends React.Component {
 
   onNavChanged(page) {
     this.props.navChanged(page);
-}
+  }
+
+  signInAction = () => {
+    if (!this.state.signedIn) {
+      firebase.signIn();
+    } else {
+      firebase.signOut();
+    }
+  }
+
+  componentWillMount() {
+    firebase.auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.setState({ btnText: "Sign Out", signedIn: true });
+      } else {
+        this.setState({ btnText: "Sign In", signedIn: false });  
+      }
+    });
+  }
 
   render() {
     return (
@@ -44,7 +65,7 @@ class NavBar extends React.Component {
             <Typography variant="h6" color="inherit">
               Augustana Events
             </Typography>
-            <Button color="inherit" style={{marginLeft: "auto"}} onClick={firebase.signIn} >Sign In</Button>
+            <Button color="inherit" style={{marginLeft: "auto"}} onClick={this.signInAction}>{this.state.btnText}</Button>
           </Toolbar>
         </AppBar>
 

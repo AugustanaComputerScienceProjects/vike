@@ -2,6 +2,7 @@ import React, { Component, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import NavDrawer from './NavDrawer';
+import Home from './Home';
 import Events from './AddEvent';
 import CurrentEvents from './CurrentEvents';
 import PastEvents from './PastEvents';
@@ -13,7 +14,7 @@ class App extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { selected: "Add Event" }
+        this.state = { selected: "Home" }
         
         this.onNavChanged = this.onNavChanged.bind(this);
         this.mainDisplay = this.mainDisplay.bind(this);
@@ -21,6 +22,12 @@ class App extends Component {
     }
 
     mainDisplay() {
+        if (this.state.selected == "Home") {
+            return (
+                <Home />
+            );
+        }
+
         if (this.state.selected == "Add Event") {
             return (
                 <Events />
