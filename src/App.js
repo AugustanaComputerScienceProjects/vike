@@ -4,6 +4,7 @@ import './App.css';
 import NavDrawer from './NavDrawer';
 import Home from './Home';
 import Events from './AddEvent';
+import PendingEvents from './PendingEvents';
 import CurrentEvents from './CurrentEvents';
 import PastEvents from './PastEvents';
 import Tags from './Tags';
@@ -31,6 +32,12 @@ class App extends Component {
         if (this.state.selected == "Add Event") {
             return (
                 <Events />
+            );
+        }
+
+        if (this.state.selected == "Pending Events") {
+            return  (
+                <PendingEvents />
             );
         }
 

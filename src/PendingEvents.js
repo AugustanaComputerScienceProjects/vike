@@ -69,7 +69,7 @@ function getModalStyle() {
     },
   });
 
-class CurrentEvents extends Component {
+class PendingEvents extends Component {
 
     state = {
         events: [],
@@ -86,6 +86,8 @@ class CurrentEvents extends Component {
         index: -1,
         hidden: "visible",
         openDelete: false,
+        cancelBtn: "Delete Event",
+        confirmBtn: "Accept Event",
         isInitial: true
     }
 
@@ -96,8 +98,16 @@ class CurrentEvents extends Component {
 
     handleDelete = () => {
         this.setState({ editing: false });
+        if (this.state.adminSignedIn) {
+            this.deleteEvent('/pending-events/' + this.state.popUpEvent["userKey"]);
+        } else if (this.state.leaderSignedIn) {
+            this.deleteEvent('/pending-events/' + this.state.uid);
+        }
+    }
+    
+    deleteEvent(ref) {
         let event = this.state.popUpEvent;
-        firebase.database.ref('/current-events').child(event["key"]).remove();
+        firebase.database.ref(ref).child(event["key"]).remove();
         var firebaseStorageRef = firebase.storage.ref("Images");
         if (event["imgid"] != "default") {
             firebaseStorageRef.child(event["imgid"] + ".jpg").delete();
@@ -106,7 +116,7 @@ class CurrentEvents extends Component {
         this.state.urls.splice(this.state.index, 1);
         this.setState({ events: newEvents, openDelete: false });
     }
-    
+
     arrayRemove(arr, value) {
         return arr.filter(function(ele){
             return ele != value;
@@ -144,7 +154,7 @@ class CurrentEvents extends Component {
                 let images = self.state.urls;
                 images[self.state.index] = url;
                 self.setState({urls: images});
-                self.pushEvent(self, event);
+                self.submitAction(self, event);
                 if (oldId != "default") {
                     firebaseStorageRef.child(oldId + ".jpg").delete();
                 }
@@ -153,9 +163,18 @@ class CurrentEvents extends Component {
                 self.displayMessage(self, "Error Uploading Image");
             });
         } else {
-            self.pushEvent(self, event);
+            self.submitAction(self, event);
         }
     };
+
+    submitAction(self, event) {
+        if (self.state.adminSignedIn) {
+            self.pushEvent(self, event, '/current-events', "Event Moved to Current Events");
+            self.deleteEvent('/pending-events/' + self.state.popUpEvent["userKey"]);
+        } else if (self.state.leaderSignedIn) {
+            self.pushEvent(self, event, '/pending-events/' + self.state.uid, "Event Updated");
+        }
+    }
 
     handleCloseEdit = () => {
         let revertEvents = this.state.events;
@@ -163,8 +182,8 @@ class CurrentEvents extends Component {
         this.setState({ editing: false, events: revertEvents });
     }
 
-    pushEvent(self, event) {
-        firebase.database.ref('/current-events').child(event["key"]).set({
+    pushEvent(self, event, ref, message) {
+        firebase.database.ref(ref).child(event["key"]).set({
             name: event["name"],
             startDate: event["startDate"],
             duration: parseInt(event["duration"]),
@@ -175,7 +194,7 @@ class CurrentEvents extends Component {
             tags: event["tags"],
         });
         self.setState({ uploading: false });
-        self.displayMessage(self, "Event Updated");
+        self.displayMessage(self, message);
     }
 
     displayMessage(self, message) {
@@ -195,20 +214,30 @@ class CurrentEvents extends Component {
         this.setState({ open: false });
     };
 
-    readCurrentEvents() {
+    readAllPendingEvents() {
         let self = this;
         let listEvents = [];
         let listURLS = [];
-        firebase.database.ref('/current-events').orderByChild('name').on('value', function(snapshot) {
+        firebase.database.ref('/pending-events').orderByKey().on('value', function(snapshot) {
             listEvents = [];
             listURLS = self.state.urls;
             let index = -1;
-            snapshot.forEach(function(childSnapshot) {
-                let event = childSnapshot.val();
-                event["key"] = childSnapshot.key;
-                listEvents.push(event);
-                index = index + 1;
-                self.getImage(self, index, snapshot, childSnapshot, listEvents, listURLS);
+            let total = 0;
+            snapshot.forEach(function(child) {
+                child.forEach(function(childSnapshot) {
+                    total = total + 1;
+                });
+            });
+            console.log(total);
+            snapshot.forEach(function(child) {
+                child.forEach(function(childSnapshot) {
+                    let event = childSnapshot.val();
+                    event["key"] = childSnapshot.key;
+                    event["userKey"] = child.key;
+                    listEvents.push(event);
+                    index = index + 1;
+                    self.getImage(self, index, child, childSnapshot, listEvents, listURLS, total);
+                });
             });
             if (snapshot.numChildren() === 0 && self.state.isInitial) {
                 self.setState({ hidden: "hidden", message: "No Events Found", open: true })
@@ -217,20 +246,38 @@ class CurrentEvents extends Component {
         });
     }
 
-    getImage(self, index, snapshot, childSnapshot, listEvents, listURLS) {
+    readPendingEvents(ref) {
+        let self = this;
+        let listEvents = [];
+        let listURLS = [];
+        firebase.database.ref(ref).orderByChild('name').on('value', function(snapshot) {
+            listEvents = [];
+            listURLS = self.state.urls;
+            let index = -1;
+            snapshot.forEach(function(childSnapshot) {
+                let event = childSnapshot.val();
+                event["key"] = childSnapshot.key;
+                listEvents.push(event);
+                index = index + 1;
+                self.getImage(self, index, snapshot, childSnapshot, listEvents, listURLS, snapshot.numChildren());
+            });
+            if (snapshot.numChildren() === 0 && self.state.isInitial) {
+                self.setState({ hidden: "hidden", message: "No Events Found", open: true })
+            }
+            self.setState({ isInitial: false });
+        });
+    }
+
+    getImage(self, index, snapshot, childSnapshot, listEvents, listURLS, endLength) {
         firebase.storage.ref('Images').child(childSnapshot.child('imgid').val() + '.jpg').getDownloadURL().then((url) => {    
             listURLS[index] = url;
             console.log(index);
-            if (snapshot.numChildren() == listURLS.length) {
+            if (endLength == listURLS.length) {
                 self.setState({ events: listEvents, urls: listURLS, hidden: "hidden" });
             }
           }).catch((error) => {
             // Handle any errors
           });
-    }
-
-    componentDidMount() {
-        this.readCurrentEvents();
     }
 
     editAction(event, i) { 
@@ -300,6 +347,32 @@ class CurrentEvents extends Component {
         let arr3 = arr[1].split(':');
         let date = new Date(arr2[2] + '-' + arr2[0] + '-' + arr2[1] + 'T' + arr3[0] + ':' + arr3[1] + '-05:00');
         return date;
+    }
+
+    checkRole(user, role) {
+        let self = this;
+        firebase.database.ref(role).once('value').then(function(snapshot) {
+            if (snapshot.hasChild(user.email.replace('.', ','))) {
+                if (role === 'admin') {
+                    self.setState({ adminSignedIn: true, uid: user.uid });
+                    self.readAllPendingEvents();
+                } else if (role === 'leaders') {
+                    self.setState({ leaderSignedIn: true, cancelBtn: "Delete Event", confirmBtn: "Save Changes", uid: user.uid });
+                    self.readPendingEvents('/pending-events/' + user.uid);
+                }
+            }
+          });
+    }
+
+    componentWillMount() {
+        firebase.auth.onAuthStateChanged((user) => {
+          if (user) {
+              this.checkRole(user, 'admin');
+              this.checkRole(user, 'leaders');
+          } else {
+            this.setState({ adminSignedIn: false });  
+          }
+        });
     }
 
     render() {
@@ -456,12 +529,12 @@ class CurrentEvents extends Component {
           <DialogActions style={{justifyContent: 'center'}}>
           <MuiThemeProvider theme={redTheme}>
           <Button variant="contained" onClick={this.handleDeleteOpen} color="primary">
-              Delete Event
+              {this.state.cancelBtn}
               <DeleteIcon/>
             </Button>
             </MuiThemeProvider>
           <Button variant="contained" onClick={this.handleSaveEdit} color="primary">
-              Save Changes
+              {this.state.confirmBtn}
               <SaveIcon/>
             </Button>
           </DialogActions>
@@ -524,4 +597,4 @@ const ChildComponent = props => <Grid item><Card style={{minHeight: 400, maxHeig
     <CardMedia style = {{ height: 0, paddingTop: '56.25%'}} image={props.image} title={props.name}/><CardContent>
     <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}</Typography></CardContent></CardActionArea></Card></Grid>;
 
-export default CurrentEvents;
+export default PendingEvents;

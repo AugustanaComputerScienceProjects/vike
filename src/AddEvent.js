@@ -49,6 +49,8 @@ class AddEvent extends Component {
         uploading: false,
         message: 'Event Added',
         image64: defaultImage,
+        submitBtnText: "Request Event",
+        uid: "",
     };
 
     handleOpen = () => {
@@ -85,18 +87,27 @@ class AddEvent extends Component {
                 return imageRef.getDownloadURL();
             }).then(function(url){
                 console.log(url);
-                self.pushEvent(self);
+                self.submitEvent(self);
             }).catch(function(error){
                 console.log(error);
                 self.displayMessage(self, "Error Uploading Image");
             });
         } else {
-            self.pushEvent(self);
+            self.submitEvent(self);
+        }
+    }
+
+    // Check authorization and add to Firebase 
+    submitEvent(self) {
+        if (self.state.adminSignedIn) {
+            self.pushEvent(self, '/current-events', "Event Added");
+        } else if (self.state.leaderSignedIn) {
+            self.pushEvent(self, '/pending-events/' + self.state.uid, "Event Requested");
         }
     }
 
     // Push event to Firebase
-    pushEvent(self) {
+    pushEvent(self, ref, message) {
         QRCode.toDataURL('I am a pony!', function (err, url) {
             console.log(url)
         })
@@ -109,7 +120,7 @@ class AddEvent extends Component {
         hours = hours.length > 1 ? hours : '0' + hours;
         var minutes = self.state.date.getMinutes().toString();
         minutes = minutes.length > 1 ? minutes : '0' + minutes;
-        firebase.database.ref('/current-events').push({
+        firebase.database.ref(ref).push({
             name: self.state.name,
             startDate: month + '-' + day + '-' + self.state.date.getFullYear() + " " + hours + ":" + minutes,
             duration: parseInt(self.state.duration),
@@ -121,7 +132,7 @@ class AddEvent extends Component {
         });
         self.resetState(self);
         self.setState({ uploading: false });
-        self.displayMessage(self, "Event Added");
+        self.displayMessage(self, message);
     }
 
     submitAction = event => {
@@ -162,6 +173,30 @@ class AddEvent extends Component {
             console.log(url)
             self.setState({ qr64: url });
         })
+    }
+
+    checkRole(user, role) {
+        let self = this;
+        firebase.database.ref(role).once('value').then(function(snapshot) {
+            if (snapshot.hasChild(user.email.replace('.', ','))) {
+                if (role === 'admin') {
+                    self.setState({ adminSignedIn: true, submitBtnText: "Add Event", uid: user.uid });
+                } else if (role === 'leaders') {
+                    self.setState({ leaderSignedIn: true, submitBtnText: "Request Event", uid: user.uid });
+                }
+            }
+          });
+    }
+
+    componentWillMount() {
+        firebase.auth.onAuthStateChanged((user) => {
+          if (user) {
+              this.checkRole(user, 'admin');
+              this.checkRole(user, 'leaders');
+          } else {
+            this.setState({ adminSignedIn: false });  
+          }
+        });
     }
 
     render() {
@@ -247,7 +282,7 @@ class AddEvent extends Component {
                                 />
                         </Grid>
                         <Grid item container direction="row">
-                            <FormControl className="selects">
+                            <FormControl>
                                 <InputLabel htmlFor="select-multiple">Tags</InputLabel>
                                 <Select
                                     multiple
@@ -289,17 +324,15 @@ class AddEvent extends Component {
                             maxSize={10}
                             onError={errMsg => this.displayMessage(this, errMsg)} >
                             <Button variant="contained"
-                                className="get-image"
                                 disabled={this.state.uploading}>
                                 Select Image    
                             </Button>
                             </ImagePicker>
                             <Button variant="contained"
                                 color="primary"
-                                className="create-event"
                                 disabled={this.state.uploading}
                                 onClick={this.submitAction}>
-                                Add Event    
+                                {this.state.submitBtnText}    
                             </Button>
                         </Grid>
                     </Grid>
@@ -343,7 +376,7 @@ class AddEvent extends Component {
 export default AddEvent;
 
 const ParentComponent = props => (
-    <div className="card calculator">
+    <div>
       <Grid container id="children-pane" direction="row" spacing={8}>
         {props.children}
       </Grid>

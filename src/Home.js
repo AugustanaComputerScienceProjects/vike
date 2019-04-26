@@ -22,7 +22,7 @@ class Home extends Component {
                 <Grid item container direction="column" spacing={40}>
                     <Grid item><label style={{fontSize: 40}}>Welcome to the Augustana Events App</label></Grid>
                     <Image style={{ height: 0, paddingTop: '56.25%' }} source={{uri: defaultImage}}></Image>
-                    <Grid item><label style={{fontSize: 20}}>Please sign in in order to use the apps features</label></Grid>
+                    <Grid item><label style={{fontSize: 20}}>Please sign in in order to use the app's features</label></Grid>
                     <Grid item><label style={{fontSize: 20}}>Created by:</label></Grid>
                     <Grid item><label style={{fontSize: 20}}>Kyle Workman, Jared Haeme, Brandon Thompson, Jack Cannell, Brent Pierce, Paige Oucheriah</label></Grid>
                 </Grid>

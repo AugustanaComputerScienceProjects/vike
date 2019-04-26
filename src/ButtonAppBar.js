@@ -18,7 +18,8 @@ class NavBar extends React.Component {
       drawerOpened: false,
       selected: "Add Event",
       btnText: "Sign In",
-      signedIn: false
+      signedIn: false,
+      title: "Augustana Events - Home"
     };
   }
 
@@ -30,6 +31,7 @@ class NavBar extends React.Component {
 
   onNavChanged(page) {
     this.props.navChanged(page);
+    this.setState({ title: "Augustana Events - " + page})
   }
 
   signInAction = () => {
@@ -64,7 +66,7 @@ class NavBar extends React.Component {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" color="inherit">
-              Augustana Events
+              {this.state.title}
             </Typography>
             <Button color="inherit" style={{marginLeft: "auto"}} onClick={this.signInAction}>{this.state.btnText}</Button>
           </Toolbar>

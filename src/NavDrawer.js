@@ -15,6 +15,7 @@ class NavDrawer extends Component {
         super(props);
         this.homeClicked = this.homeClicked.bind(this);
         this.eventClicked = this.eventClicked.bind(this);
+        this.pendingClicked = this.pendingClicked.bind(this);
         this.currentClicked = this.currentClicked.bind(this);
         this.pastClicked = this.pastClicked.bind(this);
         this.tagsClicked = this.tagsClicked.bind(this);
@@ -32,6 +33,10 @@ class NavDrawer extends Component {
         this.props.navChanged("Add Event");
     }
 
+    pendingClicked() {
+        this.props.navChanged("Pending Events");
+    }
+
     currentClicked() {
         this.props.navChanged("Current Events");
     }
@@ -44,10 +49,24 @@ class NavDrawer extends Component {
         this.props.navChanged("Tags");
     }
 
+    checkRole(user, role) {
+        let self = this;
+        firebase.database.ref(role).once('value').then(function(snapshot) {
+            if (snapshot.hasChild(user.email.replace('.', ','))) {
+                if (role === 'admin') {
+                    self.setState({ adminSignedIn: true });
+                } else if (role === 'leaders') {
+                    self.setState({ leaderSignedIn: true });
+                }
+            }
+          });
+    }
+
     componentWillMount() {
         firebase.auth.onAuthStateChanged((user) => {
           if (user) {
-            this.setState({ adminSignedIn: true });
+              this.checkRole(user, 'admin');
+              this.checkRole(user, 'leaders');
           } else {
             this.setState({ adminSignedIn: false });  
           }
@@ -65,10 +84,11 @@ class NavDrawer extends Component {
           onKeyDown={this.props.toggleDrawer(false)}
         >
                 <MenuList>
-                    <MenuItem name="Add Event" onClick={this.homeClicked}>Home</MenuItem>
-                    <MenuItem name="Add Event" onClick={this.eventClicked} disabled={!this.state.adminSignedIn}>Add Event</MenuItem>
-                    <MenuItem name="CurrentEvents" onClick={this.currentClicked} disabled={!this.state.adminSignedIn}>Current Events</MenuItem>
-                    <MenuItem name="PastEvents" onClick={this.pastClicked} disabled={!this.state.adminSignedIn}>Past Events</MenuItem>
+                    <MenuItem name="Home" onClick={this.homeClicked}>Home</MenuItem>
+                    <MenuItem name="Add Event" onClick={this.eventClicked} disabled={!this.state.adminSignedIn && !this.state.leaderSignedIn}>Add Event</MenuItem>
+                    <MenuItem name="Pending Events" onClick={this.pendingClicked} disabled={!this.state.adminSignedIn && !this.state.leaderSignedIn}>Pending Events</MenuItem>
+                    <MenuItem name="Current Events" onClick={this.currentClicked} disabled={!this.state.adminSignedIn}>Current Events</MenuItem>
+                    <MenuItem name="Past Events" onClick={this.pastClicked} disabled={!this.state.adminSignedIn}>Past Events</MenuItem>
                     <MenuItem name="Tags" onClick={this.tagsClicked} disabled={!this.state.adminSignedIn}>Tags/Groups</MenuItem>
 
                 </MenuList>
