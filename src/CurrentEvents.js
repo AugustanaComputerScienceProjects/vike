@@ -16,6 +16,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import DeleteIcon from '@material-ui/icons/Delete';
+import SaveIcon from '@material-ui/icons/Save';
 import Typography from '@material-ui/core/Typography';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
@@ -75,6 +76,7 @@ class CurrentEvents extends Component {
         editing: false,
         open: false,
         popUpEvent: [],
+        oldEvent: [],
         tags: [],
         date: new Date(),
         uploading: false,
@@ -118,7 +120,7 @@ class CurrentEvents extends Component {
         this.setState({ openDelete: true });
     }
 
-    handleStopEdit = () => {
+    handleSaveEdit = () => {
         this.setState({ editing: false });
         let event = this.state.popUpEvent;
         let self = this;
@@ -153,6 +155,12 @@ class CurrentEvents extends Component {
             self.pushEvent(self, event);
         }
     };
+
+    handleCloseEdit = () => {
+        let revertEvents = this.state.events;
+        revertEvents[this.state.index] = this.state.oldEvent;
+        this.setState({ editing: false, events: revertEvents });
+    }
 
     pushEvent(self, event) {
         firebase.database.ref('/current-events').child(event["key"]).set({
@@ -227,7 +235,8 @@ class CurrentEvents extends Component {
             tags = []
         }
         let date = this.getFormattedDate(event);
-        this.setState({ popUpEvent: event, tags: tags, date: date, index: i, image64: this.state.urls[i], image64Old: this.state.urls[i] });
+        let oldEvent = Object.assign({}, event);
+        this.setState({ oldEvent: oldEvent, popUpEvent: event, tags: tags, date: date, index: i, image64: this.state.urls[i], image64Old: this.state.urls[i] });
         this.handleBeginEdit();
     }
 
@@ -273,9 +282,11 @@ class CurrentEvents extends Component {
     };
 
     handleEventChange(key, value) {
-        let event = this.state.popUpEvent;
+        let newEvents = this.state.events;
+        let event = newEvents[this.state.index];
         event[key] = value;
-        this.setState({popUpEvent: event});
+        newEvents[this.state.index] = event;
+        this.setState({events: newEvents});
     }
 
     getFormattedDate(event) {
@@ -323,11 +334,11 @@ class CurrentEvents extends Component {
                     {children}
                 </ParentComponent>
                 <Dialog
-          onClose={this.handleStopEdit}
+          onClose={this.handleCloseEdit}
           aria-labelledby="customized-dialog-title"
           open={this.state.editing}
         >
-          <DialogTitle id="customized-dialog-title" onClose={this.handleStopEdit}>
+          <DialogTitle id="customized-dialog-title" onClose={this.handleCloseEdit}>
             Edit Event
           </DialogTitle>
           <DialogContent>
@@ -445,6 +456,10 @@ class CurrentEvents extends Component {
               <DeleteIcon/>
             </Button>
             </MuiThemeProvider>
+          <Button variant="contained" onClick={this.handleSaveEdit} color="primary">
+              Save Changes
+              <SaveIcon/>
+            </Button>
           </DialogActions>
         </Dialog>
         <Dialog
