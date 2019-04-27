@@ -8,8 +8,8 @@ import PendingEvents from './PendingEvents';
 import CurrentEvents from './CurrentEvents';
 import PastEvents from './PastEvents';
 import Tags from './Tags';
+import Users from './Users';
 import NavBar from "./ButtonAppBar";
-
 
 class App extends Component {
 
@@ -56,6 +56,12 @@ class App extends Component {
         if (this.state.selected == "Tags") {
             return (
                 <Tags/>
+            );
+        }
+
+        if (this.state.selected == "Users") {
+            return (
+                <Users/>
             );
         }
     }

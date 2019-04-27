@@ -19,6 +19,7 @@ class NavDrawer extends Component {
         this.currentClicked = this.currentClicked.bind(this);
         this.pastClicked = this.pastClicked.bind(this);
         this.tagsClicked = this.tagsClicked.bind(this);
+        this.usersClicked = this.usersClicked.bind(this);
         this.state = {
             adminSignedIn: false,
             leaderSignedIn: false
@@ -47,6 +48,10 @@ class NavDrawer extends Component {
 
     tagsClicked() {
         this.props.navChanged("Tags");
+    }
+
+    usersClicked() {
+        this.props.navChanged("Users");
     }
 
     checkRole(user, role) {
@@ -90,7 +95,7 @@ class NavDrawer extends Component {
                     <MenuItem name="Current Events" onClick={this.currentClicked} disabled={!this.state.adminSignedIn}>Current Events</MenuItem>
                     <MenuItem name="Past Events" onClick={this.pastClicked} disabled={!this.state.adminSignedIn}>Past Events</MenuItem>
                     <MenuItem name="Tags" onClick={this.tagsClicked} disabled={!this.state.adminSignedIn}>Tags/Groups</MenuItem>
-
+                    <MenuItem name="Users" onClick={this.usersClicked} disabled={!this.state.adminSignedIn}>Users</MenuItem>
                 </MenuList>
                 </div>
             </Drawer>
