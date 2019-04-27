@@ -34,6 +34,9 @@ import { red, blue } from '@material-ui/core/colors';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Snackbar from '@material-ui/core/Snackbar'; 
 import CircularProgress from '@material-ui/core/CircularProgress';
+import SearchIcon from '@material-ui/icons/Search';
+import InputBase from '@material-ui/core/InputBase';
+import { fade } from '@material-ui/core/styles/colorManipulator';
 
 const uuidv4 = require('uuid/v4');
 const redTheme = createMuiTheme({ palette: { primary: red } })
@@ -224,7 +227,7 @@ class CurrentEvents extends Component {
             listURLS[index] = url;
             console.log(index);
             if (snapshot.numChildren() == listURLS.length) {
-                self.setState({ events: listEvents, urls: listURLS, hidden: "hidden" });
+                self.setState({ events: listEvents, originalEvents: listEvents, urls: listURLS, originalURLS: listURLS, hidden: "hidden" });
             }
           }).catch((error) => {
             // Handle any errors
@@ -300,6 +303,22 @@ class CurrentEvents extends Component {
         this.setState({events: newEvents});
     }
 
+    handleSearchChange = e => {
+        var index = 0;
+        let filtered = [];
+        let urls = [];
+        let oldURLS = this.state.originalURLS;
+        this.state.originalEvents.forEach(function(event) {
+            if (event["name"].toLowerCase().includes(e.target.value.toLowerCase()) || event["location"].toLowerCase().includes(e.target.value.toLowerCase()) || 
+            event["organization"].toLowerCase().includes(e.target.value.toLowerCase()) || event["tags"].toLowerCase().includes(e.target.value.toLowerCase())) {
+                filtered.push(event);
+                urls.push(oldURLS[index]);
+            }
+            index = index + 1;
+        });
+        this.setState({ events: filtered, urls: urls });
+    };
+
     getFormattedDate(event) {
         let arr = event["startDate"].split(' ');
         let arr2 = arr[0].split('-');
@@ -336,10 +355,61 @@ class CurrentEvents extends Component {
             editAction={() => this.editAction(event, index)} />);
         };
 
+        const styles = theme => ({
+            search: {
+              position: 'relative',
+              borderRadius: theme.shape.borderRadius,
+              backgroundColor: fade(theme.palette.common.white, 0.15),
+              '&:hover': {
+                backgroundColor: fade(theme.palette.common.white, 0.25),
+              },
+              marginLeft: 0,
+              width: '100%',
+              [theme.breakpoints.up('sm')]: {
+                marginLeft: theme.spacing.unit,
+                width: 'auto',
+              },
+            },
+            searchIcon: {
+              width: theme.spacing.unit * 9,
+              height: '100%',
+              position: 'absolute',
+              pointerEvents: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            },
+            inputRoot: {
+              color: 'inherit',
+              width: '100%',
+            },
+            inputInput: {
+              paddingTop: theme.spacing.unit,
+              paddingRight: theme.spacing.unit,
+              paddingBottom: theme.spacing.unit,
+              paddingLeft: theme.spacing.unit * 10,
+              transition: theme.transitions.create('width'),
+              width: '100%',
+              [theme.breakpoints.up('sm')]: {
+                width: 120,
+                '&:focus': {
+                  width: 200,
+                },
+              },
+            },
+          });
+
         return (
             <div>
                 <div style={{position: "absolute", top: "50%", left: "50%", margintop: "-50px", marginleft: "-50px", width: "100px", height: "100px"}}>
                 <CircularProgress style={{visibility: this.state.hidden}}></CircularProgress>
+            </div>
+            <div style={{marginBottom: 20}}>
+            <SearchIcon />
+            <InputBase
+              placeholder="Search…"
+              onChange={this.handleSearchChange}
+            />
             </div>
                 <ParentComponent>
                     {children}
