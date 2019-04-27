@@ -106,6 +106,12 @@ class Users extends Component {
         this.readLeaders();
     }
 
+    componentWillUnmount() {
+        this.listeners.forEach(function(listener) {
+            listener.off();
+        });
+    }
+
     render() {
         const adminChildren = [];
         const leaderChildren = [];

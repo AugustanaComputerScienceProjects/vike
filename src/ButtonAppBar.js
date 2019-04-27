@@ -41,6 +41,7 @@ class NavBar extends React.Component {
       firebase.signIn();
     } else {
       this.onNavChanged("Home");
+      this.setState({ adminSignedIn: false, leaderSignedIn: false });
       firebase.signOut();
     }
   }
