@@ -184,12 +184,12 @@ class Users extends Component {
 const ParentComponent = props => (
     <div style={{width: 1000}}>
       <Grid container id="children-pane" direction="column" spacing={16}>
-      <Grid item container><Typography variant="h5">{props.title}</Typography><Button onClick={props.addAction}><AddIcon/></Button></Grid>
+      <Grid item container><Typography variant="h5">{props.title}</Typography><Button style={{marginLeft: 10}} onClick={props.addAction} color="primary" variant="outlined"><AddIcon/>Add</Button></Grid>
         {props.children}
       </Grid>
     </div>
 );
   
-const ChildComponent = props => <Grid item container><Typography component="p" style={{marginTop: 7}}>{props.email}</Typography><Button onClick={props.removeAction}><CloseIcon/></Button></Grid>;
+const ChildComponent = props => <Grid item container><Typography component="p" style={{marginTop: 7}}>{props.email}</Typography><MuiThemeProvider theme={redTheme}><Button color="primary" onClick={props.removeAction}><CloseIcon/></Button></MuiThemeProvider></Grid>;
 
 export default Users;
