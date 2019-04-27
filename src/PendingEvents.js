@@ -86,7 +86,7 @@ class PendingEvents extends Component {
         index: -1,
         hidden: "visible",
         openDelete: false,
-        cancelBtn: "Delete Event",
+        cancelBtn: "Reject Event",
         confirmBtn: "Accept Event",
         isInitial: true
     }

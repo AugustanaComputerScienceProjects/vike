@@ -73,7 +73,7 @@ class NavDrawer extends Component {
               this.checkRole(user, 'admin');
               this.checkRole(user, 'leaders');
           } else {
-            this.setState({ adminSignedIn: false });  
+            this.setState({ adminSignedIn: false, leaderSignedIn: false });  
           }
         });
     }
