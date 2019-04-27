@@ -525,7 +525,7 @@ const ParentComponent = props => (
     </div>
 );
   
-const ChildComponent = props => <Grid item><Card style={{minHeight: 400, maxHeight: 400, minWidth: 300, maxWidth: 300}}><CardActionArea onClick={props.editAction}>
+const ChildComponent = props => <Grid item><Card style={{minWidth: 300, maxWidth: 300, height: "auto"}}><CardActionArea onClick={props.editAction}>
     <CardHeader title={props.name} subheader={props.date}></CardHeader>
     <CardMedia style = {{ height: 0, paddingTop: '56.25%'}} image={props.image} title={props.name}/><CardContent>
     <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}</Typography></CardContent></CardActionArea></Card></Grid>;

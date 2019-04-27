@@ -129,6 +129,7 @@ class AddEvent extends Component {
             imgid: self.state.picId,
             description: self.state.description,
             tags: self.state.tags.toString(),
+            email: self.state.email,
         });
         self.resetState(self);
         self.setState({ uploading: false });
@@ -180,9 +181,9 @@ class AddEvent extends Component {
         firebase.database.ref(role).once('value').then(function(snapshot) {
             if (snapshot.hasChild(user.email.replace('.', ','))) {
                 if (role === 'admin') {
-                    self.setState({ adminSignedIn: true, submitBtnText: "Add Event", uid: user.uid });
+                    self.setState({ adminSignedIn: true, submitBtnText: "Add Event", uid: user.uid, email: user.email });
                 } else if (role === 'leaders') {
-                    self.setState({ leaderSignedIn: true, submitBtnText: "Request Event", uid: user.uid });
+                    self.setState({ leaderSignedIn: true, submitBtnText: "Request Event", uid: user.uid, email: user.email });
                 }
             }
           });

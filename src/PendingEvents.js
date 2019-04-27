@@ -88,7 +88,8 @@ class PendingEvents extends Component {
         openDelete: false,
         cancelBtn: "Reject Event",
         confirmBtn: "Accept Event",
-        isInitial: true
+        isInitial: true,
+        popUpText: "reject"
     }
 
     allListener = firebase.database.ref('/pending-events').orderByKey();
@@ -236,6 +237,7 @@ class PendingEvents extends Component {
                 child.forEach(function(childSnapshot) {
                     let event = childSnapshot.val();
                     event["key"] = childSnapshot.key;
+                    event["email"] = "Requested by: " + event["email"];
                     event["userKey"] = child.key;
                     listEvents.push(event);
                     index = index + 1;
@@ -260,6 +262,7 @@ class PendingEvents extends Component {
             let index = -1;
             snapshot.forEach(function(childSnapshot) {
                 let event = childSnapshot.val();
+                event["email"] = "";
                 event["key"] = childSnapshot.key;
                 listEvents.push(event);
                 index = index + 1;
@@ -361,7 +364,7 @@ class PendingEvents extends Component {
                     self.setState({ adminSignedIn: true, uid: user.uid });
                     self.readAllPendingEvents();
                 } else if (role === 'leaders') {
-                    self.setState({ leaderSignedIn: true, cancelBtn: "Delete Event", confirmBtn: "Save Changes", uid: user.uid });
+                    self.setState({ leaderSignedIn: true, cancelBtn: "Delete Event", confirmBtn: "Save Changes", uid: user.uid, popUpText: "delete" });
                     self.readPendingEvents('/pending-events/' + user.uid);
                 }
             }
@@ -409,7 +412,7 @@ class PendingEvents extends Component {
             let fullDate = startDate + "-" + hours + ":" + minutes;
             children.push(<ChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
             organization={'Organization: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
-            editAction={() => this.editAction(event, index)} />);
+            editAction={() => this.editAction(event, index)} email={event["email"]}/>);
         };
 
         return (
@@ -554,7 +557,7 @@ class PendingEvents extends Component {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete the event?"}</DialogTitle>
+          <DialogTitle id="alert-dialog-title">{"Are you sure you want to " + this.state.popUpText + " the event?"}</DialogTitle>
           <DialogActions>
             <Button onClick={this.handleDeleteClose} color="primary">
               Cancel
@@ -601,9 +604,9 @@ const ParentComponent = props => (
     </div>
 );
   
-const ChildComponent = props => <Grid item><Card style={{minHeight: 400, maxHeight: 400, minWidth: 300, maxWidth: 300}}><CardActionArea onClick={props.editAction}>
+const ChildComponent = props => <Grid item><Card style={{minWidth: 300, maxWidth: 300, height: "auto"}}><CardActionArea onClick={props.editAction}>
     <CardHeader title={props.name} subheader={props.date}></CardHeader>
     <CardMedia style = {{ height: 0, paddingTop: '56.25%'}} image={props.image} title={props.name}/><CardContent>
-    <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}</Typography></CardContent></CardActionArea></Card></Grid>;
+    <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}<br/>{props.email}</Typography></CardContent></CardActionArea></Card></Grid>;
 
 export default PendingEvents;
