@@ -417,7 +417,7 @@ class PendingEvents extends Component {
 
         return (
             <div>
-                <div style={{position: "absolute", top: "50%", left: "50%", margintop: "-50px", marginleft: "-50px", width: "100px", height: "100px"}}>
+                <div style={{position: "fixed", top: "50%", left: "50%", margintop: "-50px", marginleft: "-50px", width: "100px", height: "100px"}}>
                 <CircularProgress style={{visibility: this.state.hidden}}></CircularProgress>
             </div>
                 <ParentComponent>

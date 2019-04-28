@@ -145,6 +145,7 @@ class Users extends Component {
                     <Grid item container direction="column" spacing={0}>
                         <Grid item>
                             <TextField
+                                    autoFocus={true}
                                     style={{width: 300}}
                                     label="Email"
                                     id="email"

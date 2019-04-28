@@ -72,11 +72,11 @@ class App extends Component {
      render() {
          return (
              <div className='fullPage'>
-             <div style={{width: "100%", position: "fixed"}}>
+             <div style={{width: "100%", position: "absolute"}}>
                 <div style={{height: "10%"}}>
                 <NavBar navChanged={this.onNavChanged}></NavBar>
                 </div>
-                <div style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 20 }}>
+                <div style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 20, marginBottom: 20 }}>
                 {this.mainDisplay()}
                 </div>
             </div>     

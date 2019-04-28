@@ -89,7 +89,8 @@ class CurrentEvents extends Component {
         index: -1,
         hidden: "visible",
         openDelete: false,
-        isInitial: true
+        isInitial: true,
+        searchText: ''
     }
     listener = null;
 
@@ -228,6 +229,7 @@ class CurrentEvents extends Component {
             console.log(index);
             if (snapshot.numChildren() == listURLS.length) {
                 self.setState({ events: listEvents, originalEvents: listEvents, urls: listURLS, originalURLS: listURLS, hidden: "hidden" });
+                this.filterEvents(this.state.searchText, listEvents, listURLS);
             }
           }).catch((error) => {
             // Handle any errors
@@ -304,20 +306,24 @@ class CurrentEvents extends Component {
     }
 
     handleSearchChange = e => {
+        this.setState({searchText: e.target.value});
+        this.filterEvents(e.target.value, this.state.originalEvents, this.state.originalURLS);
+    };
+
+    filterEvents(text, originalEvents, oldURLS) {
         var index = 0;
         let filtered = [];
         let urls = [];
-        let oldURLS = this.state.originalURLS;
-        this.state.originalEvents.forEach(function(event) {
-            if (event["name"].toLowerCase().includes(e.target.value.toLowerCase()) || event["location"].toLowerCase().includes(e.target.value.toLowerCase()) || 
-            event["organization"].toLowerCase().includes(e.target.value.toLowerCase()) || event["tags"].toLowerCase().includes(e.target.value.toLowerCase())) {
+        originalEvents.forEach(function(event) {
+            if (event["name"].toLowerCase().includes(text.toLowerCase()) || event["location"].toLowerCase().includes(text.toLowerCase()) || 
+            event["organization"].toLowerCase().includes(text.toLowerCase()) || event["tags"].toLowerCase().includes(text.toLowerCase())) {
                 filtered.push(event);
                 urls.push(oldURLS[index]);
             }
             index = index + 1;
         });
         this.setState({ events: filtered, urls: urls });
-    };
+    }
 
     getFormattedDate(event) {
         let arr = event["startDate"].split(' ');
@@ -355,61 +361,19 @@ class CurrentEvents extends Component {
             editAction={() => this.editAction(event, index)} />);
         };
 
-        const styles = theme => ({
-            search: {
-              position: 'relative',
-              borderRadius: theme.shape.borderRadius,
-              backgroundColor: fade(theme.palette.common.white, 0.15),
-              '&:hover': {
-                backgroundColor: fade(theme.palette.common.white, 0.25),
-              },
-              marginLeft: 0,
-              width: '100%',
-              [theme.breakpoints.up('sm')]: {
-                marginLeft: theme.spacing.unit,
-                width: 'auto',
-              },
-            },
-            searchIcon: {
-              width: theme.spacing.unit * 9,
-              height: '100%',
-              position: 'absolute',
-              pointerEvents: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            },
-            inputRoot: {
-              color: 'inherit',
-              width: '100%',
-            },
-            inputInput: {
-              paddingTop: theme.spacing.unit,
-              paddingRight: theme.spacing.unit,
-              paddingBottom: theme.spacing.unit,
-              paddingLeft: theme.spacing.unit * 10,
-              transition: theme.transitions.create('width'),
-              width: '100%',
-              [theme.breakpoints.up('sm')]: {
-                width: 120,
-                '&:focus': {
-                  width: 200,
-                },
-              },
-            },
-          });
-
         return (
             <div>
-                <div style={{position: "absolute", top: "50%", left: "50%", margintop: "-50px", marginleft: "-50px", width: "100px", height: "100px"}}>
+                <div style={{position: "fixed", top: "50%", left: "50%", margintop: "-50px", marginleft: "-50px", width: "100px", height: "100px"}}>
                 <CircularProgress style={{visibility: this.state.hidden}}></CircularProgress>
             </div>
-            <div style={{marginBottom: 20}}>
-            <SearchIcon />
-            <InputBase
-              placeholder="Search…"
-              onChange={this.handleSearchChange}
-            />
+            <div style={{textAlign: "center", marginBottom: 20}}>
+            <div style={{position: 'relative', display: "inline-block"}}>
+            <SearchIcon style={{position: 'absolute', left: -30, top: 20, width: 25, height: 25}}/>
+            <TextField
+                label="Search..."   
+                value={this.state.searchText}
+                onChange={this.handleSearchChange} />
+            </div>
             </div>
                 <ParentComponent>
                     {children}
