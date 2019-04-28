@@ -102,7 +102,7 @@ class CurrentEvents extends Component {
         sortMenu: "none",
         isInitial: true,
         searchText: '',
-        sortBy: "soonestFirst",
+        sortBy: "date",
         isAscending: true
     }
     listener = null;
