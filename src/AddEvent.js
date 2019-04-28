@@ -129,7 +129,7 @@ class AddEvent extends Component {
             imgid: self.state.picId,
             description: self.state.description,
             tags: self.state.tags.toString(),
-            email: self.state.email,
+            email: self.state.email
         });
         self.resetState(self);
         self.setState({ uploading: false });
