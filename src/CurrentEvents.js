@@ -37,6 +37,16 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import SearchIcon from '@material-ui/icons/Search';
 import InputBase from '@material-ui/core/InputBase';
 import { fade } from '@material-ui/core/styles/colorManipulator';
+import CloseIcon from '@material-ui/icons/Close';
+import SortIcon from '@material-ui/icons/Sort';
+import IconButton from '@material-ui/core/IconButton';
+import Divider from '@material-ui/core/Divider';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormLabel from '@material-ui/core/FormLabel';
+import Switch from '@material-ui/core/Switch';
 
 const uuidv4 = require('uuid/v4');
 const redTheme = createMuiTheme({ palette: { primary: red } })
@@ -89,8 +99,11 @@ class CurrentEvents extends Component {
         index: -1,
         hidden: "visible",
         openDelete: false,
+        sortMenu: "none",
         isInitial: true,
-        searchText: ''
+        searchText: '',
+        sortBy: "soonestFirst",
+        isAscending: true
     }
     listener = null;
 
@@ -310,6 +323,55 @@ class CurrentEvents extends Component {
         this.filterEvents(e.target.value, this.state.originalEvents, this.state.originalURLS);
     };
 
+    handleClear = () => {
+        this.setState({searchText: ""});
+        this.filterEvents("", this.state.originalEvents, this.state.originalURLS);
+    }
+
+    handleSortOpenClose = () => {
+        console.log("sorting");
+        if (this.state.sortMenu === "block") {
+            this.setState({sortMenu: "none"});
+        } else {
+            this.setState({sortMenu: "block"});
+        }
+    }
+
+    handleSort = e => {
+        this.setState({sortBy: e.target.value});
+        this.sort(this.state.events, this.state.urls, e.target.value, this.state.isAscending);
+    }
+
+    sort(events, urls, sortBy, isAscending) {
+        if (sortBy === "date") {
+            this.sortArrays(events, urls, "startDate", isAscending);
+        } else if (sortBy === "title") {
+            this.sortArrays(events, urls, "name", isAscending);
+        } else if (sortBy === "organization") {
+            this.sortArrays(events, urls, "organization", isAscending);
+        } 
+    }
+
+    sortArrays(events, urls, attribute, ascending) {
+        var list = [];
+        for (var j = 0; j < events.length; j++) {
+            list.push({'event': events[j], 'url': urls[j]});
+        }
+        if (ascending) {
+            list.sort(function(a, b) {
+                return ('' + a.event[attribute]).localeCompare(b.event[attribute]);
+            });
+        } else {
+            list.sort(function(a, b) {
+                return ('' + b.event[attribute]).localeCompare(a.event[attribute]);
+            });
+        }
+        for (var k = 0; k < list.length; k++) {
+            events[k] = list[k].event;
+            urls[k] = list[k].url;
+        }
+    }
+
     filterEvents(text, originalEvents, oldURLS) {
         var index = 0;
         let filtered = [];
@@ -322,8 +384,14 @@ class CurrentEvents extends Component {
             }
             index = index + 1;
         });
+        this.sort(filtered, urls, this.state.sortBy, this.state.isAscending);
         this.setState({ events: filtered, urls: urls });
     }
+
+    handleToggle = name => event => {
+        this.setState({ [name]: event.target.checked });
+        this.sort(this.state.events, this.state.urls, this.state.sortBy, event.target.checked);
+    };
 
     getFormattedDate(event) {
         let arr = event["startDate"].split(' ');
@@ -368,11 +436,62 @@ class CurrentEvents extends Component {
             </div>
             <div style={{textAlign: "center", marginBottom: 20}}>
             <div style={{position: 'relative', display: "inline-block"}}>
-            <SearchIcon style={{position: 'absolute', left: -30, top: 20, width: 25, height: 25}}/>
-            <TextField
-                label="Search..."   
+            <Paper style={{padding: '2px 4px', display: "flex", alignItems: "center", width: 400}} elevation={1}>
+            <SearchIcon style={{padding: 10}}/>
+            <InputBase
+                style={{width: 300}}
+                placeholder="Search Events"   
                 value={this.state.searchText}
                 onChange={this.handleSearchChange} />
+            <IconButton onClick={this.handleClear}><CloseIcon/></IconButton>
+            <Divider style={{width: 1, height: 28, margin: 4}} />
+            <IconButton onClick={this.handleSortOpenClose}><SortIcon/></IconButton>
+            </Paper>
+            </div>
+            </div>
+            <div style={{textAlign: "center", marginBottom: 20, display: this.state.sortMenu}}>
+            <div style={{position: 'relative', display: "inline-block"}}>
+            <Paper style={{padding: '2px 4px', display: "flex", alignItems: "center", width: 400}} elevation={1}>
+            <FormControl component="fieldset" style={{paddingLeft: 10}}>
+          <FormLabel component="legend" style={{paddingTop: 10}}>Sort By:</FormLabel>
+          <FormControlLabel
+          control={
+            <Switch
+              checked={this.state.isAscending}
+              onChange={this.handleToggle('isAscending')}
+              value="isAscending"
+              color="primary"
+            />
+          }
+          label="Ascending"
+        />
+          <RadioGroup
+            aria-label="gender"
+            name="gender2"
+            value={this.state.sortBy}
+            onChange={this.handleSort}
+          >
+            <FormControlLabel
+              value="date"
+              control={<Radio color="primary" />}
+              label="Date"
+              labelPlacement="end"
+            />
+            <FormControlLabel
+              value="title"
+              control={<Radio color="primary" />}
+              label="Title"
+              labelPlacement="end"
+            />
+            <FormControlLabel
+              value="organization"
+              control={<Radio color="primary" />}
+              label="Organization"
+              labelPlacement="end"
+            />
+          </RadioGroup>
+        </FormControl>
+            </Paper>
             </div>
             </div>
                 <ParentComponent>
