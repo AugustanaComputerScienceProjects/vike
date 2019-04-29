@@ -94,6 +94,7 @@ class PendingEvents extends Component {
 
     allListener = firebase.database.ref('/pending-events').orderByKey();
     singleListener = firebase.database.ref();
+    off = null;
     
     handleBeginEdit = () => {
         this.handleClose();
@@ -232,12 +233,11 @@ class PendingEvents extends Component {
                     total = total + 1;
                 });
             });
-            console.log(total);
             snapshot.forEach(function(child) {
                 child.forEach(function(childSnapshot) {
                     let event = childSnapshot.val();
                     event["key"] = childSnapshot.key;
-                    event["email"] = "Requester: " + event["email"];
+                    event["status"] = "Requester: " + event["email"];
                     event["userKey"] = child.key;
                     listEvents.push(event);
                     index = index + 1;
@@ -262,7 +262,7 @@ class PendingEvents extends Component {
             let index = -1;
             snapshot.forEach(function(childSnapshot) {
                 let event = childSnapshot.val();
-                event["email"] = "";
+                event["status"] = "Status: Pending";
                 event["key"] = childSnapshot.key;
                 listEvents.push(event);
                 index = index + 1;
@@ -372,7 +372,7 @@ class PendingEvents extends Component {
     }
 
     componentWillMount() {
-        firebase.auth.onAuthStateChanged((user) => {
+        this.off = firebase.auth.onAuthStateChanged((user) => {
           if (user) {
               this.checkRole(user, 'admin');
               this.checkRole(user, 'leaders');
@@ -385,6 +385,7 @@ class PendingEvents extends Component {
     componentWillUnmount() {
         this.allListener.off();
         this.singleListener.off();
+        this.off();
     }
 
     render() {
@@ -412,7 +413,7 @@ class PendingEvents extends Component {
             let fullDate = startDate + "-" + hours + ":" + minutes;
             children.push(<ChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
             organization={'Organization: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
-            editAction={() => this.editAction(event, index)} email={event["email"]}/>);
+            editAction={() => this.editAction(event, index)} email={event["status"]}/>);
         };
 
         return (

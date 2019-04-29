@@ -53,7 +53,8 @@ class AddEvent extends Component {
         image64: defaultImage,
         submitBtnText: "Request Event",
         uid: "",
-        qrChecked: true
+        qrChecked: false,
+        qrDisabled: true
     };
 
     handleOpen = () => {
@@ -132,7 +133,9 @@ class AddEvent extends Component {
             tags: self.state.tags.toString(),
             email: self.state.email
         }).then((snap) => {
-            self.downloadQR(snap.key, name);
+            if (this.state.qrChecked) {
+                self.downloadQR(snap.key, name);
+            }
         });
         self.resetState(self);
         self.setState({ uploading: false });
@@ -192,7 +195,7 @@ class AddEvent extends Component {
         firebase.database.ref(role).once('value').then(function(snapshot) {
             if (snapshot.hasChild(user.email.replace('.', ','))) {
                 if (role === 'admin') {
-                    self.setState({ adminSignedIn: true, submitBtnText: "Add Event", uid: user.uid, email: user.email });
+                    self.setState({ adminSignedIn: true, submitBtnText: "Add Event", uid: user.uid, email: user.email, qrChecked: true, qrDisabled: false });
                 } else if (role === 'leaders') {
                     self.setState({ leaderSignedIn: true, submitBtnText: "Request Event", uid: user.uid, email: user.email });
                 }
@@ -360,6 +363,7 @@ class AddEvent extends Component {
                         <Checkbox
                             checked={this.state.qrChecked}
                             onChange={this.toggleChecked}
+                            disabled={this.state.qrDisabled}
                             value="qrChecked"
                             color="primary"/>
                         }
