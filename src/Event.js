@@ -24,7 +24,7 @@ class Event extends Component {
         let self = this;
         firebase.database.ref('/current-events/' + this.values.id + '/users/' + this.values.email).set(true, function(error) {
             if (error) {
-                self.setState({ text: "There was a problem checking you in.", hidden: "hidden" });
+                self.setState({ text: "There was a problem checking you in.\n\nMake sure you are signed into the Augustana Events Web App using your Augustana email and then refresh the page.", hidden: "hidden" });
             } else {
                 self.setState({ text: "Successfully checked in as " + self.values.email + ".", hidden: "hidden" });
             }
@@ -39,7 +39,7 @@ class Event extends Component {
                 <Grid container>
                 <Grid item container direction="column" spacing={40}>
                     <Grid item><label style={{fontSize: 40}}>{this.values.name.replaceAll("/+", " ")}</label></Grid>
-                    <Grid item><label style={{fontSize: 20}}>{this.state.text}</label></Grid>
+                    <Grid item><label style={{fontSize: 20}}>{this.state.text.split('\n').map((item, key) => { return <span key={key}>{item}<br/></span>})}</label></Grid>
                     <Grid item><CircularProgress style={{visibility: this.state.hidden}}></CircularProgress></Grid>
                 </Grid>
                 </Grid>

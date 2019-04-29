@@ -67,7 +67,7 @@ class NavBar extends React.Component {
 }
 
 checkReload() {
-  if (window.location.href.includes("event")) {
+  if (window.location.href.includes("event?")) {
     this.setState({icon: <HomeIcon/>, isNotHome: true, title: "Augustana Events - Check In"});
   } else {
     this.setState({icon: <MenuIcon/>, isNotHome: false});
@@ -82,7 +82,7 @@ checkReload() {
         this.checkRole(user, 'leaders');
         this.setState({ btnText: "Sign Out", signedIn: true });
         if (!this.state.adminSignedIn && !this.state.leaderSignedIn) {
-          this.setState({ userText: user.email + " (No Access)" });
+          this.setState({ userText: user.email + " (Student)" });
         }
       } else {
         this.setState({ btnText: "Sign In", signedIn: false, userText: "" });  
