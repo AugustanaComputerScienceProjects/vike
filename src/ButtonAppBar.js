@@ -10,6 +10,7 @@ import Drawer from "@material-ui/core/Drawer";
 import NavDrawer from "./NavDrawer";
 import firebase from "./config";
 import Grid from "@material-ui/core/Grid";
+import HomeIcon from '@material-ui/icons/Home';
 
 class NavBar extends React.Component {
   constructor(props) {
@@ -21,14 +22,20 @@ class NavBar extends React.Component {
       btnText: "Sign In",
       signedIn: false,
       title: "Augustana Events - Home",
-      userText: ""
+      userText: "",
+      icon: <MenuIcon />
     };
   }
 
   toggleDrawer = booleanValue => () => {
-    this.setState({
-      drawerOpened: booleanValue
-    });
+    if (this.state.isNotHome) {
+      window.history.pushState("object or string", "Title", "/");
+      window.location.reload();
+    } else {
+      this.setState({
+        drawerOpened: booleanValue
+      });
+    }
   };
 
   onNavChanged(page) {
@@ -59,7 +66,16 @@ class NavBar extends React.Component {
       });
 }
 
+checkReload() {
+  if (window.location.href.includes("event")) {
+    this.setState({icon: <HomeIcon/>, isNotHome: true, title: "Augustana Events - Check In"});
+  } else {
+    this.setState({icon: <MenuIcon/>, isNotHome: false});
+  }
+}
+
   componentWillMount() {
+    this.checkReload();
     firebase.auth.onAuthStateChanged((user) => {
       if (user) {
         this.checkRole(user, 'admin');
@@ -84,7 +100,7 @@ class NavBar extends React.Component {
               aria-label="Menu"
               onClick={this.toggleDrawer(true)}
             >
-              <MenuIcon />
+              {this.state.icon}
             </IconButton>
             <Grid
       justify="space-between" // Add it here :)

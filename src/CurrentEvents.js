@@ -47,6 +47,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Switch from '@material-ui/core/Switch';
+var QRCode = require('qrcode');
 
 const uuidv4 = require('uuid/v4');
 const redTheme = createMuiTheme({ palette: { primary: red } })
@@ -96,6 +97,7 @@ class CurrentEvents extends Component {
         image64: null,
         image64Old: null,
         urls: [],
+        qrCode: null,
         index: -1,
         hidden: "visible",
         openDelete: false,
@@ -263,10 +265,14 @@ class CurrentEvents extends Component {
         if (tags[0] == '') {
             tags = []
         }
+        let self = this;
         let date = this.getFormattedDate(event);
         let oldEvent = Object.assign({}, event);
-        this.setState({ oldEvent: oldEvent, popUpEvent: event, tags: tags, date: date, index: i, image64: this.state.urls[i], image64Old: this.state.urls[i] });
-        this.handleBeginEdit();
+        QRCode.toDataURL('https://osl-events-app.firebaseapp.com/event?id=' + event["key"] + '&name=' + event["name"].replaceAll(" ", "+"), function (err, url) {
+            console.log(url)
+            self.setState({ oldEvent: oldEvent, popUpEvent: event, tags: tags, date: date, index: i, image64: self.state.urls[i], image64Old: self.state.urls[i], qrCode: url });
+            self.handleBeginEdit();
+        })
     }
 
     handleNameChange = e => {
@@ -606,6 +612,12 @@ class CurrentEvents extends Component {
                         <Image
                             style={{width: 192, height: 108}}
                             source={{uri: this.state.image64}}
+                            />
+                        </Grid>
+                        <Grid item>
+                        <Image
+                            style={{width: 200, height: 200}}
+                            source={{uri: this.state.qrCode}}
                             />
                         </Grid>
                     </Grid>

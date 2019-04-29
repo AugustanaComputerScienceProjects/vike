@@ -108,9 +108,6 @@ class AddEvent extends Component {
 
     // Push event to Firebase
     pushEvent(self, ref, message) {
-        QRCode.toDataURL('I am a pony!', function (err, url) {
-            console.log(url)
-        })
         // Adding leading 0s
         var month = (1 + self.state.date.getMonth()).toString();
         month = month.length > 1 ? month : '0' + month;

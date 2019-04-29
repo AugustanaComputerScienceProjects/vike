@@ -8,6 +8,7 @@ import Drawer from '@material-ui/core/Drawer';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 import firebase from "./config";
+import { Link } from "react-router-dom";
 
 class NavDrawer extends Component {
 

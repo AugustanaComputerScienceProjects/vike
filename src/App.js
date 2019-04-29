@@ -10,6 +10,12 @@ import PastEvents from './PastEvents';
 import Tags from './Tags';
 import Users from './Users';
 import NavBar from "./ButtonAppBar";
+import Event from "./Event";
+import {
+    BrowserRouter as Router,
+    Route,
+    Link
+  } from 'react-router-dom'
 
 class App extends Component {
 
@@ -25,7 +31,7 @@ class App extends Component {
     mainDisplay() {
         if (this.state.selected == "Home") {
             return (
-                <Home />
+                Home
             );
         }
 
@@ -37,31 +43,31 @@ class App extends Component {
 
         if (this.state.selected == "Pending Events") {
             return  (
-                <PendingEvents />
+                PendingEvents
             );
         }
 
         if (this.state.selected == "Current Events") {
             return  (
-                <CurrentEvents />
+                CurrentEvents
             );
         }
 
         if (this.state.selected == "Past Events") {
             return (
-                <PastEvents />
+                PastEvents
             );
         }
 
         if (this.state.selected == "Tags") {
             return (
-                <Tags/>
+                Tags
             );
         }
 
         if (this.state.selected == "Users") {
             return (
-                <Users/>
+                Users
             );
         }
     }
@@ -77,9 +83,12 @@ class App extends Component {
                 <NavBar navChanged={this.onNavChanged}></NavBar>
                 </div>
                 <div style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 20, marginBottom: 20 }}>
-                {this.mainDisplay()}
+                <Router>
+                    <Route path="/" exact component={this.mainDisplay()}/>
+                    <Route path="/event" component={Event}/>
+                </Router>  
                 </div>
-            </div>     
+            </div>   
             </div>
     );
      }
