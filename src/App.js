@@ -37,7 +37,7 @@ class App extends Component {
 
         if (this.state.selected == "Add Event") {
             return (
-                <Events />
+                Events
             );
         }
 
