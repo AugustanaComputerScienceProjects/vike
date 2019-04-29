@@ -21,6 +21,8 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import defaultImage from './default.jpg';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 var QRCode = require('qrcode');
 
@@ -51,6 +53,7 @@ class AddEvent extends Component {
         image64: defaultImage,
         submitBtnText: "Request Event",
         uid: "",
+        qrChecked: true
     };
 
     handleOpen = () => {
@@ -108,6 +111,7 @@ class AddEvent extends Component {
 
     // Push event to Firebase
     pushEvent(self, ref, message) {
+        let name = self.state.name;
         // Adding leading 0s
         var month = (1 + self.state.date.getMonth()).toString();
         month = month.length > 1 ? month : '0' + month;
@@ -117,8 +121,8 @@ class AddEvent extends Component {
         hours = hours.length > 1 ? hours : '0' + hours;
         var minutes = self.state.date.getMinutes().toString();
         minutes = minutes.length > 1 ? minutes : '0' + minutes;
-        firebase.database.ref(ref).push({
-            name: self.state.name,
+        var newRef = firebase.database.ref(ref).push({
+            name: name,
             startDate: month + '-' + day + '-' + self.state.date.getFullYear() + " " + hours + ":" + minutes,
             duration: parseInt(self.state.duration),
             location: self.state.location,
@@ -127,10 +131,24 @@ class AddEvent extends Component {
             description: self.state.description,
             tags: self.state.tags.toString(),
             email: self.state.email
+        }).then((snap) => {
+            self.downloadQR(snap.key, name);
         });
         self.resetState(self);
         self.setState({ uploading: false });
         self.displayMessage(self, message);
+    }
+
+    downloadQR(key, name) {
+        QRCode.toDataURL('https://osl-events-app.firebaseapp.com/event?id=' + key + '&name=' + name.replaceAll(" ", "+"), function (err, url) {
+            console.log(url)
+            var link = document.createElement('a');
+            link.href = url;
+            link.download = name + '-QR Code.jpg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);    
+        });
     }
 
     submitAction = event => {
@@ -141,6 +159,10 @@ class AddEvent extends Component {
             alert("Required fields are not filled in.");
         }
     };
+
+    toggleChecked = () => {
+        this.setState({qrChecked: !this.state.qrChecked});
+    }
 
     resetState(self) {
         self.setState({
@@ -163,14 +185,6 @@ class AddEvent extends Component {
         self.handleClose();
         self.setState({ message: message });
         self.handleOpen();
-    }
-
-    componentDidMount() {
-        let self = this;
-        QRCode.toDataURL('https://osl-events-app.firebaseapp.com/', function (err, url) {
-            console.log(url)
-            self.setState({ qr64: url });
-        })
     }
 
     checkRole(user, role) {
@@ -326,7 +340,9 @@ class AddEvent extends Component {
                                 Select Image    
                             </Button>
                             </ImagePicker>
-                            <Button variant="contained"
+                        </Grid>
+                        <Grid item>
+                        <Button variant="contained"
                                 color="primary"
                                 disabled={this.state.uploading}
                                 onClick={this.submitAction}>
@@ -339,7 +355,15 @@ class AddEvent extends Component {
                     <ParentComponent style={{marginLeft: 50, width: 300, height: 400}}>
                         {child}
                     </ParentComponent>
-                    <div style={{marginTop: 20}}><Image style={{width: 200, height: 200}} source={{uri: this.state.qr64}}></Image></div>
+                    <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={this.state.qrChecked}
+                            onChange={this.toggleChecked}
+                            value="qrChecked"
+                            color="primary"/>
+                        }
+                        label="Download QR Code" />
                     </div>
                 </Grid>
                 </MuiPickersUtilsProvider>

@@ -40,6 +40,7 @@ import { fade } from '@material-ui/core/styles/colorManipulator';
 import CloseIcon from '@material-ui/icons/Close';
 import SortIcon from '@material-ui/icons/Sort';
 import IconButton from '@material-ui/core/IconButton';
+import SaveButton from '@material-ui/icons/SaveAlt'
 import Divider from '@material-ui/core/Divider';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
@@ -399,6 +400,15 @@ class CurrentEvents extends Component {
         this.sort(this.state.events, this.state.urls, this.state.sortBy, event.target.checked);
     };
 
+    downloadQR = () => {
+        var link = document.createElement('a');
+        link.href = this.state.qrCode;
+        link.download = this.state.popUpEvent["name"] + '-QR Code.jpg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);    
+    }
+
     getFormattedDate(event) {
         let arr = event["startDate"].split(' ');
         let arr2 = arr[0].split('-');
@@ -619,6 +629,7 @@ class CurrentEvents extends Component {
                             style={{width: 200, height: 200}}
                             source={{uri: this.state.qrCode}}
                             />
+                        <Button variant="contained" onClick={this.downloadQR}><SaveButton/>Download QR</Button>
                         </Grid>
                     </Grid>
                 </Grid>
