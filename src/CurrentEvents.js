@@ -48,10 +48,11 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Switch from '@material-ui/core/Switch';
+import DispatchGroup from './DispatchGroup';
 var QRCode = require('qrcode');
 
 const uuidv4 = require('uuid/v4');
-const redTheme = createMuiTheme({ palette: { primary: red } })
+const redTheme = createMuiTheme({ palette: { primary: red } });
 
 const testTags = [
     'comedy',
@@ -86,8 +87,12 @@ function getModalStyle() {
 
 class CurrentEvents extends Component {
 
+    group = new DispatchGroup();
+    token = null;
+
     state = {
         events: [],
+        originalEvents: [],
         editing: false,
         open: false,
         popUpEvent: [],
@@ -113,6 +118,7 @@ class CurrentEvents extends Component {
     handleBeginEdit = () => {
         this.handleClose();
         this.setState({ editing: true });
+        this.token = this.group.enter();
     };
 
     handleDelete = () => {
@@ -126,6 +132,7 @@ class CurrentEvents extends Component {
         let newEvents = this.arrayRemove(this.state.events, this.state.popUpEvent);
         this.state.urls.splice(this.state.index, 1);
         this.setState({ events: newEvents, openDelete: false });
+        this.group.leave(this.token);
     }
     
     arrayRemove(arr, value) {
@@ -182,6 +189,7 @@ class CurrentEvents extends Component {
         let revertEvents = this.state.events;
         revertEvents[this.state.index] = this.state.oldEvent;
         this.setState({ editing: false, events: revertEvents });
+        this.group.leave(this.token);
     }
 
     pushEvent(self, event) {
@@ -197,6 +205,7 @@ class CurrentEvents extends Component {
         });
         self.setState({ uploading: false });
         self.displayMessage(self, "Event Updated");
+        this.group.leave(this.token);
     }
 
     displayMessage(self, message) {
@@ -244,8 +253,10 @@ class CurrentEvents extends Component {
             listURLS[index] = url;
             console.log(index);
             if (snapshot.numChildren() == listURLS.length) {
-                self.setState({ events: listEvents, originalEvents: listEvents, urls: listURLS, originalURLS: listURLS, hidden: "hidden" });
-                this.filterEvents(this.state.searchText, listEvents, listURLS);
+                self.group.notify(function() {
+                    self.setState({ events: listEvents, originalEvents: listEvents, urls: listURLS, originalURLS: listURLS, hidden: "hidden" });
+                    self.filterEvents(self.state.searchText, listEvents, listURLS);
+                });
             }
           }).catch((error) => {
             // Handle any errors

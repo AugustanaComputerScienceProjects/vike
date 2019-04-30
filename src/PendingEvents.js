@@ -34,6 +34,7 @@ import { red, blue } from '@material-ui/core/colors';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Snackbar from '@material-ui/core/Snackbar'; 
 import CircularProgress from '@material-ui/core/CircularProgress';
+import DispatchGroup from './DispatchGroup';
 
 const uuidv4 = require('uuid/v4');
 const redTheme = createMuiTheme({ palette: { primary: red } })
@@ -71,6 +72,9 @@ function getModalStyle() {
 
 class PendingEvents extends Component {
 
+    group = new DispatchGroup();
+    token = null;
+
     state = {
         events: [],
         editing: false,
@@ -99,6 +103,7 @@ class PendingEvents extends Component {
     handleBeginEdit = () => {
         this.handleClose();
         this.setState({ editing: true });
+        this.token = this.group.enter();
     };
 
     handleDelete = () => {
@@ -120,6 +125,7 @@ class PendingEvents extends Component {
         let newEvents = this.arrayRemove(this.state.events, this.state.popUpEvent);
         this.state.urls.splice(this.state.index, 1);
         this.setState({ events: newEvents, openDelete: false });
+        this.group.leave(this.token);
     }
 
     arrayRemove(arr, value) {
@@ -185,6 +191,7 @@ class PendingEvents extends Component {
         let revertEvents = this.state.events;
         revertEvents[this.state.index] = this.state.oldEvent;
         this.setState({ editing: false, events: revertEvents });
+        this.group.leave(this.token);
     }
 
     pushEvent(self, event, ref, message) {
@@ -200,6 +207,7 @@ class PendingEvents extends Component {
         });
         self.setState({ uploading: false });
         self.displayMessage(self, message);
+        this.group.leave(this.token);
     }
 
     displayMessage(self, message) {
@@ -280,7 +288,9 @@ class PendingEvents extends Component {
             listURLS[index] = url;
             console.log(index);
             if (endLength == listURLS.length) {
-                self.setState({ events: listEvents, urls: listURLS, hidden: "hidden" });
+                self.group.notify(function() {
+                    self.setState({ events: listEvents, urls: listURLS, hidden: "hidden" });
+                });
             }
           }).catch((error) => {
             // Handle any errors
