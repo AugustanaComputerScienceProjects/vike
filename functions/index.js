@@ -15,6 +15,9 @@ exports.moveEvents = functions.https.onRequest((req, res) => {
                 console.log("Moving Event: " + event["name"]);
                 db.ref('/past-events/' + child.key).set(event);
                 db.ref('/current-events/' + child.key).remove();
+                if (event["imgid"] !== "default") {
+                    admin.storage().bucket('Images/' + event["imgid"] + '.jpg').delete();
+                }
             }
         });
         return;
