@@ -238,10 +238,12 @@ class CurrentEvents extends Component {
                 self.getImage(self, index, snapshot, childSnapshot, listEvents, listURLS);
             });
             if (snapshot.numChildren() === 0) {
-                self.setState({ events: [], originalEvents: [], urls: [], originalURLS: [] });
-                if (self.state.isInitial) {
-                    self.setState({ hidden: "hidden", message: "No Events Found", open: true});
-                }
+                self.group.notify(function() {
+                    self.setState({ events: [], originalEvents: [], urls: [], originalURLS: [] });
+                    if (self.state.isInitial) {
+                        self.setState({ hidden: "hidden", message: "No Events Found", open: true});
+                    }
+                });
             }
             self.setState({ isInitial: false });
         });

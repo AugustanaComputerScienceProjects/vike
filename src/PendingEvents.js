@@ -249,10 +249,12 @@ class PendingEvents extends Component {
                 });
             });
             if (snapshot.numChildren() === 0) {
-                self.setState({ events: listEvents, urls: listURLS });
-                if (self.state.isInitial) {
-                    self.setState({ hidden: "hidden", message: "No Events Found", open: true});
-                }
+                self.group.notify(function() {
+                    self.setState({ events: [], urls: [] });
+                    if (self.state.isInitial) {
+                        self.setState({ hidden: "hidden", message: "No Events Found", open: true});
+                    }
+                });
             }
             self.setState({ isInitial: false });
         });
@@ -274,10 +276,12 @@ class PendingEvents extends Component {
                 self.getImage(self, index, snapshot, childSnapshot, listEvents, listURLS, snapshot.numChildren());
             });
             if (snapshot.numChildren() === 0) {
-                self.setState({ events: listEvents, urls: listURLS });
-                if (self.state.isInitial) {
-                    self.setState({ hidden: "hidden", message: "No Events Found", open: true});
-                }
+                self.group.notify(function() {
+                    self.setState({ events: [], urls: [] });
+                    if (self.state.isInitial) {
+                        self.setState({ hidden: "hidden", message: "No Events Found", open: true});
+                    }
+                });
             }
             self.setState({ isInitial: false });
         });
