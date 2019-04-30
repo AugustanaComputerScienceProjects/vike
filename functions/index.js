@@ -11,9 +11,8 @@ exports.moveEvents = functions.https.onRequest((req, res) => {
             let event = child.val();
             let nowDate = new Date();
             let eventEndDate = getEndDate(event);
-            console.log(nowDate);
-            console.log(eventEndDate);
             if (nowDate > eventEndDate) {
+                console.log("Moving Event: " + event["name"]);
                 db.ref('/past-events/' + child.key).set(event);
                 db.ref('/current-events/' + child.key).remove();
             }

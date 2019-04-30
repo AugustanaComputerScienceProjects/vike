@@ -128,12 +128,24 @@ class Users extends Component {
 
         return (
             <div>
+            <Grid container>
+            <Grid item container direction="row">
+            <Grid item style={{width: "50%"}}>
+            <Paper style={{padding: 20, marginRight: 20}}>
             <ParentComponent title={"Administrators:"} addAction={() => this.addAction("/admin/", "Administrator")}>
                 {adminChildren}
             </ParentComponent>
+            </Paper>
+            </Grid>
+            <Grid item style={{width: "50%"}}>
+            <Paper style={{padding: 20}}>
             <ParentComponent title={"Leaders:"} addAction={() => this.addAction("/leaders/", "Leader")}>
                 {leaderChildren}
             </ParentComponent>
+            </Paper>
+            </Grid>
+            </Grid>
+            </Grid>
             <Dialog onClose={this.handleClose}
           aria-labelledby="customized-dialog-title"
           open={this.state.adding}>
