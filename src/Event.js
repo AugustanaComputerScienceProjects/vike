@@ -13,22 +13,29 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 class Event extends Component {
 
+    state = {text: "Checking In...", hidden: "visible"};
+
     constructor(props) {
         super(props);
         this.values = queryString.parse(this.props.location.search);
         this.checkIn();
-        this.state = {text: "Checking In...", hidden: "visible"};
     }
 
     checkIn() {
         let self = this;
-        firebase.database.ref('/current-events/' + this.values.id + '/users/' + this.values.email).set(true, function(error) {
-            if (error) {
-                self.setState({ text: "There was a problem checking you in.\n\nMake sure you are signed into the Augustana Events Web App using your Augustana email and then refresh the page.", hidden: "hidden" });
-            } else {
-                self.setState({ text: "Successfully checked in as " + self.values.email + ".", hidden: "hidden" });
-            }
-          });
+        if (this.values.id != null && this.values.id != "" && this.values.name != null && this.values.name != "" && this.values.email != null && this.values.email != "") {
+            firebase.database.ref('/current-events/' + this.values.id + '/users/' + this.values.email).set(true, function(error) {
+                if (error) {
+                    self.setState({ text: "There was a problem checking you in.\n\nMake sure you are signed into the Augustana Events Web App using your Augustana email and then refresh the page.", hidden: "hidden" });
+                } else {
+                    self.setState({ text: "Successfully checked in as " + self.values.email + ".", hidden: "hidden" });
+                }
+            });
+        } else {
+            this.values.name = "Error";
+            this.state.text = "Invalid QR link.";
+            this.state.hidden = "hidden";
+        }
     }
 
     render() {
