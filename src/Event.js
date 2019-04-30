@@ -14,6 +14,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 class Event extends Component {
 
     state = {text: "Checking In...", hidden: "visible"};
+    off = null;
 
     constructor(props) {
         super(props);
@@ -23,12 +24,19 @@ class Event extends Component {
 
     checkIn() {
         let self = this;
-        if (this.values.id != null && this.values.id != "" && this.values.name != null && this.values.name != "" && this.values.email != null && this.values.email != "") {
-            firebase.database.ref('/current-events/' + this.values.id + '/users/' + this.values.email).set(true, function(error) {
-                if (error) {
-                    self.setState({ text: "There was a problem checking you in.\n\nMake sure you are signed into the Augustana Events Web App using your Augustana email and then refresh the page.\n\nMake sure this isn't an old event link.", hidden: "hidden" });
+        if (this.values.id != null && this.values.id != "" && this.values.name != null && this.values.name != "") {
+            this.off = firebase.auth.onAuthStateChanged((user) => {
+                if (user) {
+                    let email = user.email.replace('@augustana.edu', '');
+                    firebase.database.ref('/current-events/' + this.values.id + '/users/' + email).set(true, function(error) {
+                        if (error) {
+                            self.setState({ text: "There was a problem checking you in.\n\nMake sure this isn't an old event link.", hidden: "hidden" });
+                        } else {
+                            self.setState({ text: "Successfully checked in as " + email + ".", hidden: "hidden" });
+                        }
+                    });
                 } else {
-                    self.setState({ text: "Successfully checked in as " + self.values.email + ".", hidden: "hidden" });
+                    self.setState({ text: "There was a problem checking you in.\n\nMake sure you are signed into the Augustana Events Web App using your Augustana email.", hidden: "hidden" });
                 }
             });
         } else {
@@ -36,6 +44,10 @@ class Event extends Component {
             this.state.text = "Invalid QR link.";
             this.state.hidden = "hidden";
         }
+    }
+
+    componentWillUnmount() {
+        this.off();
     }
 
     render() {
