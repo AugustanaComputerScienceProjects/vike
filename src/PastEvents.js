@@ -17,6 +17,8 @@ import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 
+import firebase from './config';
+
 
 
 
@@ -27,12 +29,61 @@ class PastEvents extends Component {
         this.state = {
             sortDate1: "2017-05-24",
             sortDate2: "2017-05-24",
-            displayedEvents: [new PastEventObj("title1", "2017-05-24", 1, 2, 3, 4, 5), new PastEventObj("title2", "2017-05-24", 1, 2, 3, 4, 5), new PastEventObj("title3", "2017-05-24", 1, 2, 3, 4, 5)]
+            displayedEvents: [],
+            events : [],
         }
         this.handleDate1Change = this.handleDate1Change.bind(this);
         this.handleDate2Change = this.handleDate2Change.bind(this);
+        this.readPastEvents = this.readPastEvents.bind(this);
+        
+        
     }
+
+    componentDidMount(){
+        this.readPastEvents();
+    }
+
+        listener = null;
+
     //TODO hook up do firebase and alter display based on dates
+
+    readPastEvents() {
+        let self = this;
+        this.listener = firebase.database.ref('/past-events').orderByChild('startDate');
+        this.listener.on('value', function(snapshot) {
+            let listEvents = [];
+            snapshot.forEach(function(childSnapshot) {
+                let webEvent = childSnapshot.val();
+
+                let len = 0;
+
+                if(webEvent.hasOwnProperty("users")){
+                //    webEvent["users"].forEach(function(user){
+                  //      len++
+                   // })
+                   let users = webEvent["users"]
+                   len = Object.keys(users).length;
+                }
+
+
+                let event = new PastEventObj(webEvent["name"],"2017-05-24",len,0,0,0,0)
+                self.setState(state =>{
+                    const displayedEvents = state.displayedEvents.concat(event);
+
+                    return {
+                        displayedEvents,
+                    }
+                })
+
+                if(listEvents.length==snapshot.numChildren()){
+                    self.setState({ events: listEvents});
+                }
+
+
+            });
+        });
+    }
+
 
     handleDate1Change = event => {
         this.setState({ sortDate1: event.target.value });
@@ -89,8 +140,7 @@ class PastEvents extends Component {
                     ))}
 
                 </Grid>
-
-
+                
             </div>
 
 
