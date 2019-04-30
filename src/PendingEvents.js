@@ -122,9 +122,7 @@ class PendingEvents extends Component {
         if (event["imgid"] != "default") {
             firebaseStorageRef.child(event["imgid"] + ".jpg").delete();
         }
-        let newEvents = this.arrayRemove(this.state.events, this.state.popUpEvent);
-        this.state.urls.splice(this.state.index, 1);
-        this.setState({ events: newEvents, openDelete: false });
+        this.setState({ openDelete: false });
         this.group.leave(this.token);
     }
 
@@ -229,11 +227,9 @@ class PendingEvents extends Component {
 
     readAllPendingEvents() {
         let self = this;
-        let listEvents = [];
-        let listURLS = [];
         this.allListener.on('value', function(snapshot) {
-            listEvents = [];
-            listURLS = self.state.urls;
+            let listEvents = [];
+            let listURLS = [];
             let index = -1;
             let total = 0;
             snapshot.forEach(function(child) {
@@ -252,8 +248,11 @@ class PendingEvents extends Component {
                     self.getImage(self, index, child, childSnapshot, listEvents, listURLS, total);
                 });
             });
-            if (snapshot.numChildren() === 0 && self.state.isInitial) {
-                self.setState({ hidden: "hidden", message: "No Events Found", open: true })
+            if (snapshot.numChildren() === 0) {
+                self.setState({ events: listEvents, urls: listURLS });
+                if (self.state.isInitial) {
+                    self.setState({ hidden: "hidden", message: "No Events Found", open: true});
+                }
             }
             self.setState({ isInitial: false });
         });
@@ -261,12 +260,10 @@ class PendingEvents extends Component {
 
     readPendingEvents(ref) {
         let self = this;
-        let listEvents = [];
-        let listURLS = [];
         this.singleListener = firebase.database.ref(ref).orderByChild('name');
         this.singleListener.on('value', function(snapshot) {
-            listEvents = [];
-            listURLS = self.state.urls;
+            let listEvents = [];
+            let listURLS = [];
             let index = -1;
             snapshot.forEach(function(childSnapshot) {
                 let event = childSnapshot.val();
@@ -276,8 +273,11 @@ class PendingEvents extends Component {
                 index = index + 1;
                 self.getImage(self, index, snapshot, childSnapshot, listEvents, listURLS, snapshot.numChildren());
             });
-            if (snapshot.numChildren() === 0 && self.state.isInitial) {
-                self.setState({ hidden: "hidden", message: "No Events Found", open: true })
+            if (snapshot.numChildren() === 0) {
+                self.setState({ events: listEvents, urls: listURLS });
+                if (self.state.isInitial) {
+                    self.setState({ hidden: "hidden", message: "No Events Found", open: true});
+                }
             }
             self.setState({ isInitial: false });
         });

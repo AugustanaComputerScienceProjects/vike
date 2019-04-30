@@ -129,9 +129,7 @@ class CurrentEvents extends Component {
         if (event["imgid"] != "default") {
             firebaseStorageRef.child(event["imgid"] + ".jpg").delete();
         }
-        let newEvents = this.arrayRemove(this.state.events, this.state.popUpEvent);
-        this.state.urls.splice(this.state.index, 1);
-        this.setState({ events: newEvents, openDelete: false });
+        this.setState({ openDelete: false });
         this.group.leave(this.token);
     }
     
@@ -227,12 +225,10 @@ class CurrentEvents extends Component {
 
     readCurrentEvents() {
         let self = this;
-        let listEvents = [];
-        let listURLS = [];
         this.listener = firebase.database.ref('/current-events').orderByChild('name');
         this.listener.on('value', function(snapshot) {
-            listEvents = [];
-            listURLS = self.state.urls;
+            let listEvents = [];
+            let listURLS = [];
             let index = -1;
             snapshot.forEach(function(childSnapshot) {
                 let event = childSnapshot.val();
@@ -241,8 +237,11 @@ class CurrentEvents extends Component {
                 index = index + 1;
                 self.getImage(self, index, snapshot, childSnapshot, listEvents, listURLS);
             });
-            if (snapshot.numChildren() === 0 && self.state.isInitial) {
-                self.setState({ hidden: "hidden", message: "No Events Found", open: true })
+            if (snapshot.numChildren() === 0) {
+                self.setState({ events: [], originalEvents: [], urls: [], originalURLS: [] });
+                if (self.state.isInitial) {
+                    self.setState({ hidden: "hidden", message: "No Events Found", open: true});
+                }
             }
             self.setState({ isInitial: false });
         });
@@ -251,7 +250,6 @@ class CurrentEvents extends Component {
     getImage(self, index, snapshot, childSnapshot, listEvents, listURLS) {
         firebase.storage.ref('Images').child(childSnapshot.child('imgid').val() + '.jpg').getDownloadURL().then((url) => {    
             listURLS[index] = url;
-            console.log(index);
             if (snapshot.numChildren() == listURLS.length) {
                 self.group.notify(function() {
                     self.setState({ events: listEvents, originalEvents: listEvents, urls: listURLS, originalURLS: listURLS, hidden: "hidden" });
