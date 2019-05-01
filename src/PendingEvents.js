@@ -111,7 +111,10 @@ class PendingEvents extends Component {
         if (this.state.adminSignedIn) {
             this.deleteEvent('/pending-events/' + this.state.popUpEvent["userKey"]);
         } else if (this.state.leaderSignedIn) {
-            this.deleteEvent('/pending-events/' + this.state.uid);
+            let self = this;
+            firebase.database.ref('/pending-events/' + this.state.uid + '/' + this.state.popUpEvent["key"] + '/email').set("Deleted by user").then(function() {
+                self.deleteEvent('/pending-events/' + self.state.uid);
+            });
         }
     }
     
@@ -270,11 +273,13 @@ class PendingEvents extends Component {
             let index = -1;
             snapshot.forEach(function(childSnapshot) {
                 let event = childSnapshot.val();
-                event["status"] = "Status: Pending";
-                event["key"] = childSnapshot.key;
-                listEvents.push(event);
-                index = index + 1;
-                self.getImage(self, index, snapshot, childSnapshot, listEvents, listURLS, snapshot.numChildren());
+                if (event["email"] != "Deleted by user") {
+                    event["status"] = "Status: Pending";
+                    event["key"] = childSnapshot.key;
+                    listEvents.push(event);
+                    index = index + 1;
+                    self.getImage(self, index, snapshot, childSnapshot, listEvents, listURLS, snapshot.numChildren());
+                }
             });
             if (snapshot.numChildren() === 0) {
                 self.group.notify(function() {

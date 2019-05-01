@@ -47,13 +47,14 @@ exports.moveEvents = functions.https.onRequest((req, res) => {
 exports.emailNotify = functions.database.ref('/pending-events/{userID}/{eventID}').onDelete((snapshot, context) => {
     admin.database().ref('/current-events/' + snapshot.key).once('value').then(function(snap) {
         let event = snapshot.val();
-        var qrCode = null;
+        if (event["email"] === "Deleted by user") {
+            return;
+        }
 
         return QRCode.toDataURL('https://osl-events-app.firebaseapp.com/event?id=' + snapshot.key + '&name=' + event["name"], function (err, url) {
             if(err) {
                 return err;
             }
-            qrCode = url;
             var subject = "";
             var message = "";
             var attachments = [];
