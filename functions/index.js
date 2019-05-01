@@ -9,7 +9,7 @@ let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'acesdispatcher@augustana.edu',
-        pass: 'ACES2018!'
+        pass: ''
     }
 });
 
@@ -53,7 +53,6 @@ exports.emailNotify = functions.database.ref('/pending-events/{userID}/{eventID}
             if(err) {
                 return err;
             }
-            console.log(url);
             qrCode = url;
             var subject = "";
             var message = "";
