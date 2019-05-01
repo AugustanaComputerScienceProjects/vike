@@ -202,6 +202,7 @@ class PendingEvents extends Component {
             imgid: event["imgid"],
             description: event["description"],
             tags: event["tags"],
+            email: event["email"],
         });
         self.setState({ uploading: false });
         self.displayMessage(self, message);
