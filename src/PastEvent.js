@@ -16,7 +16,7 @@ class PastEvent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            parentEvent : props.parentEvent,
+            parentEvent : this.props.parentEvent,
            
           
         }
