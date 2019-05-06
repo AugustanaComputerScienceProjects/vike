@@ -28,15 +28,6 @@ var QRCode = require('qrcode');
 
 const uuidv4 = require('uuid/v4');
 
-const testTags = [
-    'comedy',
-    'movie',
-    'food',
-    'raffle',
-    'caps',
-    'performance',
-];
-
 class AddEvent extends Component {
     state = {
         open: false,
@@ -54,8 +45,18 @@ class AddEvent extends Component {
         submitBtnText: "Request Event",
         uid: "",
         qrChecked: false,
-        qrDisabled: true
+        qrDisabled: true,
+        databaseTags: [],
+        groups: [],
     };
+
+    listeners = [];
+
+    componentWillUnmount() {
+        this.listeners.forEach(function(listener) {
+            listener.off();
+        });
+    }
 
     handleOpen = () => {
         this.setState({ open: true });
@@ -203,7 +204,37 @@ class AddEvent extends Component {
           });
     }
 
+    readTags() {
+        let self = this;
+        let ref = firebase.database.ref('/tags');
+        this.listeners.push(ref);
+        ref.on('value', function(snapshot) {
+          let tagsList = [];
+          snapshot.forEach(function(child) {
+            tagsList.push(child.val());
+          });
+          self.setState({ databaseTags: tagsList});
+          console.log(tagsList);
+        })
+      }
+
+      readGroups() {
+        let self = this;
+        let ref = firebase.database.ref('/groups');
+        this.listeners.push(ref);
+        ref.on('value', function(snapshot) {
+          let groupsList = [];
+          snapshot.forEach(function(child) {
+            groupsList.push(child.val());
+          });
+          self.setState({ groups: groupsList });
+          console.log(groupsList);
+        })
+      }
+
     componentWillMount() {
+        this.readTags();
+        this.readGroups();
         firebase.auth.onAuthStateChanged((user) => {
           if (user) {
               this.checkRole(user, 'admin');
@@ -288,15 +319,24 @@ class AddEvent extends Component {
                                 />
                         </Grid>
                         <Grid item>
-                            <TextField
-                                id="event-org"
-                                label="Group"
-                                margin="normal"
-                                value={this.state.organization}
-                                onChange={e => this.setState({ organization: e.target.value })}
-                                />
+                            <FormControl>
+                                <InputLabel>Group</InputLabel>
+                                <Select
+                                    displayEmpty
+                                    value={this.state.organization}
+                                    style={{minWidth: 200, maxWidth: 200}}
+                                    onChange={e => this.setState({ organization: e.target.value })}
+                                    variant='outlined'
+                                    >
+                                    {this.state.groups.map(group => (
+                                        <MenuItem key={group} value={group}>
+                                            {group}
+                                        </MenuItem>
+                                    ))}    
+                                </Select>
+                            </FormControl>
                         </Grid>
-                        <Grid item container direction="row">
+                        <Grid item> 
                             <FormControl>
                                 <InputLabel htmlFor="select-multiple">Tags</InputLabel>
                                 <Select
@@ -304,14 +344,14 @@ class AddEvent extends Component {
                                     displayEmpty
                                     input={<Input id="select-multiple"/>}
                                     value={this.state.tags}
+                                    style={{minWidth: 200, maxWidth: 200}}
                                     onChange={e => this.setState({ tags: e.target.value })}
                                     variant='outlined'
-                                    style={{minWidth: '150px',maxWidth: '150px'}}
                                     >
                                     <MenuItem disabled value="">
                                         <em>Select Tags</em>
                                     </MenuItem>
-                                    {testTags.map(tag => (
+                                    {this.state.databaseTags.map(tag => (
                                         <MenuItem key={tag} value={tag}>
                                             {tag}
                                         </MenuItem>
