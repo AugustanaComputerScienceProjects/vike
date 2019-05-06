@@ -12,109 +12,211 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import { red, blue } from '@material-ui/core/colors';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import CloseIcon from '@material-ui/icons/Close';
+import AddIcon from '@material-ui/icons/Add';
+
+const redTheme = createMuiTheme({ palette: { primary: red } })
 
 class Tags extends Component {
+  
   state = {
-    tagsList: [],
-    keys: [],
-    newTag: "",
+    tags: [],
+    groups: [],
+    key: "",
+    data: "",
+    adding: false,
+    ref: '',
+    type: '',
+    deleting: false
   }
 
-  componentDidMount() {
-    this.readTagsList();
+  listeners = [];
+
+  componentWillMount() {
+    this.readTags();
+    this.readGroups();
   }
 
-  readTagsList() {
+  componentWillUnmount() {
+    this.listeners.forEach(function(listener) {
+        listener.off();
+    });
+}
+
+  readTags() {
     let self = this;
-    let ref = firebase.database.ref('tags');
+    let ref = firebase.database.ref('/tags');
+    this.listeners.push(ref);
     ref.on('value', function(snapshot) {
       let tagsList = [];
-      let keys = [];
       snapshot.forEach(function(child) {
-        tagsList.push(child.val());
-        keys.push(child.key);
+        tagsList.push([child.key, child.val()]);
       });
-      self.setState({ tagsList: tagsList});
-      self.setState({ keys: keys})
+      self.setState({ tags: tagsList});
       console.log(tagsList);
     })
-
   }
 
-  handleNewTagChange = e => {
-    this.setState({ newTag: e.target.value})
+  readGroups() {
+    let self = this;
+    let ref = firebase.database.ref('/groups');
+    this.listeners.push(ref);
+    ref.on('value', function(snapshot) {
+      let groupsList = [];
+      snapshot.forEach(function(child) {
+        groupsList.push([child.key, child.val()]);
+      });
+      self.setState({ groups: groupsList });
+      console.log(groupsList);
+    })
   }
 
-  handleTagAdd = e => {
-    let added = this.state.tagsList.concat(this.state.newTag)
-    this.setState({tagsList: added})
+  removeAction = (ref, data, key, type) => {
+    this.setState({ key: key, data: data, ref: ref, type: type});
+    this.handleDeleteOpen();
+}
 
-    let ref = firebase.database.ref('tags');
-    ref.push(this.state.newTag);
-    this.setState({newTag: ""});
-  }
+handleDeleteClose = () => {
+  this.setState({ deleting: false });
+}
 
-  handleTagRemove(index) {
-    let copy = [...this.state.tagsList];
-    if (index !== -1) {
-      copy.splice(index,1);
-      this.setState({tagsList: copy})
-    }
+handleDeleteOpen = () => {
+  this.setState({ deleting: true });
+}
 
-    let ref = firebase.database.ref('tags');
-    ref.child(this.state.keys[index]).remove();
-  }
+addAction = (ref, type) => {
+  this.setState({ data: '', ref: ref, type: type });
+  this.handleOpen();
+}
 
+handleClose = () => {
+  this.setState({ adding: false });
+}
+
+handleOpen = () => {
+  this.setState({ adding: true });
+}
+
+handleSave = () => {
+  firebase.database.ref(this.state.ref).push().set(this.state.data);
+  this.handleClose();
+}
+
+handleChange = (event) => {
+  this.setState({ data: event.target.value });
+}
+
+deleteData = () => {
+  firebase.database.ref(this.state.ref + "/" + this.state.key).remove();
+  this.handleDeleteClose();
+}
 
     render() {
-
         const tagsChildren = [];
+        const groupsChildren = [];
 
-        for (var i = 0; i < this.state.tagsList.length; i+=1) {
+        for (var i = 0; i < this.state.tags.length; i += 1) {
           let index = i;
-          tagsChildren.push(
-            <Grid item>
-            <Paper style={{padding: '5px', display: 'flex', width: '200px'}}>
-            <Grid item container direction="row" spacing={16}>
-                <Grid item>
-                <Typography style={{margin: 6}}>{this.state.tagsList[index]}</Typography>
-                </Grid>
-                <Grid item>
-                <IconButton style={{marginLeft: 60}} onClick={(e) => this.handleTagRemove(index)}><DeleteIcon /></IconButton>
-                </Grid>
-            </Grid>
-          </Paper>
-          </Grid>)
-        }
+          let tag = this.state.tags[index];
+          tagsChildren.push(<ChildComponent key={index} data={tag[1]} removeAction={() => this.removeAction("/tags/", tag[1], tag[0], "tag")}></ChildComponent>)
+      }
+      
+      for (var i = 0; i < this.state.groups.length; i += 1) {
+          let index = i;
+          let group = this.state.groups[index];
+          groupsChildren.push(<ChildComponent key={index} data={group[1]} removeAction={() => this.removeAction("/groups/", group[1], group[0], "group")}></ChildComponent>)
+      }
 
         return (
 
-            <div style={{textAlign: 'center'}}>
-              <div style={{display: 'inline-block'}}>
-                <Grid container direction = "column">
-                  <Grid item container direction = "row">
-                    <Grid item>
-                      <TextField
-                          label = "New Tag"
-                          id = "new-tag"
-                          margin="normal"
-                          style={{width: '110px'}}
-                          value={this.state.newTag}
-                          onChange={this.handleNewTagChange} />
-                    </Grid>
-                    <Grid item>
-                      <Button style={{marginTop: '30px', marginLeft: '10px'}} variant="contained" onClick={this.handleTagAdd}>
-                        Add Tag
-                      </Button>
-                    </Grid>
-                </Grid>
+          <div>
+            <Grid container>
+            <Grid item container direction="row">
+            <Grid item style={{width: "50%"}}>
+            <Paper style={{padding: 20, marginRight: 20}}>
+            <ParentComponent title={"Groups:"} addAction={() => this.addAction("/groups/", "Group")}>
+                {groupsChildren}
+            </ParentComponent>
+            </Paper>
+            </Grid>
+            <Grid item style={{width: "50%"}}>
+            <Paper style={{padding: 20}}>
+            <ParentComponent title={"Tags:"} addAction={() => this.addAction("/tags/", "Tag")}>
                 {tagsChildren}
+            </ParentComponent>
+            </Paper>
+            </Grid>
+            </Grid>
+            </Grid>
+            <Dialog onClose={this.handleClose}
+          aria-labelledby="customized-dialog-title"
+          open={this.state.adding}>
+      <DialogTitle id="customized-dialog-title" onClose={this.handleCloseEdit}>
+            Add {this.state.type}
+          </DialogTitle>
+          <DialogContent>
+                <Grid container>
+                    <Grid item container direction="column" spacing={0}>
+                        <Grid item>
+                            <TextField
+                                    autoFocus={true}
+                                    style={{width: 300}}
+                                    label={this.state.type}
+                                    id="data"
+                                    margin="normal"
+                                    value={this.state.data}
+                                    onChange={this.handleChange} />                        
+                        </Grid>
+                    </Grid>
                 </Grid>
-              </div>
+          </DialogContent>
+          <DialogActions style={{justifyContent: 'center'}}>
+          <Button variant="contained" onClick={this.handleSave} color="primary">
+              Add
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={this.state.deleting}
+          onClose={this.handleDeleteClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{"Are you sure you want to remove this " + this.state.type + "?"}</DialogTitle>
+          <DialogContent>
+              <label>{this.state.data}</label>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleDeleteClose} color="primary">
+              Cancel
+            </Button>
+            <MuiThemeProvider theme={redTheme}>
+            <Button onClick={this.deleteData} color="primary" autoFocus>
+              Confirm
+            </Button>
+            </MuiThemeProvider>
+          </DialogActions>
+        </Dialog>
             </div>
-
         );
     }
 }
+
+const ParentComponent = props => (
+  <div style={{width: 1000}}>
+    <Grid container id="children-pane" direction="column" spacing={16}>
+    <Grid item container><Typography variant="h5">{props.title}</Typography><Button style={{marginLeft: 10}} onClick={props.addAction} color="primary" variant="outlined"><AddIcon/>Add</Button></Grid>
+      {props.children}
+    </Grid>
+  </div>
+);
+
+const ChildComponent = props => <Grid item container><Typography component="p" style={{marginTop: 7}}>{props.data}</Typography><MuiThemeProvider theme={redTheme}><Button color="primary" onClick={props.removeAction}><CloseIcon/></Button></MuiThemeProvider></Grid>;
 
 export default Tags;

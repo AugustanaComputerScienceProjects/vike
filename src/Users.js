@@ -176,7 +176,7 @@ class Users extends Component {
         </Dialog>
         <Dialog
           open={this.state.deleting}
-          onClose={this.handleClose}
+          onClose={this.handleDeleteClose}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >

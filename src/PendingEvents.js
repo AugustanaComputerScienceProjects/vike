@@ -432,7 +432,7 @@ class PendingEvents extends Component {
             minutes = minutes.length > 1 ? minutes : '0' + minutes;
             let fullDate = startDate + "-" + hours + ":" + minutes;
             children.push(<ChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
-            organization={'Organization: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
+            organization={'Group: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
             editAction={() => this.editAction(event, index)} email={event["status"]}/>);
         };
 
@@ -498,7 +498,7 @@ class PendingEvents extends Component {
                         <Grid item>
                             <TextField
                                 id="event-org"
-                                label="Organization"
+                                label="Group"
                                 margin="normal"
                                 value={this.state.popUpEvent["organization"]}
                                 onChange={this.handleOrganizationChange} />

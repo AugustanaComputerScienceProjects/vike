@@ -235,7 +235,7 @@ class AddEvent extends Component {
         minutes = minutes.length > 1 ? minutes : '0' + minutes;
         let fullDate = startDate + "-" + hours + ":" + minutes;
         child.push(<ChildComponent key={0} name={this.state.name} date={fullDate} location={'Location: ' + this.state.location} 
-        organization={'Organization: ' + this.state.organization} description={'Description: ' + this.state.description} tags={'Tags: ' + this.state.tags} image={this.state.image64} />);
+        organization={'Group: ' + this.state.organization} description={'Description: ' + this.state.description} tags={'Tags: ' + this.state.tags} image={this.state.image64} />);
         
         return (
             <div style={{textAlign: "center"}}>
@@ -290,7 +290,7 @@ class AddEvent extends Component {
                         <Grid item>
                             <TextField
                                 id="event-org"
-                                label="Organization"
+                                label="Group"
                                 margin="normal"
                                 value={this.state.organization}
                                 onChange={e => this.setState({ organization: e.target.value })}

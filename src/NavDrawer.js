@@ -95,7 +95,7 @@ class NavDrawer extends Component {
                     <MenuItem name="Pending Events" onClick={this.pendingClicked} disabled={!this.state.adminSignedIn && !this.state.leaderSignedIn}>Pending Events</MenuItem>
                     <MenuItem name="Current Events" onClick={this.currentClicked} disabled={!this.state.adminSignedIn}>Current Events</MenuItem>
                     <MenuItem name="Past Events" onClick={this.pastClicked} disabled={!this.state.adminSignedIn}>Past Events</MenuItem>
-                    <MenuItem name="Tags" onClick={this.tagsClicked} disabled={!this.state.adminSignedIn}>Tags/Groups</MenuItem>
+                    <MenuItem name="Tags" onClick={this.tagsClicked} disabled={!this.state.adminSignedIn}>Groups/Tags</MenuItem>
                     <MenuItem name="Users" onClick={this.usersClicked} disabled={!this.state.adminSignedIn}>Users</MenuItem>
                 </MenuList>
                 </div>
