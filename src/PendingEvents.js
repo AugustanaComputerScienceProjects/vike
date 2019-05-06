@@ -39,15 +39,6 @@ import DispatchGroup from './DispatchGroup';
 const uuidv4 = require('uuid/v4');
 const redTheme = createMuiTheme({ palette: { primary: red } })
 
-const testTags = [
-    'comedy',
-    'movie',
-    'food',
-    'raffle',
-    'caps',
-    'performance',
-];
-
 function getModalStyle() {
     const top = 50
     const left = 50
@@ -93,11 +84,12 @@ class PendingEvents extends Component {
         cancelBtn: "Reject Event",
         confirmBtn: "Accept Event",
         isInitial: true,
-        popUpText: "reject"
+        popUpText: "reject",
+        databaseTags: [],
+        groups: [],
     }
 
-    allListener = firebase.database.ref('/pending-events').orderByKey();
-    singleListener = firebase.database.ref();
+    listeners = [];
     off = null;
     
     handleBeginEdit = () => {
@@ -204,7 +196,7 @@ class PendingEvents extends Component {
             organization: event["organization"],
             imgid: event["imgid"],
             description: event["description"],
-            tags: event["tags"],
+            tags: this.state.tags.toString(),
             email: event["email"],
         });
         self.setState({ uploading: false });
@@ -231,7 +223,9 @@ class PendingEvents extends Component {
 
     readAllPendingEvents() {
         let self = this;
-        this.allListener.on('value', function(snapshot) {
+        let reference = firebase.database.ref('/pending-events').orderByKey();
+        this.listeners.push(reference);
+        reference.on('value', function(snapshot) {
             let listEvents = [];
             let listURLS = [];
             let index = -1;
@@ -266,8 +260,9 @@ class PendingEvents extends Component {
 
     readPendingEvents(ref) {
         let self = this;
-        this.singleListener = firebase.database.ref(ref).orderByChild('name');
-        this.singleListener.on('value', function(snapshot) {
+        let reference = firebase.database.ref(ref).orderByChild('name');
+        this.listeners.push(reference);
+        reference.on('value', function(snapshot) {
             let listEvents = [];
             let listURLS = [];
             let index = -1;
@@ -315,6 +310,15 @@ class PendingEvents extends Component {
         }
         let date = this.getFormattedDate(event);
         let oldEvent = Object.assign({}, event);
+        if (!this.state.groups.includes(event["organization"])) {
+            this.state.groups.push(event["organization"]);
+        }
+        let eventTags = event["tags"].split(',');
+        eventTags.forEach(function(tag) {
+            if (!this.state.databaseTags.includes(tag) && tag != "") {
+                this.state.databaseTags.push(tag);
+            }
+        })
         this.setState({ oldEvent: oldEvent, popUpEvent: event, tags: tags, date: date, index: i, image64: this.state.urls[i], image64Old: this.state.urls[i] });
         this.handleBeginEdit();
     }
@@ -391,7 +395,38 @@ class PendingEvents extends Component {
           });
     }
 
+    readTags() {
+        let self = this;
+        let ref = firebase.database.ref('/tags');
+        this.listeners.push(ref);
+        ref.on('value', function(snapshot) {
+          let tagsList = [];
+          snapshot.forEach(function(child) {
+            tagsList.push(child.val());
+          });
+          self.setState({ databaseTags: tagsList});
+          console.log(tagsList);
+        })
+      }
+
+      readGroups() {
+        let self = this;
+        let ref = firebase.database.ref('/groups');
+        this.listeners.push(ref);
+        ref.on('value', function(snapshot) {
+          let groupsList = [];
+          snapshot.forEach(function(child) {
+            groupsList.push(child.val());
+          });
+          self.setState({ groups: groupsList });
+          console.log(groupsList);
+        })
+      }
+
+
     componentWillMount() {
+        this.readTags();
+        this.readGroups();
         this.off = firebase.auth.onAuthStateChanged((user) => {
           if (user) {
               this.checkRole(user, 'admin');
@@ -403,9 +438,10 @@ class PendingEvents extends Component {
     }
 
     componentWillUnmount() {
-        this.allListener.off();
-        this.singleListener.off();
         this.off();
+        this.listeners.forEach(function(listener) {
+            listener.off();
+        });
     }
 
     render() {
@@ -496,29 +532,39 @@ class PendingEvents extends Component {
                                 onChange={this.handleLocationChange} />
                         </Grid>
                         <Grid item>
-                            <TextField
-                                id="event-org"
-                                label="Group"
-                                margin="normal"
-                                value={this.state.popUpEvent["organization"]}
-                                onChange={this.handleOrganizationChange} />
+                            <FormControl margin="normal">
+                                <InputLabel>Group</InputLabel>
+                                <Select
+                                    displayEmpty
+                                    value={this.state.popUpEvent["organization"]}
+                                    style={{minWidth: 200, maxWidth: 200}}
+                                    onChange={this.handleOrganizationChange}
+                                    variant='outlined'
+                                    >
+                                    {this.state.groups.map(group => (
+                                        <MenuItem key={group} value={group}>
+                                            {group}
+                                        </MenuItem>
+                                    ))}    
+                                </Select>
+                            </FormControl>
                         </Grid>
-                        <Grid item container direction="row">
-                            <FormControl>
+                        <Grid item> 
+                            <FormControl margin="normal">
                                 <InputLabel htmlFor="select-multiple">Tags</InputLabel>
                                 <Select
                                     multiple
                                     displayEmpty
                                     input={<Input id="select-multiple"/>}
                                     value={this.state.tags}
-                                    onChange={this.handleTagChange}
+                                    style={{minWidth: 200, maxWidth: 200}}
+                                    onChange={e => this.setState({ tags: e.target.value })}
                                     variant='outlined'
-                                    style={{minWidth: '150px',maxWidth: '150px'}}
                                     >
                                     <MenuItem disabled value="">
                                         <em>Select Tags</em>
                                     </MenuItem>
-                                    {testTags.map(tag => (
+                                    {this.state.databaseTags.map(tag => (
                                         <MenuItem key={tag} value={tag}>
                                             {tag}
                                         </MenuItem>

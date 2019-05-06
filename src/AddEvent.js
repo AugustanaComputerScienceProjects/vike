@@ -319,7 +319,7 @@ class AddEvent extends Component {
                                 />
                         </Grid>
                         <Grid item>
-                            <FormControl>
+                            <FormControl margin="normal">
                                 <InputLabel>Group</InputLabel>
                                 <Select
                                     displayEmpty
@@ -337,7 +337,7 @@ class AddEvent extends Component {
                             </FormControl>
                         </Grid>
                         <Grid item> 
-                            <FormControl>
+                            <FormControl margin="normal">
                                 <InputLabel htmlFor="select-multiple">Tags</InputLabel>
                                 <Select
                                     multiple

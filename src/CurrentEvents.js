@@ -54,15 +54,6 @@ var QRCode = require('qrcode');
 const uuidv4 = require('uuid/v4');
 const redTheme = createMuiTheme({ palette: { primary: red } });
 
-const testTags = [
-    'comedy',
-    'movie',
-    'food',
-    'raffle',
-    'caps',
-    'performance',
-];
-
 function getModalStyle() {
     const top = 50
     const left = 50
@@ -111,9 +102,11 @@ class CurrentEvents extends Component {
         isInitial: true,
         searchText: '',
         sortBy: "date",
-        isAscending: true
+        isAscending: true,
+        databaseTags: [],
+        groups: [],
     }
-    listener = null;
+    listeners = [];
 
     handleBeginEdit = () => {
         this.handleClose();
@@ -199,7 +192,8 @@ class CurrentEvents extends Component {
             organization: event["organization"],
             imgid: event["imgid"],
             description: event["description"],
-            tags: event["tags"],
+            tags: self.state.tags.toString(),
+            email: event["email"],
         });
         self.setState({ uploading: false });
         self.displayMessage(self, "Event Updated");
@@ -225,8 +219,9 @@ class CurrentEvents extends Component {
 
     readCurrentEvents() {
         let self = this;
-        this.listener = firebase.database.ref('/current-events').orderByChild('name');
-        this.listener.on('value', function(snapshot) {
+        let reference = firebase.database.ref('/current-events').orderByChild('name')
+        this.listeners.push(reference);
+        reference.on('value', function(snapshot) {
             let listEvents = [];
             let listURLS = [];
             let index = -1;
@@ -263,12 +258,44 @@ class CurrentEvents extends Component {
           });
     }
 
+    readTags() {
+        let self = this;
+        let ref = firebase.database.ref('/tags');
+        this.listeners.push(ref);
+        ref.on('value', function(snapshot) {
+          let tagsList = [];
+          snapshot.forEach(function(child) {
+            tagsList.push(child.val());
+          });
+          self.setState({ databaseTags: tagsList});
+          console.log(tagsList);
+        })
+      }
+
+      readGroups() {
+        let self = this;
+        let ref = firebase.database.ref('/groups');
+        this.listeners.push(ref);
+        ref.on('value', function(snapshot) {
+          let groupsList = [];
+          snapshot.forEach(function(child) {
+            groupsList.push(child.val());
+          });
+          self.setState({ groups: groupsList });
+          console.log(groupsList);
+        })
+      }
+
     componentDidMount() {
+        this.readTags();
+        this.readGroups();
         this.readCurrentEvents();
     }
 
     componentWillUnmount() {
-        this.listener.off();
+        this.listeners.forEach(function(listener) {
+            listener.off();
+        });
     }
 
     editAction(event, i) { 
@@ -282,6 +309,15 @@ class CurrentEvents extends Component {
         let oldEvent = Object.assign({}, event);
         QRCode.toDataURL('https://osl-events-app.firebaseapp.com/event?id=' + event["key"] + '&name=' + event["name"].replaceAll(" ", "+"), function (err, url) {
             console.log(url)
+            if (!self.state.groups.includes(event["organization"])) {
+                self.state.groups.push(event["organization"]);
+            }
+            let eventTags = event["tags"].split(',');
+            eventTags.forEach(function(tag) {
+                if (!self.state.databaseTags.includes(tag) && tag != "") {
+                    self.state.databaseTags.push(tag);
+                }
+            })
             self.setState({ oldEvent: oldEvent, popUpEvent: event, tags: tags, date: date, index: i, image64: self.state.urls[i], image64Old: self.state.urls[i], qrCode: url });
             self.handleBeginEdit();
         })
@@ -576,29 +612,39 @@ class CurrentEvents extends Component {
                                 onChange={this.handleLocationChange} />
                         </Grid>
                         <Grid item>
-                            <TextField
-                                id="event-org"
-                                label="Group"
-                                margin="normal"
-                                value={this.state.popUpEvent["organization"]}
-                                onChange={this.handleOrganizationChange} />
+                            <FormControl margin="normal">
+                                <InputLabel>Group</InputLabel>
+                                <Select
+                                    displayEmpty
+                                    value={this.state.popUpEvent["organization"]}
+                                    style={{minWidth: 200, maxWidth: 200}}
+                                    onChange={this.handleOrganizationChange}
+                                    variant='outlined'
+                                    >
+                                    {this.state.groups.map(group => (
+                                        <MenuItem key={group} value={group}>
+                                            {group}
+                                        </MenuItem>
+                                    ))}    
+                                </Select>
+                            </FormControl>
                         </Grid>
-                        <Grid item container direction="row">
-                            <FormControl>
+                        <Grid item> 
+                            <FormControl margin="normal">
                                 <InputLabel htmlFor="select-multiple">Tags</InputLabel>
                                 <Select
                                     multiple
                                     displayEmpty
                                     input={<Input id="select-multiple"/>}
                                     value={this.state.tags}
-                                    onChange={this.handleTagChange}
+                                    style={{minWidth: 200, maxWidth: 200}}
+                                    onChange={e => this.setState({ tags: e.target.value })}
                                     variant='outlined'
-                                    style={{minWidth: '150px',maxWidth: '150px'}}
                                     >
                                     <MenuItem disabled value="">
                                         <em>Select Tags</em>
                                     </MenuItem>
-                                    {testTags.map(tag => (
+                                    {this.state.databaseTags.map(tag => (
                                         <MenuItem key={tag} value={tag}>
                                             {tag}
                                         </MenuItem>
