@@ -223,17 +223,6 @@ class CurrentEvents extends Component {
         this.setState({ open: false });
     };
 
-    handleImageChange = base64 => {
-        let split = base64.split(",");
-        if (split.length > 0) {
-            if (split[1].charAt(0) != "U") {
-                this.setState({ image64: base64 })
-            } else {
-                this.displayMessage(this, "Can not use JPEG 2000 Images.");
-            }   
-        }
-    }
-
     readCurrentEvents() {
         let self = this;
         let reference = firebase.database.ref('/current-events').orderByChild('name')
@@ -285,7 +274,6 @@ class CurrentEvents extends Component {
             tagsList.push(child.val());
           });
           self.setState({ databaseTags: tagsList});
-          console.log(tagsList);
         })
       }
 
@@ -498,17 +486,16 @@ class CurrentEvents extends Component {
         this.setState({numWinners:e.target.value})
     }
 
-    runRaffle = () =>{
+    async runRaffle(self){
         let winners = [];
-        for(let i = 0; i < this.state.numWinners; i++){
-            let index = Math.floor(Math.random()*(Object.keys(this.state.raffleEvent["users"]).length))
-            winners.push(Object.keys(this.state.raffleEvent["users"])[index])      
+        for(let i = 0; i < self.state.numWinners; i++){
+            let index = Math.floor(Math.random()*(Object.keys(self.state.raffleEvent["users"]).length))
+            winners.push(Object.keys(self.state.raffleEvent["users"])[index])      
         }
         //console.log(winners);
-        this.setState({winners: winners})
-        this.handleRaffleClose();
-        this.displayWinners();
-        this.handleOpenWinners();
+        await self.setState({winners: winners})
+        self.handleRaffleClose();
+        self.displayWinners();
     }
 
     handleOpenWinners = () => {
@@ -519,16 +506,20 @@ class CurrentEvents extends Component {
         this.setState({winnersOpen:false})
     }
 
-    displayWinners= () =>{
+    async displayWinners(){
+        let self = this;
         let s = "";
         console.log(s);
-        for(let i = 0; i < this.state.winners.length-1; i++){
-            s= s +this.state.winners[i]+",";
+        for(let i = 0; i < self.state.winners.length-1; i++){
+            s= s +self.state.winners[i]+",";
             console.log(s);
         }
-        s+=this.state.winners[this.state.winners.length-1];
-        console.log(this.state.winners);
-        this.setState({winnerString : s});
+        s+=self.state.winners[self.state.winners.length-1];
+        console.log(self.state.winners);
+        await self.setState({winnerString : ""});
+        await self.setState({winnerString : s});
+        await this.setState({winnersOpen:true});
+
     }
 
     render() {
@@ -644,7 +635,7 @@ class CurrentEvents extends Component {
                                     onChange={this.numWinnersChange} />    
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="outlined" onClick={this.runRaffle}>Run Raffle</Button>
+                    <Button variant="outlined" onClick={() => this.runRaffle(this)}>Run Raffle</Button>
                 </DialogActions>
                 </Dialog>
 
@@ -771,7 +762,7 @@ class CurrentEvents extends Component {
                             extensions={['jpg', 'jpeg', 'png']}
                             dims={{minWidth: 100, maxWidth: 10000, minHeight: 100, maxHeight: 10000}}
                             maxSize={10}
-                            onChange={this.handleImageChange}
+                            onChange={base64 => this.setState({ image64: base64 })}
                             onError={errMsg => this.displayMessage(this, errMsg)} >
                             <Button variant="contained">
                                 Select Image    
