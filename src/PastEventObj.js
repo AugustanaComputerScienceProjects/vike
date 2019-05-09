@@ -2,14 +2,11 @@
 
 class PastEventObj {
 
-    constructor(title, date, numAttend, numFresh, numSoph, numJun, numSen){
+    constructor(title, date, numAttend, stuList){
         this.title = title;
         this.date = date;
         this.numAttend = numAttend;
-        this.numFresh = numFresh;
-        this.numSoph = numSoph;
-        this.numJun = numJun;
-        this.numSen = numSen;
+        this.stuList = stuList;
     }
 
     getTitle(){
@@ -24,20 +21,8 @@ class PastEventObj {
         return this.numAttend;
     }
 
-    getFresh(){
-        return this.numFresh;
-    }
-
-    getSoph(){
-        return this.numSoph;
-    }
-
-    getJun(){
-        return this.numJun;
-    }
-
-    getSen(){
-        return this.numSen;
+    getStuList(){
+        return this.stuList;
     }
 
 }

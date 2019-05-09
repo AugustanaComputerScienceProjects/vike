@@ -71,7 +71,7 @@ class PastEvents extends Component {
                 let date = arr2[2] + '-' + arr2[0] + '-' + arr2[1]
 
 
-                let event = new PastEventObj(webEvent["name"],date,len,0,0,0,0)
+                let event = new PastEventObj(webEvent["name"],date,len,webEvent["users"])
                 self.setState(state =>{
                     const events = state.displayedEvents.concat(event);
 
