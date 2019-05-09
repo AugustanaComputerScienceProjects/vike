@@ -314,9 +314,10 @@ class PendingEvents extends Component {
             this.state.groups.push(event["organization"]);
         }
         let eventTags = event["tags"].split(',');
+        let self = this;
         eventTags.forEach(function(tag) {
-            if (!this.state.databaseTags.includes(tag) && tag != "") {
-                this.state.databaseTags.push(tag);
+            if (!self.state.databaseTags.includes(tag) && tag != "") {
+                self.state.databaseTags.push(tag);
             }
         })
         this.setState({ oldEvent: oldEvent, popUpEvent: event, tags: tags, date: date, index: i, image64: this.state.urls[i], image64Old: this.state.urls[i] });
