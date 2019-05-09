@@ -59,7 +59,7 @@ class App extends Component {
             );
         }
 
-        if (this.state.selected == "Tags") {
+        if (this.state.selected == "Groups/Tags") {
             return (
                 Tags
             );
@@ -78,7 +78,7 @@ class App extends Component {
      render() {
          return (
              <div className='fullPage'>
-             <div style={{width: "100%", position: "absolute"}}>
+             <div style={{width: "100%", position: "absolute", overflow: "hidden"}}>
                 <div style={{height: "10%"}}>
                 <NavBar navChanged={this.onNavChanged}></NavBar>
                 </div>
