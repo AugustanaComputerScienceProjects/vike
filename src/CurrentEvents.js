@@ -217,6 +217,17 @@ class CurrentEvents extends Component {
         this.setState({ open: false });
     };
 
+    handleImageChange = base64 => {
+        let split = base64.split(",");
+        if (split.length > 0) {
+            if (split[1].charAt(0) != "U") {
+                this.setState({ image64: base64 })
+            } else {
+                this.displayMessage(this, "Can not use JPEG 2000 Images.");
+            }   
+        }
+    }
+
     readCurrentEvents() {
         let self = this;
         let reference = firebase.database.ref('/current-events').orderByChild('name')
@@ -668,7 +679,7 @@ class CurrentEvents extends Component {
                             extensions={['jpg', 'jpeg', 'png']}
                             dims={{minWidth: 100, maxWidth: 10000, minHeight: 100, maxHeight: 10000}}
                             maxSize={10}
-                            onChange={base64 => this.setState({ image64: base64 })}
+                            onChange={this.handleImageChange}
                             onError={errMsg => this.displayMessage(this, errMsg)} >
                             <Button variant="contained">
                                 Select Image    
