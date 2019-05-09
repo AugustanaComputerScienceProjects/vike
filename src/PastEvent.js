@@ -21,7 +21,7 @@ class PastEvent extends Component {
             buttonDisabled: false
 
         }
-        this.downloadCSV = this.downloadCSV.bind(this);
+        this.downloadXLDoc = this.downloadXLDoc.bind(this);
         this.checkStuList = this.checkStuList.bind(this);
 
     }
@@ -36,9 +36,8 @@ class PastEvent extends Component {
     }
 
     //Uses XLSX - npm to run
-    downloadCSV() {
+    downloadXLDoc() {
         var workbook = XLSX.utils.book_new();
-        if (this.state.parentEvent.getStuList() != null) {
             var users = Object.keys(this.state.parentEvent.getStuList());
 
             var usersSheet = new Array();
@@ -53,7 +52,6 @@ class PastEvent extends Component {
             XLSX.utils.book_append_sheet(workbook, usersSheet, "Attendee List");
 
             XLSX.writeFile(workbook, this.state.parentEvent.getTitle() + 'Attendees.xlsx');
-        }
     }
 
     render() {
@@ -91,7 +89,7 @@ class PastEvent extends Component {
 
 
                 </Grid>
-                <Button onClick={this.downloadCSV} disabled={this.state.buttonDisabled}>Download XL Doc</Button>
+                <Button onClick={this.downloadXLDoc} disabled={this.state.buttonDisabled}>Download XL Doc</Button>
 
 
 
