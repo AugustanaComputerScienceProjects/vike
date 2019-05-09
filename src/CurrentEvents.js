@@ -21,7 +21,7 @@ import Typography from '@material-ui/core/Typography';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 import firebase from './config';
-import { CardActionArea } from '@material-ui/core';
+import { CardActionArea, CardActions } from '@material-ui/core';
 import {MuiPickersUtilsProvider, TimePicker, DatePicker} from 'material-ui-pickers';
 import MomentUtils from '@date-io/moment';
 import FormControl from '@material-ui/core/FormControl';
@@ -105,6 +105,12 @@ class CurrentEvents extends Component {
         isAscending: true,
         databaseTags: [],
         groups: [],
+        raffleOpen: false,
+        numWinners: 0,
+        raffleEvent: "",
+        winners: [],
+        winnersOpen: false,
+        winnerString: "abcd",
     }
     listeners = [];
 
@@ -464,6 +470,56 @@ class CurrentEvents extends Component {
         return date;
     }
 
+    raffleOnclick(event, index){
+        if(event.hasOwnProperty("users")){
+            this.setState({raffleEvent:event})
+            this.setState({raffleOpen:true})
+
+        }else{
+            //DO Something
+        }
+    }
+    handleRaffleClose = () => {
+        this.setState({raffleOpen:false})
+    }
+
+    numWinnersChange= e => {
+        this.setState({numWinners:e.target.value})
+    }
+
+    runRaffle = () =>{
+        let winners = [];
+        for(let i = 0; i < this.state.numWinners; i++){
+            let index = Math.floor(Math.random()*(Object.keys(this.state.raffleEvent["users"]).length))
+            winners.push(Object.keys(this.state.raffleEvent["users"])[index])      
+        }
+        //console.log(winners);
+        this.setState({winners: winners})
+        this.handleRaffleClose();
+        this.displayWinners();
+        this.handleOpenWinners();
+    }
+
+    handleOpenWinners = () => {
+        this.setState({winnersOpen: true})
+    }
+
+    handleWinnersClose = () => {
+        this.setState({winnersOpen:false})
+    }
+
+    displayWinners= () =>{
+        let s = "";
+        console.log(s);
+        for(let i = 0; i < this.state.winners.length-1; i++){
+            s= s +this.state.winners[i]+",";
+            console.log(s);
+        }
+        s+=this.state.winners[this.state.winners.length-1];
+        console.log(this.state.winners);
+        this.setState({winnerString : s});
+    }
+
     render() {
         const { classes } = this.props;
         const children = [];
@@ -489,7 +545,10 @@ class CurrentEvents extends Component {
             let fullDate = startDate + "-" + hours + ":" + minutes;
             children.push(<ChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
             organization={'Group: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
-            editAction={() => this.editAction(event, index)} />);
+            editAction={() => this.editAction(event, index)} 
+            raffleOnclick={() => this.raffleOnclick(event,index)}
+
+            />);
         };
 
         return (
@@ -561,6 +620,39 @@ class CurrentEvents extends Component {
                     {children}
                 </ParentComponent>
                 <Dialog
+                onClose={this.handleRaffleClose}
+                open={this.state.raffleOpen}
+                >
+                <DialogTitle onClose={this.handleRaffleClose}>Raffle</DialogTitle>
+                <DialogContent>
+                <TextField
+                                    label="How many to select?"
+                                    margin="normal"
+                                    value={this.state.numWinners}
+                                    type="number"
+                                    onChange={this.numWinnersChange} />    
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" onClick={this.runRaffle}>Run Raffle</Button>
+                </DialogActions>
+                </Dialog>
+
+                <Dialog
+                onClose={this.handleWinnersClose}
+                open={this.state.winnersOpen}
+                >
+                <DialogTitle onClose={this.handleWinnersClose}>Congratulations to </DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        {this.state.winnerString}
+                    </Typography>
+                </DialogContent>
+                
+                </Dialog>
+
+                <Dialog
+
+                
           onClose={this.handleCloseEdit}
           aria-labelledby="customized-dialog-title"
           open={this.state.editing}
@@ -761,6 +853,8 @@ const ParentComponent = props => (
 const ChildComponent = props => <Grid item><Card style={{minWidth: 350, maxWidth: 350, height: "auto"}}><CardActionArea onClick={props.editAction}>
     <CardHeader title={props.name} subheader={props.date}></CardHeader>
     <CardMedia style = {{ height: 0, paddingTop: '56.25%'}} image={props.image} title={props.name}/><CardContent>
-    <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}</Typography></CardContent></CardActionArea></Card></Grid>;
+    <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}</Typography>
+    </CardContent></CardActionArea><CardActions><Button variant = "outlined" onClick = {props.raffleOnclick}>Raffle</Button>
+</CardActions></Card></Grid>;
 
 export default CurrentEvents;
