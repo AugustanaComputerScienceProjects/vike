@@ -44,6 +44,10 @@ class PastEvents extends Component {
         this.readPastEvents();
     }
 
+    componentWillUnmount() {
+        this.listener.off();
+    }
+
         listener = null;
 
 
@@ -72,22 +76,18 @@ class PastEvents extends Component {
 
 
                 let event = new PastEventObj(webEvent["name"],date,len,webEvent["users"])
-                self.setState(state =>{
-                    const events = state.displayedEvents.concat(event);
-
-                    return {
-                        events,
-                    }
-                })
+                listEvents.push(event);
 
                 
 
-                self.setState({displayedEvents : self.state.events});
+                
 
 
             });
-                self.setState({sortDate1 : self.state.events[0].getDate()})
-                self.setState({sortDate2 : self.state.events[self.state.events.length-1].getDate()})
+            self.setState({displayedEvents : listEvents});
+            self.setState({events : listEvents});
+            self.setState({sortDate1 : listEvents[0].getDate()})
+            self.setState({sortDate2 : listEvents[listEvents.length-1].getDate()})
 
         });
         
