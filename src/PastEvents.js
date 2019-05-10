@@ -86,8 +86,6 @@ class PastEvents extends Component {
     }
 
     async createDisplayEvents(d1,d2){
-      
-        console.log(d2)
 
         let startInd = this.state.events.length;
         let endInd = -2;
@@ -98,10 +96,7 @@ class PastEvents extends Component {
             let date = (this.state.events[i].getDate());
             if(moment(date).isSameOrAfter(d1)){
                 startInd = i;
-                //console.log(date);
-                //console.log(this.state.sortDate1);
-                //console.log(i);
-                 i = this.state.events.length;
+                i = this.state.events.length;
             }
            
         }
@@ -119,32 +114,11 @@ class PastEvents extends Component {
 
         let displayedEvents = []
 
-        console.log(endInd)
         for(let i = startInd; i < endInd; i++){
-     //       console.log(this.state.events[i]);
             displayedEvents.push(this.state.events[i])
         }
-        //console.log(displayedEvents);
-
-        //console.log(startInd);
-        //console.log(endInd);
-
-        //let displayedEvents = [];
-        //for( let i = 0; i < this.state.events.length; i++){
-            //let event = this.state.events[i]
-           // console.log(event.getDate() + " "+ d1 + moment(event.getDate()).isSameOrAfter(d1));
-            //if(moment(event.getDate()).isSameOrAfter(d1)){
-            //    displayedEvents.push(event);
-                
-            //}
-
-           
-        //}
-        //console.log(displayedEvents);
         await this.setState({eventsInRange : []});
         await this.setState({eventsInRange : displayedEvents});
-        console.log(displayedEvents);
-        console.log(this.state.text);
         this.filterEvents(this.state.searchText, displayedEvents);
     }
 
@@ -186,7 +160,6 @@ class PastEvents extends Component {
     }
 
     async filterEvents(text, originalEvents) {
-        console.log(originalEvents);
         var index = 0;
         let filtered = [];
         originalEvents.forEach(function(event) {

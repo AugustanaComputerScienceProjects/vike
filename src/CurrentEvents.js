@@ -40,7 +40,8 @@ import { fade } from '@material-ui/core/styles/colorManipulator';
 import CloseIcon from '@material-ui/icons/Close';
 import SortIcon from '@material-ui/icons/Sort';
 import IconButton from '@material-ui/core/IconButton';
-import SaveButton from '@material-ui/icons/SaveAlt'
+import SaveButton from '@material-ui/icons/SaveAlt';
+import RandomButton from '@material-ui/icons/Shuffle'
 import Divider from '@material-ui/core/Divider';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
@@ -94,7 +95,6 @@ class CurrentEvents extends Component {
         image64: null,
         image64Old: null,
         urls: [],
-        qrCode: null,
         index: -1,
         hidden: "visible",
         openDelete: false,
@@ -323,20 +323,17 @@ class CurrentEvents extends Component {
         let self = this;
         let date = this.getFormattedDate(event);
         let oldEvent = Object.assign({}, event);
-        QRCode.toDataURL('https://osl-events-app.firebaseapp.com/event?id=' + event["key"] + '&name=' + event["name"].replaceAll(" ", "+"), function (err, url) {
-            console.log(url)
-            if (!self.state.groups.includes(event["organization"])) {
-                self.state.groups.push(event["organization"]);
+        if (!self.state.groups.includes(event["organization"])) {
+            self.state.groups.push(event["organization"]);
+        }
+        let eventTags = event["tags"].split(',');
+        eventTags.forEach(function(tag) {
+            if (!self.state.databaseTags.includes(tag) && tag != "") {
+                self.state.databaseTags.push(tag);
             }
-            let eventTags = event["tags"].split(',');
-            eventTags.forEach(function(tag) {
-                if (!self.state.databaseTags.includes(tag) && tag != "") {
-                    self.state.databaseTags.push(tag);
-                }
-            })
-            self.setState({ oldEvent: oldEvent, popUpEvent: event, tags: tags, date: date, index: i, image64: self.state.urls[i], image64Old: self.state.urls[i], qrCode: url });
-            self.handleBeginEdit();
         })
+        self.setState({ oldEvent: oldEvent, popUpEvent: event, tags: tags, date: date, index: i, image64: self.state.urls[i], image64Old: self.state.urls[i] });
+        self.handleBeginEdit();
     }
 
     handleNameChange = e => {
@@ -463,13 +460,15 @@ class CurrentEvents extends Component {
         this.sort(this.state.events, this.state.urls, this.state.sortBy, event.target.checked);
     };
 
-    downloadQR = () => {
-        var link = document.createElement('a');
-        link.href = this.state.qrCode;
-        link.download = this.state.popUpEvent["name"] + '-QR Code.jpg';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);    
+    downloadQR = (event) => {
+        QRCode.toDataURL('https://osl-events-app.firebaseapp.com/event?id=' + event["key"] + '&name=' + event["name"].replaceAll(" ", "+"), function (err, url) {
+            var link = document.createElement('a');
+            link.href = url;
+            link.download = event["name"] + '-QR Code.jpg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);    
+        });
     }
 
     getFormattedDate(event) {
@@ -482,11 +481,10 @@ class CurrentEvents extends Component {
 
     raffleOnclick(event, index){
         if(event.hasOwnProperty("users")){
-            this.setState({raffleEvent:event})
-            this.setState({raffleOpen:true})
-
-        }else{
-            //DO Something
+            this.setState({raffleEvent:event, raffleOpen:true});
+        } else {
+            let self = this;
+            this.displayMessage(self, "No users checked into the event.")
         }
     }
     handleRaffleClose = () => {
@@ -560,7 +558,7 @@ class CurrentEvents extends Component {
             organization={'Group: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
             editAction={() => this.editAction(event, index)} 
             raffleOnclick={() => this.raffleOnclick(event,index)}
-
+            downloadQR={() => this.downloadQR(event)}
             />);
         };
 
@@ -787,11 +785,6 @@ class CurrentEvents extends Component {
                             />
                         </Grid>
                         <Grid item>
-                        <Image
-                            style={{width: 200, height: 200}}
-                            source={{uri: this.state.qrCode}}
-                            />
-                        <Button variant="contained" onClick={this.downloadQR}><SaveButton/>Download QR</Button>
                         </Grid>
                     </Grid>
                 </Grid>
@@ -867,7 +860,8 @@ const ChildComponent = props => <Grid item><Card style={{minWidth: 350, maxWidth
     <CardHeader title={props.name} subheader={props.date}></CardHeader>
     <CardMedia style = {{ height: 0, paddingTop: '56.25%'}} image={props.image} title={props.name}/><CardContent>
     <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}</Typography>
-    </CardContent></CardActionArea><CardActions><Button variant = "outlined" onClick = {props.raffleOnclick}>Raffle</Button>
+    </CardContent></CardActionArea><CardActions><Button variant="outlined" onClick={props.downloadQR}>Download QR</Button>
+    <Button variant="outlined" onClick={props.raffleOnclick}>Raffle</Button>
 </CardActions></Card></Grid>;
 
 export default CurrentEvents;
