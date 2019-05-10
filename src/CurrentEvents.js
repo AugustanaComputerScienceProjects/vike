@@ -106,7 +106,7 @@ class CurrentEvents extends Component {
         databaseTags: [],
         groups: [],
         raffleOpen: false,
-        numWinners: 0,
+        numWinners: 1,
         raffleEvent: "",
         winners: [],
         winnersOpen: false,
@@ -481,7 +481,8 @@ class CurrentEvents extends Component {
 
     raffleOnclick(event, index){
         if(event.hasOwnProperty("users")){
-            this.setState({raffleEvent:event, raffleOpen:true});
+            this.handleClose();
+            this.setState({raffleEvent: event, raffleOpen: true, numWinners: 1});
         } else {
             let self = this;
             this.displayMessage(self, "No users checked into the event.")
@@ -496,15 +497,26 @@ class CurrentEvents extends Component {
     }
 
     async runRaffle(self){
-        let winners = [];
-        for(let i = 0; i < self.state.numWinners; i++){
-            let index = Math.floor(Math.random()*(Object.keys(self.state.raffleEvent["users"]).length))
-            winners.push(Object.keys(self.state.raffleEvent["users"])[index])      
+        let numUsers = Object.keys(self.state.raffleEvent["users"]).length;
+        if (self.state.numWinners > 0 && self.state.numWinners <= numUsers) {
+            let winners = [];
+            for(let i = 0; i < self.state.numWinners; i++){
+                let index = Math.floor(Math.random()*(numUsers))
+                let user = Object.keys(self.state.raffleEvent["users"])[index];
+                if (!winners.includes(user)) {
+                    winners.push(user); 
+                } else {
+                    i = i - 1;
+                }
+            }
+            await self.setState({winners: winners})
+            self.handleRaffleClose();
+            self.displayWinners();
+        } else if (self.state.numWinners <= 0) {
+            self.displayMessage(self, "The number of winners must be greater than 0.")
+        } else {
+            self.displayMessage(self, "The number of winners is higher than the number of checked in users.")
         }
-        //console.log(winners);
-        await self.setState({winners: winners})
-        self.handleRaffleClose();
-        self.displayWinners();
     }
 
     handleOpenWinners = () => {
@@ -518,10 +530,8 @@ class CurrentEvents extends Component {
     async displayWinners(){
         let self = this;
         let s = "";
-        console.log(s);
         for(let i = 0; i < self.state.winners.length-1; i++){
             s= s +self.state.winners[i]+",";
-            console.log(s);
         }
         s+=self.state.winners[self.state.winners.length-1];
         console.log(self.state.winners);
@@ -637,7 +647,7 @@ class CurrentEvents extends Component {
                 <DialogTitle onClose={this.handleRaffleClose}>Raffle</DialogTitle>
                 <DialogContent>
                 <TextField
-                                    label="How many to select?"
+                                    label="How many winners?"
                                     margin="normal"
                                     value={this.state.numWinners}
                                     type="number"
