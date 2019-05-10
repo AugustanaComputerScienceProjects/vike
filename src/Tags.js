@@ -20,11 +20,15 @@ import { red, blue } from '@material-ui/core/colors';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CloseIcon from '@material-ui/icons/Close';
 import AddIcon from '@material-ui/icons/Add';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import DispatchGroup from './DispatchGroup';
 
 const redTheme = createMuiTheme({ palette: { primary: red } })
 
 class Tags extends Component {
   
+  group = new DispatchGroup();
+
   state = {
     tags: [],
     groups: [],
@@ -33,7 +37,8 @@ class Tags extends Component {
     adding: false,
     ref: '',
     type: '',
-    deleting: false
+    deleting: false,
+    hidden: "visible"
   }
 
   listeners = [];
@@ -41,6 +46,10 @@ class Tags extends Component {
   componentWillMount() {
     this.readTags();
     this.readGroups();
+    let self = this;
+    this.group.notify(function() {
+      self.setState({ hidden: "hidden" });
+    });
   }
 
   componentWillUnmount() {
@@ -50,6 +59,7 @@ class Tags extends Component {
 }
 
   readTags() {
+    let token = this.group.enter();
     let self = this;
     let ref = firebase.database.ref('/tags');
     this.listeners.push(ref);
@@ -58,12 +68,14 @@ class Tags extends Component {
       snapshot.forEach(function(child) {
         tagsList.push([child.key, child.val()]);
       });
-      self.setState({ tags: tagsList});
+      self.setState({ tags: tagsList });
+      self.group.leave(token);
       console.log(tagsList);
     })
   }
 
   readGroups() {
+    let token = this.group.enter();
     let self = this;
     let ref = firebase.database.ref('/groups');
     this.listeners.push(ref);
@@ -73,6 +85,7 @@ class Tags extends Component {
         groupsList.push([child.key, child.val()]);
       });
       self.setState({ groups: groupsList });
+      self.group.leave(token);
       console.log(groupsList);
     })
   }
@@ -134,8 +147,10 @@ deleteData = () => {
       }
 
         return (
-
           <div>
+          <div style={{position: "fixed", top: "50%", left: "50%", margintop: "-50px", marginleft: "-50px", width: "100px", height: "100px"}}>
+                <CircularProgress disableShrink style={{visibility: this.state.hidden}}></CircularProgress>
+          </div>
             <Grid container>
             <Grid item container direction="row">
             <Grid item style={{width: "50%"}}>

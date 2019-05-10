@@ -18,10 +18,14 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { red, blue } from '@material-ui/core/colors';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import DispatchGroup from './DispatchGroup';
 
 const redTheme = createMuiTheme({ palette: { primary: red } })
 
 class Users extends Component {
+
+    group = new DispatchGroup();
 
     state = {
         admins: [],
@@ -30,7 +34,8 @@ class Users extends Component {
         adding: false,
         ref: '',
         type: '',
-        deleting: false
+        deleting: false,
+        hidden: "visible"
     }
 
     listeners = [];
@@ -76,6 +81,7 @@ class Users extends Component {
     }
 
     readAdministrators() {
+        let token = this.group.enter();
         let self = this;
         let ref = firebase.database.ref('/admin');
         this.listeners.push(ref);
@@ -85,10 +91,12 @@ class Users extends Component {
                 admins.push(child.key.replace(",", "."));
             });
             self.setState({ admins: admins });
+            self.group.leave(token);
         });
     }
 
     readLeaders() {
+        let token = this.group.enter();
         let self = this;
         let ref = firebase.database.ref('/leaders');
         this.listeners.push(ref);
@@ -98,12 +106,17 @@ class Users extends Component {
                 leaders.push(child.key.replace(",", "."));
             });
             self.setState({ leaders: leaders });
+            self.group.leave(token);
         });
     }
 
     componentWillMount() {
         this.readAdministrators();
         this.readLeaders();
+        let self = this;
+        this.group.notify(function() {
+            self.setState({ hidden: "hidden" });
+        });
     }
 
     componentWillUnmount() {
@@ -128,6 +141,9 @@ class Users extends Component {
 
         return (
             <div>
+            <div style={{position: "fixed", top: "50%", left: "50%", margintop: "-50px", marginleft: "-50px", width: "100px", height: "100px"}}>
+                <CircularProgress disableShrink style={{visibility: this.state.hidden}}></CircularProgress>
+            </div>
             <Grid container>
             <Grid item container direction="row">
             <Grid item style={{width: "50%"}}>
