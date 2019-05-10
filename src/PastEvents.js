@@ -16,28 +16,31 @@ import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
-
+import CircularProgress from '@material-ui/core/CircularProgress';
 import firebase from './config';
-
-
-
+import SearchIcon from '@material-ui/icons/Search';
+import InputBase from '@material-ui/core/InputBase';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 class PastEvents extends Component {
 
+    listener = null;
     constructor(props) {
         super(props);
         this.state = {
             sortDate1: "2017-05-24",
             sortDate2: "2017-05-22",
             displayedEvents: [],
+            filteredEvents: [],
             events : [],
+            hidden: "visible",
+            searchText: "",
         }
         this.handleDate1Change = this.handleDate1Change.bind(this);
         this.handleDate2Change = this.handleDate2Change.bind(this);
         this.readPastEvents = this.readPastEvents.bind(this);
         this.createDisplayEvents = this.createDisplayEvents.bind(this);
-        
-        
     }
 
     componentDidMount(){
@@ -47,9 +50,6 @@ class PastEvents extends Component {
     componentWillUnmount() {
         this.listener.off();
     }
-
-        listener = null;
-
 
     readPastEvents() {
         let self = this;
@@ -78,17 +78,9 @@ class PastEvents extends Component {
                 let event = new PastEventObj(webEvent["name"],date,len,webEvent["users"])
                 listEvents.push(event);
 
-                
-
-                
-
-
             });
-            self.setState({displayedEvents : listEvents});
-            self.setState({events : listEvents});
-            self.setState({sortDate1 : listEvents[0].getDate()})
-            self.setState({sortDate2 : listEvents[listEvents.length-1].getDate()})
-
+            self.setState({events : listEvents, eventsInRange: listEvents, filteredEvents: listEvents});
+            self.setState({sortDate1 : listEvents[0].getDate(), sortDate2 : listEvents[listEvents.length-1].getDate(), hidden: "hidden"});
         });
         
     }
@@ -149,10 +141,11 @@ class PastEvents extends Component {
            
         //}
         //console.log(displayedEvents);
-        await this.setState({displayedEvents : []});
-        await this.setState({displayedEvents : displayedEvents});
-
-
+        await this.setState({eventsInRange : []});
+        await this.setState({eventsInRange : displayedEvents});
+        console.log(displayedEvents);
+        console.log(this.state.text);
+        this.filterEvents(this.state.searchText, displayedEvents);
     }
 
 
@@ -182,19 +175,56 @@ class PastEvents extends Component {
         this.createDisplayEvents(this.state.sortDate1, sortDate2);
     };
 
+    handleSearchChange = e => {
+        this.setState({searchText: e.target.value});
+        this.filterEvents(e.target.value, this.state.eventsInRange);
+    };
+
+    handleClear = () => {
+        this.setState({searchText: ""});
+        this.filterEvents("", this.state.eventsInRange);
+    }
+
+    async filterEvents(text, originalEvents) {
+        console.log(originalEvents);
+        var index = 0;
+        let filtered = [];
+        originalEvents.forEach(function(event) {
+            if (event["title"].toLowerCase().includes(text.toLowerCase())) {
+                filtered.push(event);
+            }
+            index = index + 1;
+        });
+        await this.setState({ filteredEvents: [] });
+        await this.setState({ filteredEvents: filtered });
+    }
+
     render() {
         const children = [];
-        this.state.displayedEvents.forEach(function(event) {
-            //console.log(event);
+        this.state.filteredEvents.forEach(function(event) {
             children.push(<Card style={{margin : "10px", padding : "4px"}}><PastEvent parentEvent={event}/></Card>)
-            //console.log(children)
         })
 
         return (
-            <div style={{ width: "100vw" }}>
+            <div>
+            <div style={{position: "fixed", top: "50%", left: "50%", margintop: "-50px", marginleft: "-50px", width: "100px", height: "100px"}}>
+                <CircularProgress disableShrink style={{visibility: this.state.hidden}}></CircularProgress>
+            </div>
+            <div style={{textAlign: "center", marginBottom: 20}}>
+            <div style={{position: 'relative', display: "inline-block"}}>
+            <Paper style={{padding: '2px 4px', display: "flex", alignItems: "center", width: 400}} elevation={1}>
+            <SearchIcon style={{padding: 10}}/>
+            <InputBase
+                style={{width: 300}}
+                placeholder="Search Events"   
+                value={this.state.searchText}
+                onChange={this.handleSearchChange} />
+            <IconButton onClick={this.handleClear}><CloseIcon/></IconButton>
+            </Paper>
+            </div>
+            </div>
 
-
-                <Grid container direction="column" justify="center" alignItems="center" >
+                <Grid container direction="row" justify="center" >
 
                     <MuiPickersUtilsProvider utils={MomentUtils}>
                         <Grid container direction="row" justify="center" alignItems="flex-start" >
