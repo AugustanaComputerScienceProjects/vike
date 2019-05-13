@@ -121,6 +121,13 @@ class PendingEvents extends Component {
         this.group.leave(this.token);
     }
 
+    moveEvent(ref) {
+        let event = this.state.popUpEvent;
+        firebase.database.ref(ref).child(event["key"]).remove();
+        this.setState({ openDelete: false });
+        this.group.leave(this.token);
+    }
+
     arrayRemove(arr, value) {
         return arr.filter(function(ele){
             return ele != value;
@@ -174,7 +181,7 @@ class PendingEvents extends Component {
     submitAction(self, event) {
         if (self.state.adminSignedIn) {
             self.pushEvent(self, event, '/current-events', "Event Moved to Current Events");
-            self.deleteEvent('/pending-events/' + self.state.popUpEvent["userKey"]);
+            self.moveEvent('/pending-events/' + self.state.popUpEvent["userKey"]);
         } else if (self.state.leaderSignedIn) {
             self.pushEvent(self, event, '/pending-events/' + self.state.uid, "Event Updated");
         }
