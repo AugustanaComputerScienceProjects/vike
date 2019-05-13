@@ -531,12 +531,15 @@ class CurrentEvents extends Component {
         let self = this;
         let s = "";
         for(let i = 0; i < self.state.winners.length-1; i++){
-            s= s +self.state.winners[i]+",";
+            s= s +self.state.winners[i] + "\n";
         }
         s+=self.state.winners[self.state.winners.length-1];
+        let winnerString = s.split('\n').map((item, i) => {
+            return <p key={i}>{item}</p>;
+        });
         console.log(self.state.winners);
         await self.setState({winnerString : ""});
-        await self.setState({winnerString : s});
+        await self.setState({winnerString : winnerString});
         await this.setState({winnersOpen:true});
 
     }
@@ -647,6 +650,7 @@ class CurrentEvents extends Component {
                 <DialogTitle onClose={this.handleRaffleClose}>Raffle</DialogTitle>
                 <DialogContent>
                 <TextField
+                                    autoFocus
                                     label="How many winners?"
                                     margin="normal"
                                     value={this.state.numWinners}
