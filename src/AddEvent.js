@@ -24,6 +24,8 @@ import defaultImage from './default.jpg';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
+// File for the Add Event Screen
+
 var QRCode = require('qrcode');
 
 const uuidv4 = require('uuid/v4');
@@ -52,16 +54,19 @@ class AddEvent extends Component {
 
     listeners = [];
 
+    // Component will unmount, turn of the Firebase listeners
     componentWillUnmount() {
         this.listeners.forEach(function(listener) {
             listener.off();
         });
     }
 
+    // Handle opening of the Snackbar
     handleOpen = () => {
         this.setState({ open: true });
     };
     
+    // Handle closing of the Snackbar
     handleClose = (event, reason) => {
         if (reason === 'clickaway') {
           return;
@@ -69,6 +74,7 @@ class AddEvent extends Component {
         this.setState({ open: false });
     };
     
+    // Handle changing of the event for the date/time pickers
     handleDateChange = event => {
         this.setState({ date: new Date(event) });
     };
@@ -143,6 +149,7 @@ class AddEvent extends Component {
         self.displayMessage(self, message);
     }
 
+    // Download the QR code as a jpg
     downloadQR(key, name) {
         QRCode.toDataURL('https://osl-events-app.firebaseapp.com/event?id=' + key + '&name=' + name.replaceAll(" ", "+"), function (err, url) {
             console.log(url)
@@ -155,6 +162,7 @@ class AddEvent extends Component {
         });
     }
 
+    // Add event button action
     submitAction = event => {
         // Check inputs
         if (this.state.name != '' && this.state.location != '' && this.state.organization != '' && this.state.duration != '') {
@@ -164,6 +172,7 @@ class AddEvent extends Component {
         }
     };
 
+    // Handle changing of the image, do not allow JPEG 2000 images
     handleImageChange = base64 => {
         let split = base64.split(",");
         if (split.length > 0) {
@@ -175,10 +184,12 @@ class AddEvent extends Component {
         }
     }
 
+    // Toggle checking of the "Downlod QR Code" Checkbox
     toggleChecked = () => {
         this.setState({qrChecked: !this.state.qrChecked});
     }
 
+    // Resets the state after adding/requesting an event
     resetState(self) {
         self.setState({
             open: false,
@@ -196,12 +207,14 @@ class AddEvent extends Component {
         });
     }
 
+    // Display a message using the Snackbar
     displayMessage(self, message) {
         self.handleClose();
         self.setState({ message: message });
         self.handleOpen();
     }
 
+    // Checks what role the current user signed in has
     checkRole(user, role) {
         let self = this;
         firebase.database.ref(role).once('value').then(function(snapshot) {
@@ -215,6 +228,7 @@ class AddEvent extends Component {
           });
     }
 
+    // Reads the tags from Firebase and sets the tags list
     readTags() {
         let self = this;
         let ref = firebase.database.ref('/tags');
@@ -229,6 +243,7 @@ class AddEvent extends Component {
         })
       }
 
+      // Reads the groups from Firebase and sets the groups list
       readGroups() {
         let self = this;
         let ref = firebase.database.ref('/groups');
@@ -243,6 +258,7 @@ class AddEvent extends Component {
         })
       }
 
+    // Component will mount - read tags, groups, auth listener
     componentWillMount() {
         this.readTags();
         this.readGroups();
@@ -256,10 +272,12 @@ class AddEvent extends Component {
         });
     }
 
+    // Render the page
     render() {
         const { classes } = this.props;
         const child = [];
         
+        // Format Date - display preview
         let date = new Date(this.state.date);
         var month = (1 + date.getMonth()).toString();
         month = month.length > 1 ? month : '0' + month;
@@ -452,6 +470,7 @@ class AddEvent extends Component {
 
 export default AddEvent;
 
+// Parent component for the preview
 const ParentComponent = props => (
     <div>
       <Grid container id="children-pane" direction="row" spacing={8}>
@@ -460,6 +479,7 @@ const ParentComponent = props => (
     </div>
 );
   
+// Child component for the preview
 const ChildComponent = props => <Grid item><Card style={{minHeight: 400, maxHeight: 400, minWidth: 300, maxWidth: 300}}>
     <CardHeader title={props.name} subheader={props.date}></CardHeader>
     <CardMedia style = {{ height: 0, paddingTop: '56.25%'}} image={props.image} title={props.name}/><CardContent>
