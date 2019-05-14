@@ -497,6 +497,19 @@ class PendingEvents extends Component {
         });
     }
 
+    // Gets a formatted AM/PM time string with the given hours and minutes
+    timeString(hours, minutes) {
+        if (hours == 0) {
+            return (hours + 12) + ":" + minutes + " AM";
+        } else if (hours < 12) {
+            return hours + ":" + minutes + " AM";
+        } else if (hours == 12) {
+            return hours + ":" + minutes + " PM";
+        } else {
+            return (hours - 12) + ":" + minutes + " PM";
+        }
+    }
+
     // Render the Pending Events page
     render() {
         const { classes } = this.props;
@@ -511,17 +524,15 @@ class PendingEvents extends Component {
             month = month.length > 1 ? month : '0' + month;
             var day = date.getDate().toString();
             day = day.length > 1 ? day : '0' + day;
-            var hours = date.getHours().toString();
-            hours = hours.length > 1 ? hours : '0' + hours;
+            var hours = date.getHours();
             var minutes = date.getMinutes().toString();
             minutes = minutes.length > 1 ? minutes : '0' + minutes;
-            let startDate = month + '-' + day + '-' + date.getFullYear() + " " + hours + ":" + minutes;
+            let startDate = month + '-' + day + '-' + date.getFullYear() + " " + this.timeString(hours, minutes);
             date.setMilliseconds(date.getMilliseconds() + (event["duration"] * 60000));
-            hours = date.getHours().toString();
-            hours = hours.length > 1 ? hours : '0' + hours;
+            hours = date.getHours();
             minutes = date.getMinutes().toString();
             minutes = minutes.length > 1 ? minutes : '0' + minutes;
-            let fullDate = startDate + "-" + hours + ":" + minutes;
+            let fullDate = startDate + "-" + this.timeString(hours, minutes);
             children.push(<ChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
             organization={'Group: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
             editAction={() => this.editAction(event, index)} email={event["status"]}/>);
