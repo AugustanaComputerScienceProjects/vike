@@ -4,6 +4,9 @@ import 'firebase/database';
 import 'firebase/storage';
 import 'firebase/auth';
 
+// Config file for Firebase
+
+// Config to initialize Firebase
 let config = {
     apiKey: "AIzaSyBFTh3ZprCrzReAlVDeGcNN8WzijuDU6DI",
     authDomain: "osl-events-app.firebaseapp.com",
@@ -22,28 +25,28 @@ class Firebase {
       this.adminSignedIn = false;
     }
 
+    // Signs in the user via Google through a pop-up
     signIn = () => {
         var provider = new app.auth.GoogleAuthProvider();
         this.auth.signInWithPopup(provider).then(function(result) {
-            // This gives you a Google Access Token. You can use it to access the Google API.
             var token = result.credential.accessToken;
-            // The signed-in user info.
             var user = result.user;
-            // ...
             this.adminSignedIn = true;
             console.log(user.email);
           }).catch(function(error) {
-            // Handle Errors here.
             var errorCode = error.code;
             var errorMessage = error.message;
-            // The email of the user's account used.
             var email = error.email;
-            // The firebase.auth.AuthCredential type that was used.
             var credential = error.credential;
-            // ...
+            console.log("Error Signing in...");
+            console.log(errorCode);
+            console.log(errorMessage);
+            console.log(email);
+            console.log(credential);
           });
     }
 
+    // Signs out the current user
     signOut = () => this.auth.signOut();
 }
 

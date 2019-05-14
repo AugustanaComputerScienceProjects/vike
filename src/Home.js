@@ -10,10 +10,11 @@ import MenuList from '@material-ui/core/MenuList';
 import defaultImage from './default.jpg';
 import { View, Image } from 'react-native';
 
+// File for the home page
+
 class Home extends Component {
 
-
-
+    // Render the page
     render() {
         return (
             <div style={{textAlign: "center", paddingTop: 40}}>

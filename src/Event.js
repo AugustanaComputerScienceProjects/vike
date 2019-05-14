@@ -11,6 +11,8 @@ import queryString from 'query-string';
 import firebase from './config';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
+// File for managing the event check in page
+
 class Event extends Component {
 
     state = {text: "Checking In...", hidden: "visible"};
@@ -22,6 +24,7 @@ class Event extends Component {
         this.checkIn();
     }
 
+    // Checks the user into the event
     checkIn() {
         let self = this;
         if (this.values.id != null && this.values.id != "" && this.values.name != null && this.values.name != "") {
@@ -46,10 +49,12 @@ class Event extends Component {
         }
     }
 
+    // Turn off auth listener when the component unmounts
     componentWillUnmount() {
         this.off();
     }
 
+    // Render the event check in page
     render() {
         
         return (
@@ -70,6 +75,7 @@ class Event extends Component {
 
 export default Event;
 
+// Function for replacing all of the + signs in the name so that it is displayed with spaces instead
 String.prototype.replaceAll = function(search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);

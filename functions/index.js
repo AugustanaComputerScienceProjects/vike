@@ -5,6 +5,9 @@ const cors = require('cors');
 const QRCode = require('qrcode');
 admin.initializeApp();
 
+// File for Firebase Functions
+
+// Transporter config for sending emails
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -13,6 +16,7 @@ let transporter = nodemailer.createTransport({
     }
 });
 
+// Firebase Cloud Function moveEvents - moves current events to past events when they have expired
 exports.moveEvents = functions.https.onRequest((req, res) => {
     var db = admin.database();
     
@@ -35,6 +39,7 @@ exports.moveEvents = functions.https.onRequest((req, res) => {
     res.end();
   });
 
+  // Gets the end date of a given Event
   function getEndDate(event) {
     let arr = event["startDate"].split(' ');
     let arr2 = arr[0].split('-');
@@ -44,6 +49,7 @@ exports.moveEvents = functions.https.onRequest((req, res) => {
     return date;
 }
 
+// Firebase Cloud Function emailNotify - notifies leaders when their Event gets accepted or rejected via email
 exports.emailNotify = functions.database.ref('/pending-events/{userID}/{eventID}').onDelete((snapshot, context) => {
     admin.database().ref('/current-events/' + snapshot.key).once('value').then(function(snap) {
         let event = snapshot.val();

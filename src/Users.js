@@ -21,6 +21,8 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import DispatchGroup from './DispatchGroup';
 
+// File for the Users page
+
 const redTheme = createMuiTheme({ palette: { primary: red } })
 
 class Users extends Component {
@@ -40,46 +42,56 @@ class Users extends Component {
 
     listeners = [];
 
+    // Handles the changing of the email in the add admin/leader screen
     handleEmailChange = (event) => {
         this.setState({ email: event.target.value });
     }
 
+    // Action for removing a given user - opens the confirm option
     removeAction = (ref, user) => {
         this.setState({ email: user, ref: ref});
         this.handleDeleteOpen();
     }
 
+    // Deletes the user from the database once they hit the confirm button
     deleteUser = () => {
         firebase.database.ref(this.state.ref + this.state.email.replace(".", ",")).remove();
         this.handleDeleteClose();
     }
 
+    // Handles closing of the add user pop up
     handleClose = () => {
         this.setState({ adding: false });
     }
 
+    // Handles opening of the add user pop up
     handleOpen = () => {
         this.setState({ adding: true });
     }
 
+    // Handles closing of the confirm pop up for deleting a user
     handleDeleteClose = () => {
         this.setState({ deleting: false });
     }
 
+    // Handles opening of the confrim pop up for deleting a user
     handleDeleteOpen = () => {
         this.setState({ deleting: true });
     }
 
+    // Handles opening of the add user screen
     addAction = (ref, type) => {
         this.setState({ email: '', ref: ref, type: type });
         this.handleOpen();
     }
 
+    // Handles adding of the user once the add user button is clicked
     handleSave = () => {
         firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).set(true);
         this.handleClose();
     }
 
+    // Reads the current administrators from the database
     readAdministrators() {
         let token = this.group.enter();
         let self = this;
@@ -95,6 +107,7 @@ class Users extends Component {
         });
     }
 
+    // Reads the current leaders from the database
     readLeaders() {
         let token = this.group.enter();
         let self = this;
@@ -110,6 +123,7 @@ class Users extends Component {
         });
     }
 
+    // Component will mount - read the administrators and leaders, then hide the progress indicator
     componentWillMount() {
         this.readAdministrators();
         this.readLeaders();
@@ -119,21 +133,25 @@ class Users extends Component {
         });
     }
 
+    // Compone will unmount - turn off the Firebase listeners
     componentWillUnmount() {
         this.listeners.forEach(function(listener) {
             listener.off();
         });
     }
 
+    // Render the page
     render() {
         const adminChildren = [];
         const leaderChildren = [];
 
+        // Build the administrator components to display
         for (var i = 0; i < this.state.admins.length; i += 1) {
             let index = i;
             adminChildren.push(<ChildComponent key={index} email={this.state.admins[index]} removeAction={() => this.removeAction("/admin/", this.state.admins[index])}></ChildComponent>)
         }
         
+        // Build the leader components to display
         for (var i = 0; i < this.state.leaders.length; i += 1) {
             let index = i;
             leaderChildren.push(<ChildComponent key={index} email={this.state.leaders[index]} removeAction={() => this.removeAction("/leaders/", this.state.leaders[index])}></ChildComponent>)
@@ -216,6 +234,7 @@ class Users extends Component {
     }
 }
 
+// Parent component for a user to be displayed
 const ParentComponent = props => (
     <div style={{width: 1000}}>
       <Grid container id="children-pane" direction="column" spacing={16}>
@@ -225,6 +244,7 @@ const ParentComponent = props => (
     </div>
 );
   
+// Child component for a user to be displayed
 const ChildComponent = props => <Grid item container><Typography component="p" style={{marginTop: 7}}>{props.email}</Typography><MuiThemeProvider theme={redTheme}><Button color="primary" onClick={props.removeAction}><CloseIcon/></Button></MuiThemeProvider></Grid>;
 
 export default Users;

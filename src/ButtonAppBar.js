@@ -12,6 +12,8 @@ import firebase from "./config";
 import Grid from "@material-ui/core/Grid";
 import HomeIcon from '@material-ui/icons/Home';
 
+// File for managing the top app bar
+
 class NavBar extends React.Component {
   constructor(props) {
     super(props);
@@ -27,6 +29,7 @@ class NavBar extends React.Component {
     };
   }
 
+  // Toggles opening/closing the drawer (NavDrawer)
   toggleDrawer = booleanValue => () => {
     if (this.state.isNotHome) {
       window.history.pushState("object or string", "Title", "/");
@@ -38,11 +41,13 @@ class NavBar extends React.Component {
     }
   };
 
+  // When clicking on a page to navigate to, changes the title of the app bar
   onNavChanged(page) {
     this.props.navChanged(page);
     this.setState({ title: "Augustana Events - " + page})
   }
 
+  // Action for signing the user in and signing the user out
   signInAction = () => {
     if (!this.state.signedIn) {
       firebase.signIn();
@@ -53,6 +58,7 @@ class NavBar extends React.Component {
     }
   }
 
+  // Checks the role of the current user and displays their email and role in the right side of the app bar
   checkRole(user, role) {
     let self = this;
     firebase.database.ref(role).once('value').then(function(snapshot) {
@@ -66,6 +72,7 @@ class NavBar extends React.Component {
       });
 }
 
+// Checks if the current page is an event page, if so, changes the left icon of the app bar to take to home
 checkReload() {
   if (window.location.href.includes("event?")) {
     this.setState({icon: <HomeIcon/>, isNotHome: true, title: "Augustana Events - Check In"});
@@ -73,7 +80,7 @@ checkReload() {
     this.setState({icon: <MenuIcon/>, isNotHome: false});
   }
 }
-
+  // Component Will Mount, check which icon is needed and listen to Firebase auth
   componentWillMount() {
     this.checkReload();
     firebase.auth.onAuthStateChanged((user) => {
@@ -90,6 +97,7 @@ checkReload() {
     });
   }
 
+  // Render the app bar
   render() {
     return (
       <div className="App">

@@ -52,6 +52,8 @@ import Switch from '@material-ui/core/Switch';
 import DispatchGroup from './DispatchGroup';
 var QRCode = require('qrcode');
 
+// File for managing the Current Events page
+
 const uuidv4 = require('uuid/v4');
 const redTheme = createMuiTheme({ palette: { primary: red } });
 
@@ -114,12 +116,14 @@ class CurrentEvents extends Component {
     }
     listeners = [];
 
+    // Handles opening of the pop up for editing an event
     handleBeginEdit = () => {
         this.handleClose();
         this.setState({ editing: true });
         this.token = this.group.enter();
     };
 
+    // Handles the deleting/rejecting of an event from Firebase 
     handleDelete = () => {
         this.setState({ editing: false });
         let event = this.state.popUpEvent;
@@ -132,20 +136,24 @@ class CurrentEvents extends Component {
         this.group.leave(this.token);
     }
     
+    // Removes a given value from the given array
     arrayRemove(arr, value) {
         return arr.filter(function(ele){
             return ele != value;
         });
      }
      
+    // Handles closing of the confirm pop up for deleting/rejecting an event
     handleDeleteClose = () => {
         this.setState({ openDelete: false });
     }
 
+    // Handles opening of the confirm pop up for deleting/rejecting an event
     handleDeleteOpen = () => {
         this.setState({ openDelete: true });
     }
 
+    // Handles saving of edits once the save changes button is clicked
     handleSaveEdit = () => {
         this.setState({ editing: false });
         let event = this.state.popUpEvent;
@@ -182,6 +190,7 @@ class CurrentEvents extends Component {
         }
     };
 
+    // Handles closing of the edit event pop up
     handleCloseEdit = () => {
         let revertEvents = this.state.events;
         revertEvents[this.state.index] = this.state.oldEvent;
@@ -189,6 +198,7 @@ class CurrentEvents extends Component {
         this.group.leave(this.token);
     }
 
+    // Pushes the given event to the given reference in Firebase database
     pushEvent(self, event) {
         firebase.database.ref('/current-events').child(event["key"]).set({
             name: event["name"],
@@ -206,16 +216,19 @@ class CurrentEvents extends Component {
         this.group.leave(this.token);
     }
 
+    // Displays a message to the user using the Snackbar
     displayMessage(self, message) {
         self.handleClose();
         self.setState({ message: message });
         self.handleOpen();
     }
 
+    // Handles opening of the Snackbar
     handleOpen = () => {
         this.setState({ open: true });
     };
     
+    // Handles closing of the Snackbar
     handleClose = (event, reason) => {
         if (reason === 'clickaway') {
           return;
@@ -223,6 +236,7 @@ class CurrentEvents extends Component {
         this.setState({ open: false });
     };
 
+    // Handles changing of the image in the edit pop up
     handleImageChange = base64 => {
         let split = base64.split(",");
         if (split.length > 0) {
@@ -234,6 +248,7 @@ class CurrentEvents extends Component {
         }
     }
 
+    // Reads all of the current events from Firebase
     readCurrentEvents() {
         let self = this;
         let reference = firebase.database.ref('/current-events').orderByChild('name')
@@ -261,6 +276,7 @@ class CurrentEvents extends Component {
         });
     }
 
+    // Retrieves a single image from Firebase storage
     getImage(self, index, snapshot, childSnapshot, listEvents, listURLS) {
         firebase.storage.ref('Images').child(childSnapshot.child('imgid').val() + '.jpg').getDownloadURL().then((url) => {    
             listURLS[index] = url;
@@ -275,6 +291,7 @@ class CurrentEvents extends Component {
           });
     }
 
+    // Reads the tags from the Firebase database
     readTags() {
         let self = this;
         let ref = firebase.database.ref('/tags');
@@ -288,6 +305,7 @@ class CurrentEvents extends Component {
         })
       }
 
+      // Reads the groups from the Firebase database
       readGroups() {
         let self = this;
         let ref = firebase.database.ref('/groups');
@@ -302,18 +320,21 @@ class CurrentEvents extends Component {
         })
       }
 
+    // Component did mount - read the tags, groups, and current events
     componentDidMount() {
         this.readTags();
         this.readGroups();
         this.readCurrentEvents();
     }
 
+    // Component will unmount - turn off all Firebase listeners
     componentWillUnmount() {
         this.listeners.forEach(function(listener) {
             listener.off();
         });
     }
 
+    // Action called when clicking an event to edit it
     editAction(event, i) { 
         console.log('Editing: ' + event["name"]);
         let tags = event["tags"].split(',');
@@ -336,10 +357,12 @@ class CurrentEvents extends Component {
         self.handleBeginEdit();
     }
 
+    // Handles changing of the name field in the edit pop up
     handleNameChange = e => {
         this.handleEventChange("name", e.target.value);
     };
 
+    // Handles changing of the date picker/time picker in the edit pop up
     handleDateChange = e => {
         // Adding leading 0s
         let date = new Date(e);
@@ -356,27 +379,33 @@ class CurrentEvents extends Component {
         this.setState({date: date});
     };
 
+    // Handles changing of the duration field in the edit pop up
     handleDurationChange = e => {
         this.handleEventChange("duration", e.target.value);
     };
 
+    // Handles changing of the location field in the edit pop up
     handleLocationChange = e => {
         this.handleEventChange("location", e.target.value);
     };
 
+    // Handles changing of the organization choice in the edit pop up
     handleOrganizationChange = e => {
         this.handleEventChange("organization", e.target.value);
     };
 
+    // Handles changing of the tag choices in the edit pop up
     handleTagChange = e => {
         this.handleEventChange("tags", e.target.value.toString());
         this.setState({ tags: e.target.value });
     };
 
+    // Handles changing of the description field in the edit pop up
     handleDescriptionChange = e => {
         this.handleEventChange("description", e.target.value);
     };
 
+    // Handles changing of a single element in the edit pop up
     handleEventChange(key, value) {
         let newEvents = this.state.events;
         let event = newEvents[this.state.index];
@@ -385,16 +414,19 @@ class CurrentEvents extends Component {
         this.setState({events: newEvents});
     }
 
+    // Handles changing text of the search bar
     handleSearchChange = e => {
         this.setState({searchText: e.target.value});
         this.filterEvents(e.target.value, this.state.originalEvents, this.state.originalURLS);
     };
 
+    // Handles clearing of the search field (when clicking the x button)
     handleClear = () => {
         this.setState({searchText: ""});
         this.filterEvents("", this.state.originalEvents, this.state.originalURLS);
     }
 
+    // Handles toggling of the sort menu
     handleSortOpenClose = () => {
         console.log("sorting");
         if (this.state.sortMenu === "block") {
@@ -404,11 +436,13 @@ class CurrentEvents extends Component {
         }
     }
 
+    // Handles changing of the different sorting options
     handleSort = e => {
         this.setState({sortBy: e.target.value});
         this.sort(this.state.events, this.state.urls, e.target.value, this.state.isAscending);
     }
 
+    // Handles the sorting of the different sorting options
     sort(events, urls, sortBy, isAscending) {
         if (sortBy === "date") {
             this.sortArrays(events, urls, "startDate", isAscending);
@@ -419,6 +453,7 @@ class CurrentEvents extends Component {
         } 
     }
 
+    // Sorts the event and image arrays
     sortArrays(events, urls, attribute, ascending) {
         var list = [];
         for (var j = 0; j < events.length; j++) {
@@ -439,6 +474,7 @@ class CurrentEvents extends Component {
         }
     }
 
+    // Filters events with the given text and original events/images
     filterEvents(text, originalEvents, oldURLS) {
         var index = 0;
         let filtered = [];
@@ -455,11 +491,13 @@ class CurrentEvents extends Component {
         this.setState({ events: filtered, urls: urls });
     }
 
+    // Handles toggling of the ascending option
     handleToggle = name => event => {
         this.setState({ [name]: event.target.checked });
         this.sort(this.state.events, this.state.urls, this.state.sortBy, event.target.checked);
     };
 
+    // Downloads a QR code with the given event
     downloadQR = (event) => {
         QRCode.toDataURL('https://osl-events-app.firebaseapp.com/event?id=' + event["key"] + '&name=' + event["name"].replaceAll(" ", "+"), function (err, url) {
             var link = document.createElement('a');
@@ -471,6 +509,7 @@ class CurrentEvents extends Component {
         });
     }
 
+    // Returns a formmatted date from the given event
     getFormattedDate(event) {
         let arr = event["startDate"].split(' ');
         let arr2 = arr[0].split('-');
@@ -479,6 +518,7 @@ class CurrentEvents extends Component {
         return date;
     }
 
+    // Handles opening of the raffle pop up
     raffleOnclick(event, index){
         if(event.hasOwnProperty("users")){
             this.handleClose();
@@ -488,14 +528,18 @@ class CurrentEvents extends Component {
             this.displayMessage(self, "No users checked into the event.")
         }
     }
+
+    // Handles closing of the raffle pop up
     handleRaffleClose = () => {
         this.setState({raffleOpen:false})
     }
 
+    // Handles changing of the number of winners in the raffle pop up
     numWinnersChange= e => {
         this.setState({numWinners:e.target.value})
     }
 
+    // Runs a raffle on the given event
     async runRaffle(self){
         let numUsers = Object.keys(self.state.raffleEvent["users"]).length;
         if (self.state.numWinners > 0 && self.state.numWinners <= numUsers) {
@@ -519,14 +563,17 @@ class CurrentEvents extends Component {
         }
     }
 
+    // Handles opening of the winners pop up
     handleOpenWinners = () => {
         this.setState({winnersOpen: true})
     }
 
+    // Handles closing of the winners pop up
     handleWinnersClose = () => {
         this.setState({winnersOpen:false})
     }
 
+    // Displays the winners after running the raffle
     async displayWinners(){
         let self = this;
         let s = "";
@@ -544,10 +591,12 @@ class CurrentEvents extends Component {
 
     }
 
+    // Render the Current Events page
     render() {
         const { classes } = this.props;
         const children = [];
 
+        // Build all of the events
         for (var i = 0; i < this.state.events.length; i += 1) {
             let event = this.state.events[i];
             let index = i;
@@ -862,6 +911,7 @@ class CurrentEvents extends Component {
     }
 }
 
+// Parent Component for a single event
 const ParentComponent = props => (
     <div>
       <Grid container id="children-pane" direction="row" spacing={8}>
@@ -870,6 +920,7 @@ const ParentComponent = props => (
     </div>
 );
   
+// Child Component for a single event
 const ChildComponent = props => <Grid item><Card style={{minWidth: 350, maxWidth: 350, height: "auto"}}><CardActionArea onClick={props.editAction}>
     <CardHeader title={props.name} subheader={props.date}></CardHeader>
     <CardMedia style = {{ height: 0, paddingTop: '56.25%'}} image={props.image} title={props.name}/><CardContent>

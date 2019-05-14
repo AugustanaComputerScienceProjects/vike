@@ -10,6 +10,8 @@ import MenuList from '@material-ui/core/MenuList';
 import firebase from "./config";
 import { Link } from "react-router-dom";
 
+// File for the navigation drawer (the menu that pops out when clicking the left menu button in the app bar)
+
 class NavDrawer extends Component {
 
     constructor(props) {
@@ -27,6 +29,7 @@ class NavDrawer extends Component {
         };
     }
 
+    // Actions for when each menu item is clicked
     homeClicked() {
         this.props.navChanged("Home");
     }
@@ -55,6 +58,7 @@ class NavDrawer extends Component {
         this.props.navChanged("Users");
     }
 
+    // Checks the role of the current user
     checkRole(user, role) {
         let self = this;
         firebase.database.ref(role).once('value').then(function(snapshot) {
@@ -68,6 +72,7 @@ class NavDrawer extends Component {
           });
     }
 
+    // Component will mount - initiate the Firebase auth listener
     componentWillMount() {
         firebase.auth.onAuthStateChanged((user) => {
           if (user) {
@@ -79,6 +84,7 @@ class NavDrawer extends Component {
         });
     }
 
+    // Render the drawer
     render() {
         return (
             <Drawer

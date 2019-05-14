@@ -17,6 +17,8 @@ import {
     Link
   } from 'react-router-dom'
 
+// Main application file that manages all the different views
+
 class App extends Component {
 
     constructor(props) {
@@ -28,6 +30,7 @@ class App extends Component {
 
     }
 
+    // Checks which display should be visible
     mainDisplay() {
         if (this.state.selected == "Home") {
             return (
@@ -71,10 +74,13 @@ class App extends Component {
             );
         }
     }
+
+    // Called when a different page is selected, set the state to that page
     onNavChanged(page) {
         this.setState({selected : page})
     }
 
+     // Render the page
      render() {
          return (
              <div className='fullPage'>

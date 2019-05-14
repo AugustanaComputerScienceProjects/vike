@@ -36,6 +36,8 @@ import Snackbar from '@material-ui/core/Snackbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import DispatchGroup from './DispatchGroup';
 
+// File for managing the Pending Events page
+
 const uuidv4 = require('uuid/v4');
 const redTheme = createMuiTheme({ palette: { primary: red } })
 
@@ -92,12 +94,14 @@ class PendingEvents extends Component {
     listeners = [];
     off = null;
     
+    // Handles opening of the pop up for editing an event
     handleBeginEdit = () => {
         this.handleClose();
         this.setState({ editing: true });
         this.token = this.group.enter();
     };
 
+    // Handles the deleting/rejecting of an event from Firebase 
     handleDelete = () => {
         this.setState({ editing: false });
         if (this.state.adminSignedIn) {
@@ -110,6 +114,7 @@ class PendingEvents extends Component {
         }
     }
     
+    // Deletes a single event from Firebase with the given database reference
     deleteEvent(ref) {
         let event = this.state.popUpEvent;
         firebase.database.ref(ref).child(event["key"]).remove();
@@ -121,6 +126,7 @@ class PendingEvents extends Component {
         this.group.leave(this.token);
     }
 
+    // Moves an event from Pending Events to Current Events in Firebase
     moveEvent(ref) {
         let event = this.state.popUpEvent;
         firebase.database.ref(ref).child(event["key"]).remove();
@@ -128,20 +134,24 @@ class PendingEvents extends Component {
         this.group.leave(this.token);
     }
 
+    // Removes a given value from the given array
     arrayRemove(arr, value) {
         return arr.filter(function(ele){
             return ele != value;
         });
      }
      
+    // Handles closing of the confirm pop up for deleting/rejecting an event
     handleDeleteClose = () => {
         this.setState({ openDelete: false });
     }
 
+    // Handles opening of the confirm pop up for deleting/rejecting an event
     handleDeleteOpen = () => {
         this.setState({ openDelete: true });
     }
 
+    // Handles saving of edits once the save changes button is clicked
     handleSaveEdit = () => {
         this.setState({ editing: false });
         let event = this.state.popUpEvent;
@@ -178,6 +188,7 @@ class PendingEvents extends Component {
         }
     };
 
+    // Action for clicking the accept event/save changes button (handleSaveEdit called first)
     submitAction(self, event) {
         if (self.state.adminSignedIn) {
             self.pushEvent(self, event, '/current-events', "Event Moved to Current Events");
@@ -187,6 +198,7 @@ class PendingEvents extends Component {
         }
     }
 
+    // Handles closing of the edit event pop up
     handleCloseEdit = () => {
         let revertEvents = this.state.events;
         revertEvents[this.state.index] = this.state.oldEvent;
@@ -194,6 +206,7 @@ class PendingEvents extends Component {
         this.group.leave(this.token);
     }
 
+    // Pushes the given event to the given reference in Firebase database
     pushEvent(self, event, ref, message) {
         firebase.database.ref(ref).child(event["key"]).set({
             name: event["name"],
@@ -211,16 +224,19 @@ class PendingEvents extends Component {
         this.group.leave(this.token);
     }
 
+    // Displays a message to the user using the Snackbar
     displayMessage(self, message) {
         self.handleClose();
         self.setState({ message: message });
         self.handleOpen();
     }
 
+    // Handles opening of the Snackbar
     handleOpen = () => {
         this.setState({ open: true });
     };
     
+    // Handles closing of the Snackbar
     handleClose = (event, reason) => {
         if (reason === 'clickaway') {
           return;
@@ -228,6 +244,7 @@ class PendingEvents extends Component {
         this.setState({ open: false });
     };
 
+    // Reads all of the pending events from Firebase
     readAllPendingEvents() {
         let self = this;
         let reference = firebase.database.ref('/pending-events').orderByKey();
@@ -265,6 +282,7 @@ class PendingEvents extends Component {
         });
     }
 
+    // Reads a given user's (reference) pending events from Firebase
     readPendingEvents(ref) {
         let self = this;
         let reference = firebase.database.ref(ref).orderByChild('name');
@@ -295,6 +313,7 @@ class PendingEvents extends Component {
         });
     }
 
+    // Retrieves a single image from Firebase storage
     getImage(self, index, snapshot, childSnapshot, listEvents, listURLS, endLength) {
         firebase.storage.ref('Images').child(childSnapshot.child('imgid').val() + '.jpg').getDownloadURL().then((url) => {    
             listURLS[index] = url;
@@ -309,6 +328,7 @@ class PendingEvents extends Component {
           });
     }
 
+    // Action called when clicking an event to edit it
     editAction(event, i) { 
         console.log('Editing: ' + event["name"]);
         let tags = event["tags"].split(',');
@@ -331,10 +351,12 @@ class PendingEvents extends Component {
         this.handleBeginEdit();
     }
 
+    // Handles changing of the name field in the edit pop up
     handleNameChange = e => {
         this.handleEventChange("name", e.target.value);
     };
 
+    // Handles changing of the date picker/time picker in the edit pop up
     handleDateChange = e => {
         // Adding leading 0s
         let date = new Date(e);
@@ -351,27 +373,33 @@ class PendingEvents extends Component {
         this.setState({date: date});
     };
 
+    // Handles changing of the duration field in the edit pop up
     handleDurationChange = e => {
         this.handleEventChange("duration", e.target.value);
     };
 
+    // Handles changing of the location field in the edit pop up
     handleLocationChange = e => {
         this.handleEventChange("location", e.target.value);
     };
 
+    // Handles changing of the organization choice in the edit pop up
     handleOrganizationChange = e => {
         this.handleEventChange("organization", e.target.value);
     };
 
+    // Handles changing of the tag choices in the edit pop up
     handleTagChange = e => {
         this.handleEventChange("tags", e.target.value.toString());
         this.setState({ tags: e.target.value });
     };
 
+    // Handles changing of the description field in the edit pop up
     handleDescriptionChange = e => {
         this.handleEventChange("description", e.target.value);
     };
 
+    // Handles changing of a single element in the edit pop up
     handleEventChange(key, value) {
         let newEvents = this.state.events;
         let event = newEvents[this.state.index];
@@ -380,6 +408,7 @@ class PendingEvents extends Component {
         this.setState({events: newEvents});
     }
 
+    // Handles changing of the image in the edit pop up
     handleImageChange = base64 => {
         let split = base64.split(",");
         if (split.length > 0) {
@@ -391,6 +420,7 @@ class PendingEvents extends Component {
         }
     }
 
+    // Returns a formmatted date from the given event
     getFormattedDate(event) {
         let arr = event["startDate"].split(' ');
         let arr2 = arr[0].split('-');
@@ -399,6 +429,7 @@ class PendingEvents extends Component {
         return date;
     }
 
+    // Checks the role of the current user
     checkRole(user, role) {
         let self = this;
         firebase.database.ref(role).once('value').then(function(snapshot) {
@@ -414,6 +445,7 @@ class PendingEvents extends Component {
           });
     }
 
+    // Reads the tags from the Firebase database
     readTags() {
         let self = this;
         let ref = firebase.database.ref('/tags');
@@ -428,6 +460,7 @@ class PendingEvents extends Component {
         })
       }
 
+      // Reads the groups from the Firebase database
       readGroups() {
         let self = this;
         let ref = firebase.database.ref('/groups');
@@ -442,7 +475,7 @@ class PendingEvents extends Component {
         })
       }
 
-
+    // Component will mount - read the tags and groups and start the auth change listener
     componentWillMount() {
         this.readTags();
         this.readGroups();
@@ -456,6 +489,7 @@ class PendingEvents extends Component {
         });
     }
 
+    // Component will unmount - turn off all Firebase listeners
     componentWillUnmount() {
         this.off();
         this.listeners.forEach(function(listener) {
@@ -463,10 +497,12 @@ class PendingEvents extends Component {
         });
     }
 
+    // Render the Pending Events page
     render() {
         const { classes } = this.props;
         const children = [];
 
+        // Build all of the events
         for (var i = 0; i < this.state.events.length; i += 1) {
             let event = this.state.events[i];
             let index = i;
@@ -682,6 +718,7 @@ class PendingEvents extends Component {
     }
 }
 
+// Parent Component for a single event
 const ParentComponent = props => (
     <div>
       <Grid container id="children-pane" direction="row" spacing={8}>
@@ -690,6 +727,7 @@ const ParentComponent = props => (
     </div>
 );
   
+// Child Component for a single event
 const ChildComponent = props => <Grid item><Card style={{minWidth: 350, maxWidth: 350, height: "auto"}}><CardActionArea onClick={props.editAction}>
     <CardHeader title={props.name} subheader={props.date}></CardHeader>
     <CardMedia style = {{ height: 0, paddingTop: '56.25%'}} image={props.image} title={props.name}/><CardContent>

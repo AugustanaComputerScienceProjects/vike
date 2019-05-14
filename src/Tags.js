@@ -23,6 +23,8 @@ import AddIcon from '@material-ui/icons/Add';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import DispatchGroup from './DispatchGroup';
 
+// File for manging the Groups/Tags screen
+
 const redTheme = createMuiTheme({ palette: { primary: red } })
 
 class Tags extends Component {
@@ -43,6 +45,7 @@ class Tags extends Component {
 
   listeners = [];
 
+  // Component will mount - read the tags and groups and then hide the progress indicator
   componentWillMount() {
     this.readTags();
     this.readGroups();
@@ -52,12 +55,14 @@ class Tags extends Component {
     });
   }
 
+  // Component will unmount - turn off the Firebase listeners
   componentWillUnmount() {
     this.listeners.forEach(function(listener) {
         listener.off();
     });
 }
 
+  // Read the tags from Firebase
   readTags() {
     let token = this.group.enter();
     let self = this;
@@ -74,6 +79,7 @@ class Tags extends Component {
     })
   }
 
+  // Read the groups from Firebase
   readGroups() {
     let token = this.group.enter();
     let self = this;
@@ -90,56 +96,68 @@ class Tags extends Component {
     })
   }
 
+  // Action for opening the confirm pop up when deleting a tag/group
   removeAction = (ref, data, key, type) => {
     this.setState({ key: key, data: data, ref: ref, type: type});
     this.handleDeleteOpen();
 }
 
+// Handles closing of the confirm delete pop up
 handleDeleteClose = () => {
   this.setState({ deleting: false });
 }
 
+// Handles opening of the confirm delete pop up
 handleDeleteOpen = () => {
   this.setState({ deleting: true });
 }
 
+// Action for opening the add group/tag pop up
 addAction = (ref, type) => {
   this.setState({ data: '', ref: ref, type: type });
   this.handleOpen();
 }
 
+// Handles closing of the add group/tag pop up
 handleClose = () => {
   this.setState({ adding: false });
 }
 
+// Handles opening of the add group/tag pop up
 handleOpen = () => {
   this.setState({ adding: true });
 }
 
+// Action for adding the group/tag to Firebase once the Add button is clicked
 handleSave = () => {
   firebase.database.ref(this.state.ref).push().set(this.state.data);
   this.handleClose();
 }
 
+// Handles changing of the group/tag field in the add pop up
 handleChange = (event) => {
   this.setState({ data: event.target.value });
 }
 
+// Deletes the tag/group from Firebase once the confirm button is clicked
 deleteData = () => {
   firebase.database.ref(this.state.ref + "/" + this.state.key).remove();
   this.handleDeleteClose();
 }
 
+    // Render the Groups/Tags page
     render() {
         const tagsChildren = [];
         const groupsChildren = [];
 
+        // Build the components for tags
         for (var i = 0; i < this.state.tags.length; i += 1) {
           let index = i;
           let tag = this.state.tags[index];
           tagsChildren.push(<ChildComponent key={index} data={tag[1]} removeAction={() => this.removeAction("/tags/", tag[1], tag[0], "tag")}></ChildComponent>)
       }
       
+      // Build the components for groups
       for (var i = 0; i < this.state.groups.length; i += 1) {
           let index = i;
           let group = this.state.groups[index];
@@ -223,6 +241,7 @@ deleteData = () => {
     }
 }
 
+// Parent component for displaying a single group/tag
 const ParentComponent = props => (
   <div style={{width: 1000}}>
     <Grid container id="children-pane" direction="column" spacing={16}>
@@ -232,6 +251,7 @@ const ParentComponent = props => (
   </div>
 );
 
+// Child component for displaying a single group/tag
 const ChildComponent = props => <Grid item container><Typography component="p" style={{marginTop: 7}}>{props.data}</Typography><MuiThemeProvider theme={redTheme}><Button color="primary" onClick={props.removeAction}><CloseIcon/></Button></MuiThemeProvider></Grid>;
 
 export default Tags;
