@@ -522,7 +522,14 @@ class CurrentEvents extends Component {
     raffleOnclick(event, index){
         if(event.hasOwnProperty("users")){
             this.handleClose();
-            this.setState({raffleEvent: event, raffleOpen: true, numWinners: 1});
+            let users = event["users"];
+            let length = Object.keys(users).length;
+            if (length > 1) {
+                this.setState({raffleEvent: event, raffleOpen: true, numWinners: 1, raffleTitle: "Raffle - " + length + " Attendees"});
+            } else {
+                this.setState({raffleEvent: event, raffleOpen: true, numWinners: 1, raffleTitle: "Raffle - " + length + " Attendee"});
+            }
+            this.token = this.group.enter();
         } else {
             let self = this;
             this.displayMessage(self, "No users checked into the event.")
@@ -532,6 +539,7 @@ class CurrentEvents extends Component {
     // Handles closing of the raffle pop up
     handleRaffleClose = () => {
         this.setState({raffleOpen:false})
+        this.group.leave(this.token);
     }
 
     // Handles changing of the number of winners in the raffle pop up
@@ -696,7 +704,7 @@ class CurrentEvents extends Component {
                 onClose={this.handleRaffleClose}
                 open={this.state.raffleOpen}
                 >
-                <DialogTitle onClose={this.handleRaffleClose}>Raffle</DialogTitle>
+                <DialogTitle onClose={this.handleRaffleClose}>{this.state.raffleTitle}</DialogTitle>
                 <DialogContent>
                 <TextField
                                     autoFocus
