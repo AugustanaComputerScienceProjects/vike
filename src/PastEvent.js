@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 
 
 
-
+//an individual past event, containing the information that each cell contains
 class PastEvent extends Component {
 
     constructor(props) {
@@ -36,6 +36,7 @@ class PastEvent extends Component {
     }
 
     //Uses XLSX - npm to run
+    //Downloads an XL doc onto the local machine
     downloadXLDoc() {
         var workbook = XLSX.utils.book_new();
             var users = Object.keys(this.state.parentEvent.getStuList());
@@ -75,28 +76,10 @@ class PastEvent extends Component {
                             </Typography>
 
                         </Grid>
-
-
-
-
-
                     </Grid>
-
-
-
-
-
-
-
                 </Grid>
                 <Button onClick={this.downloadXLDoc} disabled={this.state.buttonDisabled}>Download XL Doc</Button>
-
-
-
-
-
             </div>
-
         );
     }
 }

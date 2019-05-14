@@ -23,6 +23,7 @@ import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 
+//The main runner of the past event page, contains many past events
 class PastEvents extends Component {
 
     listener = null;
@@ -51,6 +52,7 @@ class PastEvents extends Component {
         this.listener.off();
     }
 
+    //reads in the past events from firebase
     readPastEvents() {
         let self = this;
         this.listener = firebase.database.ref('/past-events').orderByChild('startDate');
@@ -85,6 +87,7 @@ class PastEvents extends Component {
         
     }
 
+    //makes an aray of the past events that should be displayed
     async createDisplayEvents(d1,d2){
 
         let startInd = this.state.events.length;
@@ -108,6 +111,7 @@ class PastEvents extends Component {
             }
         }
 
+        //if no end was found
         if(endInd == -2){
             endInd = this.state.events.length
         }
@@ -117,12 +121,15 @@ class PastEvents extends Component {
         for(let i = startInd; i < endInd; i++){
             displayedEvents.push(this.state.events[i])
         }
+
+        //this was done to prevent a display bug (threading issues)
         await this.setState({eventsInRange : []});
         await this.setState({eventsInRange : displayedEvents});
         this.filterEvents(this.state.searchText, displayedEvents);
     }
 
 
+    //changes the date for the first date picker (and updates the display)
     handleDate1Change = e => {
         let date = new Date(e);
         var month = (1 + date.getMonth()).toString();
@@ -136,6 +143,7 @@ class PastEvents extends Component {
         this.createDisplayEvents(sortDate1, this.state.sortDate2);
     };
 
+    //changes the date for the second date picker (and updates the display)
     handleDate2Change = e => {
         let date = new Date(e);
         var month = (1 + date.getMonth()).toString();
@@ -149,16 +157,19 @@ class PastEvents extends Component {
         this.createDisplayEvents(this.state.sortDate1, sortDate2);
     };
 
+    //handles the search bar changing
     handleSearchChange = e => {
         this.setState({searchText: e.target.value});
         this.filterEvents(e.target.value, this.state.eventsInRange);
     };
 
+    //clears the search bar
     handleClear = () => {
         this.setState({searchText: ""});
         this.filterEvents("", this.state.eventsInRange);
     }
 
+    //filters the display based on search results
     async filterEvents(text, originalEvents) {
         var index = 0;
         let filtered = [];

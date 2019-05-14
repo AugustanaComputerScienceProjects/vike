@@ -1,5 +1,5 @@
 
-
+//this object contains the nessisary information for the past event to display/know about
 class PastEventObj {
 
     constructor(title, date, numAttend, stuList){
