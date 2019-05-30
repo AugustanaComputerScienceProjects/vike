@@ -155,7 +155,7 @@ class AddEvent extends Component {
             console.log(url)
             var link = document.createElement('a');
             link.href = url;
-            link.download = name + '-QR Code.jpg';
+            link.download = name + '-QR Code.png';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);    

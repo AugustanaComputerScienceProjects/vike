@@ -502,7 +502,7 @@ class CurrentEvents extends Component {
         QRCode.toDataURL('https://osl-events-app.firebaseapp.com/event?id=' + event["key"] + '&name=' + event["name"].replaceAll(" ", "+"), function (err, url) {
             var link = document.createElement('a');
             link.href = url;
-            link.download = event["name"] + '-QR Code.jpg';
+            link.download = event["name"] + '-QR Code.png';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);    
