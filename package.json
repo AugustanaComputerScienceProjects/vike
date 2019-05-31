@@ -19,6 +19,8 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-file-picker": "0.0.6",
+    "react-image-file-resizer": "^0.2.0",
+    "react-native-image-resizer": "^1.0.1",
     "react-native-web": "^0.11.2",
     "react-router-dom": "^5.0.0",
     "react-scripts": "^2.1.8",
@@ -39,5 +41,8 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "react-image-resizer": "^1.3.0"
+  }
 }

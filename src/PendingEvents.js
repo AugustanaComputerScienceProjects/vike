@@ -25,7 +25,7 @@ import { CardActionArea } from '@material-ui/core';
 import {MuiPickersUtilsProvider, TimePicker, DatePicker} from 'material-ui-pickers';
 import MomentUtils from '@date-io/moment';
 import FormControl from '@material-ui/core/FormControl';
-import { ImagePicker } from 'react-file-picker'
+import { FilePicker } from 'react-file-picker'
 import { View, Image } from 'react-native';
 import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
@@ -35,6 +35,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Snackbar from '@material-ui/core/Snackbar'; 
 import CircularProgress from '@material-ui/core/CircularProgress';
 import DispatchGroup from './DispatchGroup';
+import Resizer from 'react-image-file-resizer';
 
 // File for managing the Pending Events page
 
@@ -408,16 +409,20 @@ class PendingEvents extends Component {
         this.setState({events: newEvents});
     }
 
-    // Handles changing of the image in the edit pop up
-    handleImageChange = base64 => {
-        let split = base64.split(",");
-        if (split.length > 0) {
-            if (split[1].charAt(0) != "U") {
-                this.setState({ image64: base64 })
-            } else {
-                this.displayMessage(this, "Can not use JPEG 2000 Images.");
-            }   
-        }
+    // Handle changing of the image file
+    handleImageFileChanged = theFile => {
+        Resizer.imageFileResizer(
+            theFile,
+            500,
+            500,
+            'JPEG',
+            95,
+            0,
+            uri => {
+                this.setState({ image64: uri })
+            },
+            'base64'
+        );
     }
 
     // Returns a formmatted date from the given event
@@ -650,16 +655,15 @@ class PendingEvents extends Component {
                                 onChange={this.handleDescriptionChange} />
                         </Grid>
                         <Grid item>
-                        <ImagePicker
+                        <FilePicker
                             extensions={['jpg', 'jpeg', 'png']}
-                            dims={{minWidth: 100, maxWidth: 10000, minHeight: 100, maxHeight: 10000}}
-                            maxSize={10}
-                            onChange={this.handleImageChange}
+                            onChange={this.handleImageFileChanged}
                             onError={errMsg => this.displayMessage(this, errMsg)} >
-                            <Button variant="contained">
+                            <Button variant="contained"
+                                disabled={this.state.uploading}>
                                 Select Image    
                             </Button>
-                            </ImagePicker>
+                            </FilePicker>
                         </Grid>
                         <Grid item>
                         <Image

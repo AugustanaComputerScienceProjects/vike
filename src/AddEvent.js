@@ -13,8 +13,8 @@ import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import firebase from './config';
 import Snackbar from '@material-ui/core/Snackbar';  
-import { ImagePicker } from 'react-file-picker'
-import { View, Image } from 'react-native';
+import { FilePicker } from 'react-file-picker'
+//import { View, Image } from 'react-native';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
@@ -23,6 +23,7 @@ import Typography from '@material-ui/core/Typography';
 import defaultImage from './default.jpg';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Resizer from 'react-image-file-resizer';
 
 // File for the Add Event Screen
 
@@ -172,16 +173,21 @@ class AddEvent extends Component {
         }
     };
 
-    // Handle changing of the image, do not allow JPEG 2000 images
-    handleImageChange = base64 => {
-        let split = base64.split(",");
-        if (split.length > 0) {
-            if (split[1].charAt(0) != "U") {
-                this.setState({ image64: base64 })
-            } else {
-                this.displayMessage(this, "Can not use JPEG 2000 Images.");
-            }   
-        }
+    // Handle changing of the image file
+    handleImageFileChanged = theFile => {
+        //https://www.npmjs.com/package/react-image-file-resizer
+        Resizer.imageFileResizer(
+            theFile,
+            500,
+            500,
+            'JPEG',
+            95, // compression quality
+            0, // no rotation
+            uri => {
+                this.setState({ image64: uri })
+            },
+            'base64'
+        );
     }
 
     // Toggle checking of the "Downlod QR Code" Checkbox
@@ -401,17 +407,15 @@ class AddEvent extends Component {
                                 />
                         </Grid>
                         <Grid item>
-                        <ImagePicker
+                        <FilePicker
                             extensions={['jpg', 'jpeg', 'png']}
-                            dims={{minWidth: 100, maxWidth: 10000, minHeight: 100, maxHeight: 10000}}
-                            onChange={this.handleImageChange}
-                            maxSize={10}
+                            onChange={this.handleImageFileChanged}
                             onError={errMsg => this.displayMessage(this, errMsg)} >
                             <Button variant="contained"
                                 disabled={this.state.uploading}>
                                 Select Image    
                             </Button>
-                            </ImagePicker>
+                            </FilePicker>
                         </Grid>
                         <Grid item>
                         <Button variant="contained"
