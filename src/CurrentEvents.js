@@ -636,11 +636,11 @@ class CurrentEvents extends Component {
             minutes = minutes.length > 1 ? minutes : '0' + minutes;
             let fullDate = startDate + "-" + this.timeString(hours, minutes);
             children.push(<ChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
-            organization={'Group: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
-            editAction={() => this.editAction(event, index)} 
-            raffleOnclick={() => this.raffleOnclick(event,index)}
-            downloadQR={() => this.downloadQR(event)}
-            />);
+                organization={'Group: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
+                editAction={() => this.editAction(event, index)} 
+                raffleOnclick={() => this.raffleOnclick(event,index)}
+                downloadQR={() => this.downloadQR(event)}
+                />);
         };
 
         return (
@@ -940,10 +940,14 @@ const ParentComponent = props => (
 );
   
 // Child Component for a single event
-const ChildComponent = props => <Grid item><Card style={{minWidth: 350, maxWidth: 350, height: "auto"}}><CardActionArea onClick={props.editAction}>
+const ChildComponent = props => <Grid item><Card style={{minWidth: 350, maxWidth: 350, height: "auto"}}>
+    <CardActionArea onClick={props.editAction}>
     <CardHeader title={props.name} subheader={props.date}></CardHeader>
-    <CardMedia style = {{ height: 0, paddingTop: '56.25%'}} image={props.image} title={props.name}/><CardContent>
-    <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}</Typography>
+    {/*<CardMedia style = {{ height: 0, paddingTop: '0%'}} title={props.name}>
+    </CardMedia>*/}
+    <CardContent style = {{paddingTop: '0'}}>
+    <img src={props.image} style={{height: 100}}></img>
+        <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}</Typography>
     </CardContent></CardActionArea><CardActions><Button variant="outlined" onClick={props.downloadQR}>Download QR</Button>
     <Button variant="outlined" onClick={props.raffleOnclick}>Raffle</Button>
 </CardActions></Card></Grid>;
