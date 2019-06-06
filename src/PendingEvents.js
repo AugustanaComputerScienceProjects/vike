@@ -109,16 +109,16 @@ class PendingEvents extends Component {
             this.deleteEvent('/pending-events/' + this.state.popUpEvent["userKey"]);
         } else if (this.state.leaderSignedIn) {
             let self = this;
-            firebase.database.ref('/pending-events/' + this.state.uid + '/' + this.state.popUpEvent["key"] + '/email').set("Deleted by user").then(function() {
-                self.deleteEvent('/pending-events/' + self.state.uid);
-            });
+            //firebase.database.ref('/pending-events/' + '/' + this.state.popUpEvent["key"] + '/email').set("Deleted by user").then(function() {
+                self.deleteEvent('/pending-events/' + '/' + this.state.popUpEvent["key"]);
+            //});
         }
     }
     
     // Deletes a single event from Firebase with the given database reference
     deleteEvent(ref) {
         let event = this.state.popUpEvent;
-        firebase.database.ref(ref).child(event["key"]).remove();
+        firebase.database.ref(ref).remove();
         var firebaseStorageRef = firebase.storage.ref("Images");
         if (event["imgid"] != "default") {
             firebaseStorageRef.child(event["imgid"] + ".jpg").delete();
@@ -130,7 +130,7 @@ class PendingEvents extends Component {
     // Moves an event from Pending Events to Current Events in Firebase
     moveEvent(ref) {
         let event = this.state.popUpEvent;
-        firebase.database.ref(ref).child(event["key"]).remove();
+        firebase.database.ref(ref).remove();
         this.setState({ openDelete: false });
         this.group.leave(this.token);
     }
@@ -192,10 +192,10 @@ class PendingEvents extends Component {
     // Action for clicking the accept event/save changes button (handleSaveEdit called first)
     submitAction(self, event) {
         if (self.state.adminSignedIn) {
-            self.pushEvent(self, event, '/current-events', "Event Moved to Current Events");
-            self.moveEvent('/pending-events/' + self.state.popUpEvent["userKey"]);
+            self.pushEvent(self, event, '/current-events/' + self.state.popUpEvent["key"], "Event Moved to Current Events");
+            self.moveEvent('/pending-events/' + self.state.popUpEvent["key"]);
         } else if (self.state.leaderSignedIn) {
-            self.pushEvent(self, event, '/pending-events/' + self.state.uid, "Event Updated");
+            self.pushEvent(self, event, '/pending-events/' + self.state.popUpEvent["key"], "Event Updated");
         }
     }
 
@@ -209,7 +209,7 @@ class PendingEvents extends Component {
 
     // Pushes the given event to the given reference in Firebase database
     pushEvent(self, event, ref, message) {
-        firebase.database.ref(ref).child(event["key"]).set({
+        firebase.database.ref(ref).set({
             name: event["name"],
             startDate: event["startDate"],
             duration: parseInt(event["duration"]),
@@ -256,20 +256,16 @@ class PendingEvents extends Component {
             let index = -1;
             let total = 0;
             snapshot.forEach(function(child) {
-                child.forEach(function(childSnapshot) {
                     total = total + 1;
-                });
             });
             snapshot.forEach(function(child) {
-                child.forEach(function(childSnapshot) {
-                    let event = childSnapshot.val();
-                    event["key"] = childSnapshot.key;
+                    let event = child.val();
+                    event["key"] = child.key;
                     event["status"] = "Requester: " + event["email"];
                     event["userKey"] = child.key;
                     listEvents.push(event);
                     index = index + 1;
-                    self.getImage(self, index, child, childSnapshot, listEvents, listURLS, total);
-                });
+                    self.getImage(self, index, child, listEvents, listURLS, total);
             });
             if (snapshot.numChildren() === 0) {
                 self.group.notify(function() {
@@ -292,14 +288,14 @@ class PendingEvents extends Component {
             let listEvents = [];
             let listURLS = [];
             let index = -1;
-            snapshot.forEach(function(childSnapshot) {
-                let event = childSnapshot.val();
+            snapshot.forEach(function(child) {
+                let event = child.val();
                 if (event["email"] != "Deleted by user") {
                     event["status"] = "Status: Pending";
-                    event["key"] = childSnapshot.key;
+                    event["key"] = child.key;
                     listEvents.push(event);
                     index = index + 1;
-                    self.getImage(self, index, snapshot, childSnapshot, listEvents, listURLS, snapshot.numChildren());
+                    self.getImage(self, index, snapshot, listEvents, listURLS, snapshot.numChildren());
                 }
             });
             if (snapshot.numChildren() === 0) {
@@ -315,8 +311,8 @@ class PendingEvents extends Component {
     }
 
     // Retrieves a single image from Firebase storage
-    getImage(self, index, snapshot, childSnapshot, listEvents, listURLS, endLength) {
-        firebase.storage.ref('Images').child(childSnapshot.child('imgid').val() + '.jpg').getDownloadURL().then((url) => {    
+    getImage(self, index, snapshot, listEvents, listURLS, endLength) {
+        firebase.storage.ref('Images').child(snapshot.child('imgid').val() + '.jpg').getDownloadURL().then((url) => {    
             listURLS[index] = url;
             console.log(index);
             if (endLength == listURLS.length) {
@@ -444,7 +440,10 @@ class PendingEvents extends Component {
                     self.readAllPendingEvents();
                 } else if (role === 'leaders') {
                     self.setState({ leaderSignedIn: true, cancelBtn: "Delete Event", confirmBtn: "Save Changes", uid: user.uid, popUpText: "delete" });
-                    self.readPendingEvents('/pending-events/' + user.uid);
+                    //TODO: Change this from reading all pending events to checking
+                    //the group of each pending event and making sure the leader can access
+                    //those pending events
+                    self.readAllPendingEvents();
                 }
             }
           });

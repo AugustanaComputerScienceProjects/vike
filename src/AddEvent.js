@@ -114,7 +114,7 @@ class AddEvent extends Component {
         if (self.state.adminSignedIn) {
             self.pushEvent(self, '/current-events', "Event Added");
         } else if (self.state.leaderSignedIn) {
-            self.pushEvent(self, '/pending-events/' + self.state.uid, "Event Requested");
+            self.pushEvent(self, '/pending-events/', "Event Requested");
         }
     }
 
@@ -178,8 +178,8 @@ class AddEvent extends Component {
         //https://www.npmjs.com/package/react-image-file-resizer
         Resizer.imageFileResizer(
             theFile,
-            500,
-            500,
+            300,
+            300,
             'JPEG',
             95, // compression quality
             0, // no rotation
