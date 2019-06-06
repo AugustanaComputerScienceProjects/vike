@@ -99,7 +99,7 @@ class Users extends Component {
 
     // Handles adding of the user once the add user button is clicked
     handleSave = () => {
-        firebase.database.ref(this.state.ref + this.state.email.replace('.', ','));
+        firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).set(true);
         this.handleClose();
     }
 
