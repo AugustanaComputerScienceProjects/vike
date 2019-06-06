@@ -20,6 +20,9 @@ import { red, blue } from '@material-ui/core/colors';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import DispatchGroup from './DispatchGroup';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
 
 // File for the Users page
 
@@ -33,11 +36,14 @@ class Users extends Component {
         admins: [],
         leaders: [],
         email: '',
+        organization: '',
+        groups: [],
         adding: false,
         ref: '',
         type: '',
         deleting: false,
-        hidden: "visible"
+        hidden: "visible",
+        disabled: false
     }
 
     listeners = [];
@@ -82,12 +88,18 @@ class Users extends Component {
     // Handles opening of the add user screen
     addAction = (ref, type) => {
         this.setState({ email: '', ref: ref, type: type });
+        if (type === "Administrator") {
+            this.setState({disabled: true});
+        } else {
+            this.setState({disabled: false})
+        }
+        
         this.handleOpen();
     }
 
     // Handles adding of the user once the add user button is clicked
     handleSave = () => {
-        firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).set(true);
+        firebase.database.ref(this.state.ref + this.state.email.replace('.', ','));
         this.handleClose();
     }
 
@@ -123,10 +135,26 @@ class Users extends Component {
         });
     }
 
+    // Reads the groups from Firebase and sets the groups list
+    readGroups() {
+        let self = this;
+        let ref = firebase.database.ref('/groups');
+        this.listeners.push(ref);
+        ref.on('value', function(snapshot) {
+          let groupsList = [];
+          snapshot.forEach(function(child) {
+            groupsList.push(child.val());
+          });
+          self.setState({ groups: groupsList });
+          console.log(groupsList);
+        })
+      }
+
     // Component will mount - read the administrators and leaders, then hide the progress indicator
     componentWillMount() {
         this.readAdministrators();
         this.readLeaders();
+        this.readGroups();
         let self = this;
         this.group.notify(function() {
             self.setState({ hidden: "hidden" });
@@ -138,6 +166,33 @@ class Users extends Component {
         this.listeners.forEach(function(listener) {
             listener.off();
         });
+    }
+
+    //Gives the group selector if the adding a leader
+    //Otherwise, leaves it blank
+    addGroupSelect() {
+        if (this.state.type === "Leader") {
+            return (
+                <Grid item>
+                        <FormControl margin="normal" disabled={this.state.disabled}>
+                        <InputLabel>Group</InputLabel>
+                        <Select
+                            displayEmpty
+                            value={this.state.organization}
+                            style={{minWidth: 200, maxWidth: 200}}
+                            onChange={e => this.setState({ organization: e.target.value })}
+                            variant='outlined'
+                            >
+                            {this.state.groups.map(group => (
+                            <MenuItem key={group} value={group}>
+                            {group}
+                            </MenuItem>
+                            ))}    
+                        </Select>
+                    </FormControl>  
+                </Grid>
+            );
+        }
     }
 
     // Render the page
@@ -197,8 +252,9 @@ class Users extends Component {
                                     id="email"
                                     margin="normal"
                                     value={this.state.email}
-                                    onChange={this.handleEmailChange} />                        
+                                    onChange={this.handleEmailChange} />                 
                         </Grid>
+                        {/*this.addGroupSelect()*/}
                     </Grid>
                 </Grid>
           </DialogContent>
@@ -208,6 +264,7 @@ class Users extends Component {
             </Button>
           </DialogActions>
         </Dialog>
+
         <Dialog
           open={this.state.deleting}
           onClose={this.handleDeleteClose}
