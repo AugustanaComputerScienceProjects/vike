@@ -260,7 +260,7 @@ class AddEvent extends Component {
             groupsList.push(child.val());
           });
           self.setState({ groups: groupsList });
-          console.log(groupsList);
+          console.log('Groups List: ' + groupsList);
         })
       }
 

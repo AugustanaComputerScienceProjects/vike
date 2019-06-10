@@ -12,6 +12,7 @@ let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'acesdispatcher@augustana.edu',
+        //Need to fill in password to deploy
         pass: ''
     }
 });
@@ -50,21 +51,27 @@ exports.moveEvents = functions.https.onRequest((req, res) => {
 }
 
 // Firebase Cloud Function emailNotify - notifies leaders when their Event gets accepted or rejected via email
-exports.emailNotify = functions.database.ref('/pending-events/{userID}/{eventID}').onDelete((snapshot, context) => {
+exports.emailNotify = functions.database.ref('/pending-events/{eventID}').onDelete((snapshot, context) => {
+    console.log("Deleted");
     admin.database().ref('/current-events/' + snapshot.key).once('value').then(function(snap) {
+        console.log("Current Event: " + snap);
         let event = snapshot.val();
+        console.log("Event: " + event);
         if (event["email"] === "Deleted by user") {
             return;
         }
 
         return QRCode.toDataURL('https://osl-events-app.firebaseapp.com/event?id=' + snapshot.key + '&name=' + event["name"], function (err, url) {
+            console.log("QR code function");
             if(err) {
                 return err;
             }
+            console.log("No error");
             var subject = "";
             var message = "";
             var attachments = [];
             if (snap.hasChildren()) {
+                console.log("Has Children");
                 console.log("Event Accepted: " + event["name"]);
                 subject = "Augie Events - Event Accepted: " + event["name"];
                 message = '<p>Your event was accepted and is now in current events! You can view the event on the mobile Augustana OSL Events App and save/download the QR code below.</p>'

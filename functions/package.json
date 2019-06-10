@@ -22,7 +22,7 @@
     "firebase-functions-test": "^0.1.6"
   },
   "engines": {
-    "node": "10"
+    "node": "8"
   },
   "private": true
 }
