@@ -180,8 +180,8 @@ export class EventsView extends Component {
                 self.setState({urls: images});
                 //TODO: add conditional to run submitAction or pushEvent
                 //depending on the page running it - resolved
-                if (this.props.eventType === '/current-events') {
-                    self.pushEvent(self, event, this.props.eventType, "Event Updated");
+                if (self.props.eventType === '/current-events') {
+                    self.pushEvent(self, event, self.props.eventType, "Event Updated");
                     console.log("event pushed");
                 } else {
                     self.submitAction(self, event);
@@ -195,8 +195,8 @@ export class EventsView extends Component {
                 self.displayMessage(self, "Error Uploading Image");
             });
         } else {
-            if (this.props.eventType === '/current-events') {
-                self.pushEvent(self, event, this.props.eventType, "Event Updated");
+            if (self.props.eventType === '/current-events') {
+                self.pushEvent(self, event, self.props.eventType, "Event Updated");
             } else {
                 self.submitAction(self, event);
             }
@@ -251,8 +251,45 @@ export class EventsView extends Component {
 
     // Reads all of the current events from Firebase
     readEvents() {
+        console.log("called");
         let self = this;
-        let reference = firebase.database.ref(this.props.eventType).orderByChild('name')
+        let reference = firebase.database.ref(this.props.eventType).orderByChild('name');
+        this.listeners.push(reference);
+        let eventType = this.props.eventType;
+        reference.on('value', function(snapshot) {
+            console.log("reference");
+            let listEvents = [];
+            let listURLS = [];
+            let index = -1;
+            snapshot.forEach(function(childSnapshot) {
+                console.log("foreach");
+                let event = childSnapshot.val();
+                event["key"] = childSnapshot.key;
+                if (eventType === '/pending-events') {
+                    event["status"] = "Requester: " + event["email"];
+                }
+                listEvents.push(event);
+                index = index + 1;
+                self.getImage(self, index, childSnapshot, listEvents, listURLS, snapshot.numChildren());
+            });
+            console.log("Checkpoint 1");
+            if (snapshot.numChildren() === 0) {
+                self.group.notify(function() {
+                    self.setState({ events: [], originalEvents: [], urls: [], originalURLS: [] });
+                    if (self.state.isInitial) {
+                        self.setState({ hidden: "hidden", message: "No Events Found", open: true});
+                    }
+                });
+            }
+            self.setState({ isInitial: false });
+            console.log("finished");
+        });
+        console.log("skipped");
+    }
+
+    readLeaderEvents() {
+        let self = this;
+        let reference = firebase.database.ref(this.props.eventType).orderByChild('name');
         this.listeners.push(reference);
         let eventType = this.props.eventType;
         reference.on('value', function(snapshot) {
@@ -265,9 +302,13 @@ export class EventsView extends Component {
                 if (eventType === '/pending-events') {
                     event["status"] = "Requester: " + event["email"];
                 }
-                listEvents.push(event);
-                index = index + 1;
-                self.getImage(self, index, childSnapshot, listEvents, listURLS, snapshot.numChildren());
+                if (self.state.groups.includes(event["organization"])) {
+                    listEvents.push(event);
+                    index = index + 1;
+                }
+                if (listEvents.length > 0) {
+                    self.getImage(self, index, childSnapshot, listEvents, listURLS, listEvents.length);
+                }
             });
             if (snapshot.numChildren() === 0) {
                 self.group.notify(function() {
@@ -327,7 +368,7 @@ export class EventsView extends Component {
       }
 
       // Reads the groups from the Firebase database
-      readGroups() {
+      readAllGroups() {
         let self = this;
         let ref = firebase.database.ref('/groups');
         this.listeners.push(ref);
@@ -339,6 +380,21 @@ export class EventsView extends Component {
           self.setState({ groups: groupsList });
           console.log(groupsList);
         })
+      }
+
+      //Read the groups a leader can post and edit for
+      readLeaderGroups() {
+        let self = this;
+        let email = firebase.auth.currentUser.email;
+        let ref = firebase.database.ref('/leaders').child(email.replace('.', ',')).child('Groups');
+        ref.on('value', function(snapshot) {
+            let myGroups = [];
+            snapshot.forEach(function(child) {
+                console.log(child.val());
+                myGroups.push(child.val());
+            });
+            self.setState({groups: myGroups});
+        });
       }
 
       // Action called when clicking an event to edit it
@@ -529,7 +585,6 @@ export class EventsView extends Component {
     //Component did mount - read tags, groups, and all events from the database
     componentDidMount() {
         this.readTags();
-        this.readGroups();
         this.off = firebase.auth.onAuthStateChanged((user) => {
             if (user) {
                 this.checkRole(user, 'admin');
@@ -699,7 +754,7 @@ export class EventsView extends Component {
             self.pushEvent(self, event, '/current-events', "Event Moved to Current Events");
             self.moveEvent('/pending-events/' + self.state.popUpEvent["key"]);
         } else if (self.state.leaderSignedIn) {
-            self.pushEvent(self, event, this.props.eventType, "Event Updated");
+            self.pushEvent(self, event, self.props.eventType, "Event Updated");
         }
     }
 
@@ -708,8 +763,10 @@ export class EventsView extends Component {
         let self = this;
         firebase.database.ref(role).once('value').then(function(snapshot) {
             if (snapshot.hasChild(user.email.replace('.', ','))) {
+                console.log("Snapshot: " + snapshot);
                 if (role === 'admin') {
                     self.setState({ adminSignedIn: true, uid: user.uid });
+                    self.readAllGroups();
                     if (self.props.eventType === '/current-events') {
                         self.readEvents();
                     } else {
@@ -717,12 +774,14 @@ export class EventsView extends Component {
                         self.readEvents();
                     }
                 } else if (role === 'leaders') {
+                    console.log("Is a leader");
                     self.setState({ leaderSignedIn: true, uid: user.uid});
+                    self.readLeaderGroups();
                     //TODO: Change this from reading all pending events to checking
                     //the group of each pending event and making sure the leader can access
                     //those pending events
-                    self.readEvents();
-                }
+                    self.readLeaderEvents();
+                } 
             }
           });
     }

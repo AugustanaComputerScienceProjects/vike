@@ -99,7 +99,7 @@ class Users extends Component {
 
     // Handles adding of the user once the add user button is clicked
     handleSave = () => {
-        firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).set(true);
+        firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).child('Groups').push(this.state.organization);
         this.handleClose();
     }
 
@@ -254,7 +254,7 @@ class Users extends Component {
                                     value={this.state.email}
                                     onChange={this.handleEmailChange} />                 
                         </Grid>
-                        {/*this.addGroupSelect()*/}
+                        {this.addGroupSelect()}
                     </Grid>
                 </Grid>
           </DialogContent>

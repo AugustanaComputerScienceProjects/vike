@@ -227,8 +227,10 @@ class AddEvent extends Component {
             if (snapshot.hasChild(user.email.replace('.', ','))) {
                 if (role === 'admin') {
                     self.setState({ adminSignedIn: true, submitBtnText: "Add Event", uid: user.uid, email: user.email, qrChecked: true, qrDisabled: false });
+                    self.readAllGroups();
                 } else if (role === 'leaders') {
                     self.setState({ leaderSignedIn: true, submitBtnText: "Request Event", uid: user.uid, email: user.email });
+                    self.readLeaderGroups();
                 }
             }
           });
@@ -250,7 +252,7 @@ class AddEvent extends Component {
       }
 
       // Reads the groups from Firebase and sets the groups list
-      readGroups() {
+      readAllGroups() {
         let self = this;
         let ref = firebase.database.ref('/groups');
         this.listeners.push(ref);
@@ -261,13 +263,26 @@ class AddEvent extends Component {
           });
           self.setState({ groups: groupsList });
           console.log('Groups List: ' + groupsList);
-        })
+        });
+      }
+
+      readLeaderGroups() {
+        let self = this;
+        let email = firebase.auth.currentUser.email;
+        let ref = firebase.database.ref('/leaders').child(email.replace('.', ',')).child('Groups');
+        ref.on('value', function(snapshot) {
+            let myGroups = [];
+            snapshot.forEach(function(child) {
+                console.log(child.val());
+                myGroups.push(child.val());
+            });
+            self.setState({groups: myGroups});
+        });
       }
 
     // Component will mount - read tags, groups, auth listener
     componentWillMount() {
         this.readTags();
-        this.readGroups();
         firebase.auth.onAuthStateChanged((user) => {
           if (user) {
               this.checkRole(user, 'admin');
