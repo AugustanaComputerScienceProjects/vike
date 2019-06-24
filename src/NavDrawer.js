@@ -99,7 +99,7 @@ class NavDrawer extends Component {
                     <MenuItem name="Home" onClick={this.homeClicked}>Home</MenuItem>
                     <MenuItem name="Add Event" onClick={this.eventClicked} disabled={!this.state.adminSignedIn && !this.state.leaderSignedIn}>Add Event</MenuItem>
                     <MenuItem name="Pending Events" onClick={this.pendingClicked} disabled={!this.state.adminSignedIn && !this.state.leaderSignedIn}>Pending Events</MenuItem>
-                    <MenuItem name="Current Events" onClick={this.currentClicked} disabled={!this.state.adminSignedIn}>Current Events</MenuItem>
+                    <MenuItem name="Current Events" onClick={this.currentClicked} disabled={!this.state.adminSignedIn && !this.state.leaderSignedIn}>Current Events</MenuItem>
                     <MenuItem name="Past Events" onClick={this.pastClicked} disabled={!this.state.adminSignedIn}>Past Events</MenuItem>
                     <MenuItem name="Groups/Tags" onClick={this.tagsClicked} disabled={!this.state.adminSignedIn}>Groups/Tags</MenuItem>
                     <MenuItem name="Users" onClick={this.usersClicked} disabled={!this.state.adminSignedIn}>Users</MenuItem>
