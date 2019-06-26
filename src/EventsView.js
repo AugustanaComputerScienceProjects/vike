@@ -156,6 +156,7 @@ export class EventsView extends Component {
 
     // Handles saving of edits once the save changes button is clicked
     handleSaveEdit = () => {
+        console.log(event["startDate"]);
         this.setState({ editing: false });
         let event = this.state.popUpEvent;
         let self = this;
@@ -437,7 +438,7 @@ export class EventsView extends Component {
         hours = hours.length > 1 ? hours : '0' + hours;
         var minutes = date.getMinutes().toString();
         minutes = minutes.length > 1 ? minutes : '0' + minutes;
-        let startDate = month + '-' + day + '-' + date.getFullYear() + " " + hours + ":" + minutes;
+        let startDate = date.getFullYear() + '-' + month + '-' + day + " " + hours + ":" + minutes;
         this.handleEventChange("startDate", startDate);
         this.setState({date: date});
     };
@@ -562,10 +563,11 @@ export class EventsView extends Component {
 
     // Returns a formmatted date from the given event
     getFormattedDate(event) {
+        console.log(event["startDate"]);
         let arr = event["startDate"].split(' ');
         let arr2 = arr[0].split('-');
         let arr3 = arr[1].split(':');
-        let date = new Date(arr2[2] + '-' + arr2[0] + '-' + arr2[1] + 'T' + arr3[0] + ':' + arr3[1] + '-05:00');
+        let date = new Date(arr2[0] + '-' + arr2[1] + '-' + arr2[2] + 'T' + arr3[0] + ':' + arr3[1] + '-05:00');
         return date;
     }
 
@@ -803,7 +805,7 @@ export class EventsView extends Component {
             var hours = date.getHours();
             var minutes = date.getMinutes().toString();
             minutes = minutes.length > 1 ? minutes : '0' + minutes;
-            let startDate = month + '-' + day + '-' + date.getFullYear() + " " + this.timeString(hours, minutes);
+            let startDate = date.getFullYear() + '-' + month + '-' + day + " " + this.timeString(hours, minutes);
             date.setMilliseconds(date.getMilliseconds() + (event["duration"] * 60000));
             hours = date.getHours();
             minutes = date.getMinutes().toString();

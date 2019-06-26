@@ -132,7 +132,7 @@ class AddEvent extends Component {
         minutes = minutes.length > 1 ? minutes : '0' + minutes;
         var newRef = firebase.database.ref(ref).push({
             name: name,
-            startDate: month + '-' + day + '-' + self.state.date.getFullYear() + " " + hours + ":" + minutes,
+            startDate: self.state.date.getFullYear() + '-' + month + '-' + day + " " + hours + ":" + minutes,
             duration: parseInt(self.state.duration),
             location: self.state.location,
             organization: self.state.organization,
