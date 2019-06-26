@@ -51,15 +51,10 @@ class Pepsico extends Component {
                 self.setState({title: 'Checked In'});
                 let email = snapshot.child(idNum).val();
                 demoReference.once('value').then(function(snapshot) {
-                    let firstName = snapshot.child(email).child('Pref_FirstName').val();
-                    let lastName = snapshot.child(email).child('LastName').val()
-                    self.setState({message: firstName + ' ' + lastName +  ' has checked in.'});
-                    self.setState({confirmation: true});
+                    self.checkedIn(email, snapshot);
                 });
             } else {
-                self.setState({title: 'Check In Failed'});
-                self.setState({message: 'Not a student.'});
-                self.setState({confirmation: true});
+                self.failedCheckIn();
             }
         });
     }
@@ -70,17 +65,31 @@ class Pepsico extends Component {
         let self = this;
         reference.once('value').then(function(snapshot) {
             if (snapshot.hasChild(userId)) {
-                self.setState({title: 'Checked In'});
-                let firstName = snapshot.child(userId).child('Pref_FirstName').val();
-                let lastName = snapshot.child(userId).child('LastName').val()
-                self.setState({message: firstName + ' ' + lastName +  ' has checked in.'});
-                self.setState({confirmation: true});
+                self.checkedIn(userId, snapshot);
             } else {
-                self.setState({title: 'Check In Failed'});
-                self.setState({message: 'Not a student.'});
-                self.setState({confirmation: true});
+                self.failedCheckIn();
             }
         });
+    }
+
+    checkedIn = (userId, snapshot) => {
+        this.setState({title: 'Checked In'});
+        let firstName = snapshot.child(userId).child('Pref_FirstName').val();
+        let lastName = snapshot.child(userId).child('LastName').val()
+        this.setState({message: firstName + ' ' + lastName +  ' has checked in.'});
+        this.setState({confirmation: true});
+        firebase.database.ref('/Pepsico').once('value').then(function(snapshot) {
+            snapshot.forEach(function(child) {
+                let eventKey = child.key;
+                firebase.database.ref('/Pepsico').child(eventKey).child('users').child(userId).set(true);
+            });
+        }); 
+    }
+
+    failedCheckIn = () => {
+        this.setState({title: 'Check In Failed'});
+        this.setState({message: 'Not a student.'});
+        this.setState({confirmation: true});
     }
 
     keyPress = e => {

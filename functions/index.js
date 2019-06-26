@@ -18,9 +18,12 @@ let transporter = nodemailer.createTransport({
 });
 
 // Firebase Cloud Function moveEvents - moves current events to past events when they have expired
-exports.moveEvents = functions.https.onRequest((req, res) => {
-    var db = admin.database();
-    
+// and uses the Google Cloud Scheduler to run it on a regular basis
+exports.scheduledMoveEvents =
+                            //runs every 10 minutes
+functions.pubsub.schedule('*/10 * * * *').onRun((context) => {
+    let db = admin.database();
+    console.log("working"); 
     db.ref('/current-events').once('value').then(function(snapshot) {
         snapshot.forEach(function(child) {
             let event = child.val();
@@ -37,15 +40,74 @@ exports.moveEvents = functions.https.onRequest((req, res) => {
         });
         return;
     }).catch(error => {console.log(error);});
-    res.end();
-  });
+});
+
+exports.pepsicoEventAutoScheduling =
+                            //run daily at 2:00 am
+functions.pubsub.schedule('0 2 * * *').onRun((context) => {
+    let databaseRef = admin.database();
+    console.log("start");
+    databaseRef.ref('/Pepsico').once('value').then(function(snapshot) {
+        console.log("next");
+        let event;
+        let nowDate = new Date();
+        let year = nowDate.getFullYear();
+        let month = nowDate.getMonth();
+        let day = nowDate.getDay();
+        if (month.length < 2) {
+            month = '0' + month;
+        }
+        if (day.length < 2) {
+            day = '0' + day;
+        }
+        if (snapshot.hasChildren()) {
+            snapshot.forEach(function(child) {
+                event = child.val();
+            });
+            let eventEndDate = getEndDate(event);
+            console.log("checking pepsico");
+            if (nowDate > eventEndDate) {
+                console.log("Moving Pepsico");
+                databaseRef.ref('/past-events/' + snapshot.child.key).set(event);
+                databaseRef.ref("/Pepsico").child(snapshot.child.key).remove();
+                databaseRef.ref("/Pepsico").push({
+                    name: "Pepsico Attendance",
+                    startDate: year + '-' + month + '-' + day + " " + "6:00",
+                    duration: 1020,
+                    location: "Pepsico Recreational Center",
+                    organization: "Pepsico",
+                    imgid: "default.jpg",
+                    description: "Pepsico is open",
+                    tags: "",
+                    email: "michaelwardach17@augustana.edu"
+                });
+                console.log("Created Pepsico");
+            }
+        } else {
+            console.log("creating Pepsico");
+            databaseRef.ref('/Pepsico').push({
+                name: "Pepsico Attendance",
+                startDate: year + '-' + month + '-' + day + " " + "6:00",
+                duration: 1020,
+                location: "Pepsico Recreational Center",
+                organization: "Pepsico",
+                imgid: "default.jpg",
+                description: "Pepsico is open",
+                tags: "",
+                email: "michaelwardach17@augustana.edu"
+            });
+            console.log("pepsico created");
+        }
+        return;
+    }).catch(error => {console.log(error);});
+});
 
   // Gets the end date of a given Event
   function getEndDate(event) {
     let arr = event["startDate"].split(' ');
     let arr2 = arr[0].split('-');
     let arr3 = arr[1].split(':');
-    let date = new Date(arr2[2] + '-' + arr2[0] + '-' + arr2[1] + 'T' + arr3[0] + ':' + arr3[1] + '-05:00');
+    let date = new Date(arr2[0] + '-' + arr2[1] + '-' + arr2[2] + 'T' + arr3[0] + ':' + arr3[1] + '-05:00');
     date.setMinutes(date.getMinutes() + event["duration"]);
     return date;
 }
