@@ -99,9 +99,15 @@ class Users extends Component {
 
     // Handles adding of the user once the add user button is clicked
     handleSave = () => {
-        firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).child('Groups').push(this.state.organization);
+        if (this.state.ref === '/leaders/') {
+            firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).child('Groups').push(this.state.organization);
+        } else {
+            firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).set(true);
+        }
         this.handleClose();
     }
+
+
 
     // Reads the current administrators from the database
     readAdministrators() {
