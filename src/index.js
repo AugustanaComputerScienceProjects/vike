@@ -5,6 +5,7 @@ import './index.css';
 import App from './App';
 import Pepsico from './Pepsico'
 import DemographicsUpload from './DemographicsUpload'
+import UploadSuccess from './UploadSuccess'
 import * as serviceWorker from './serviceWorker';
 
 const routing = (
@@ -12,6 +13,7 @@ const routing = (
         <Route exact path="/" component={App} />
         <Route path="/pepsico" component={Pepsico} />
         <Route path="/upload" component={DemographicsUpload} />
+        <Route path="/success" component={UploadSuccess} />
     </Router>
 )
 

@@ -31,12 +31,12 @@ class DemographicsUpload extends Component {
         } else {
             let columnNames = demographicsCSVData[0]; // first row has column names
             firebase.database.ref('/demographics').remove();
-            firebase.database.ref('/idToEmail').remove();
+            firebase.database.ref('/id-to-email').remove();
             for (let row = 1; row < demographicsCSVData.length; row++) {
                 if (demographicsCSVData[row].length > 1) { // avoid final blank row (if any)
                     let idNum = demographicsCSVData[row][0];
                     let email = demographicsCSVData[row][1];
-                    firebase.database.ref('/idToEmail').child(idNum).set(email);
+                    firebase.database.ref('/id-to-email').child(idNum).set(email);
 
                     for (let column = 0; column < columnNames.length; column++) {
                         if (column !== 1) {
@@ -46,7 +46,7 @@ class DemographicsUpload extends Component {
                 }
             }
             this.setState({demographicsFile: null});
-            alert('File Uploaded!')
+            window.open('/success', '_self');
         }
     }
 

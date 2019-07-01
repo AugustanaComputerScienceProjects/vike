@@ -43,7 +43,7 @@ class Pepsico extends Component {
 
     checkIdEntered = idNum => {
         console.log("SID: " + idNum);
-        let reference = firebase.database.ref('/idToEmail');
+        let reference = firebase.database.ref('/id-to-email');
         let demoReference = firebase.database.ref('/demographics');
         let self = this;
         reference.once('value').then(function(snapshot) {
@@ -78,10 +78,11 @@ class Pepsico extends Component {
         let lastName = snapshot.child(userId).child('LastName').val()
         this.setState({message: firstName + ' ' + lastName +  ' has checked in.'});
         this.setState({confirmation: true});
-        firebase.database.ref('/Pepsico').once('value').then(function(snapshot) {
+        firebase.database.ref('/pepsico').once('value').then(function(snapshot) {
+
             snapshot.forEach(function(child) {
                 let eventKey = child.key;
-                firebase.database.ref('/Pepsico').child(eventKey).child('users').child(userId).set(true);
+                firebase.database.ref('/pepsico').child(eventKey).child('users').child(userId).set(true);
             });
         }); 
     }
