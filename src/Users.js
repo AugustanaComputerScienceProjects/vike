@@ -22,7 +22,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import DispatchGroup from './DispatchGroup';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import Select from 'react-select';
+import { SingleSelect } from 'react-select-material-ui';
 
 // File for the Users page
 
@@ -144,7 +145,7 @@ class Users extends Component {
     // Reads the groups from Firebase and sets the groups list
     readGroups() {
         let self = this;
-        let ref = firebase.database.ref('/groups');
+        let ref = firebase.database.ref('/groups').orderByValue();
         this.listeners.push(ref);
         ref.on('value', function(snapshot) {
           let groupsList = [];
@@ -182,19 +183,13 @@ class Users extends Component {
                 <Grid item>
                         <FormControl margin="normal" disabled={this.state.disabled}>
                         <InputLabel>Group</InputLabel>
+                        <div style={{width: 500}}>
                         <Select
-                            displayEmpty
                             value={this.state.organization}
-                            style={{minWidth: 200, maxWidth: 200}}
                             onChange={e => this.setState({ organization: e.target.value })}
-                            variant='outlined'
-                            >
-                            {this.state.groups.map(group => (
-                            <MenuItem key={group} value={group}>
-                            {group}
-                            </MenuItem>
-                            ))}    
-                        </Select>
+                            options={this.state.groups.map(group => {return {value: group, label: group}})} /> 
+                        </div> 
+                        
                     </FormControl>  
                 </Grid>
             );
@@ -242,12 +237,12 @@ class Users extends Component {
             </Grid>
             </Grid>
             <Dialog onClose={this.handleClose}
-          aria-labelledby="customized-dialog-title"
-          open={this.state.adding}>
+                    aria-labelledby="customized-dialog-title"
+                    open={this.state.adding}>
       <DialogTitle id="customized-dialog-title" onClose={this.handleCloseEdit}>
             Add {this.state.type}
           </DialogTitle>
-          <DialogContent>
+          <DialogContent style={{height: 425}}>
                 <Grid container>
                     <Grid item container direction="column" spacing={0}>
                         <Grid item>

@@ -6,14 +6,16 @@ const QRCode = require('qrcode');
 admin.initializeApp();
 
 // File for Firebase Functions
-
+'use strict';
+const gmailEmail = functions.config().gmail.email;
+const gmailPassword = functions.config().gmail.password;
 // Transporter config for sending emails
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'acesdispatcher@augustana.edu',
+        user: gmailEmail,
         //Need to fill in password to deploy
-        pass: ''
+        pass: gmailPassword
     }
 });
 
@@ -21,7 +23,7 @@ let transporter = nodemailer.createTransport({
 // and uses the Google Cloud Scheduler to run it on a regular basis
 exports.scheduledMoveEvents =
                             //runs every 10 minutes
-functions.pubsub.schedule('*/10 * * * *').onRun((context) => {
+functions.pubsub.schedule('*/10 * * * *').timeZone('America/Chicago').onRun((context) => {
     let db = admin.database();
     console.log("working"); 
     db.ref('/current-events').once('value').then(function(snapshot) {
@@ -29,6 +31,8 @@ functions.pubsub.schedule('*/10 * * * *').onRun((context) => {
             let event = child.val();
             let nowDate = new Date();
             let eventEndDate = getEndDate(event);
+            // add one hour buffer before we move to past events (e.g. for Raffle time)
+            eventEndDate.setMinutes(eventEndDate.getMinutes() + 60);
             if (nowDate > eventEndDate) {
                 console.log("Moving Event: " + event["name"]);
                 db.ref('/past-events/' + child.key).set(event);
@@ -44,73 +48,59 @@ functions.pubsub.schedule('*/10 * * * *').onRun((context) => {
 
 exports.pepsicoEventAutoScheduling =
                             //run daily at 2:00 am
-functions.pubsub.schedule('0 2 * * *').onRun((context) => {
+functions.pubsub.schedule('0 2 * * *').timeZone('America/Chicago').onRun((context) => {
     let databaseRef = admin.database();
-    console.log("start");
-    databaseRef.ref('/Pepsico').once('value').then(function(snapshot) {
-        console.log("next");
-        let event;
-        let nowDate = new Date();
-        let year = nowDate.getFullYear();
-        let month = nowDate.getMonth();
-        let day = nowDate.getDay();
-        if (month.length < 2) {
-            month = '0' + month;
-        }
-        if (day.length < 2) {
-            day = '0' + day;
-        }
-        if (snapshot.hasChildren()) {
-            snapshot.forEach(function(child) {
-                event = child.val();
-            });
-            let eventEndDate = getEndDate(event);
-            console.log("checking pepsico");
-            if (nowDate > eventEndDate) {
-                console.log("Moving Pepsico");
-                databaseRef.ref('/past-events/' + snapshot.child.key).set(event);
-                databaseRef.ref("/Pepsico").child(snapshot.child.key).remove();
-                databaseRef.ref("/Pepsico").push({
-                    name: "Pepsico Attendance",
-                    startDate: year + '-' + month + '-' + day + " " + "6:00",
-                    duration: 1020,
-                    location: "Pepsico Recreational Center",
-                    organization: "Pepsico",
-                    imgid: "default.jpg",
-                    description: "Pepsico is open",
-                    tags: "",
-                    email: "michaelwardach17@augustana.edu"
-                });
-                console.log("Created Pepsico");
-            }
-        } else {
-            console.log("creating Pepsico");
-            databaseRef.ref('/Pepsico').push({
-                name: "Pepsico Attendance",
-                startDate: year + '-' + month + '-' + day + " " + "6:00",
-                duration: 1020,
-                location: "Pepsico Recreational Center",
-                organization: "Pepsico",
-                imgid: "default.jpg",
-                description: "Pepsico is open",
-                tags: "",
-                email: "michaelwardach17@augustana.edu"
-            });
-            console.log("pepsico created");
-        }
+    let nowDate = new Date();
+    databaseRef.ref('/pepsico').once('value').then(function(snapshot) {
+        snapshot.forEach(function(child) {
+            let event = child.val();
+            databaseRef.ref('/past-events/' + child.key).set(event);
+            databaseRef.ref("/pepsico").child(child.key).remove();
+        });
+        
+        databaseRef.ref('/pepsico').push({
+            name: "Pepsico Attendance",
+            startDate: formatDate(nowDate) + " " + "06:00",
+            duration: (18*60-1), //almost 18 hours, until 11:59 PM
+            location: "Pepsico Recreational Center",
+            organization: "Pepsico",
+            imgid: "default.jpg",
+            description: "(auto-generated Pepsico Event)",
+            tags: "",
+            email: "michaelwardach17@augustana.edu"
+        });
+        console.log(nowDate.getDay());
+        console.log(nowDate.getMonth());
+        console.log("Pepsico Moved and Created");
         return;
     }).catch(error => {console.log(error);});
 });
 
   // Gets the end date of a given Event
   function getEndDate(event) {
-    let arr = event["startDate"].split(' ');
-    let arr2 = arr[0].split('-');
-    let arr3 = arr[1].split(':');
-    let date = new Date(arr2[0] + '-' + arr2[1] + '-' + arr2[2] + 'T' + arr3[0] + ':' + arr3[1] + '-05:00');
+    let dateTimePieces = event["startDate"].trim().split(' ');
+    let datePart = dateTimePieces[0];
+    let timePart = dateTimePieces[1];
+    let date = new Date(datePart + 'T' + timePart);
     date.setMinutes(date.getMinutes() + event["duration"]);
     return date;
 }
+    //Formats a date object with padded zeros, e.g.  2019-02-25
+    function formatDate(date) {
+        let year = date.getFullYear();
+        let month = String(date.getMonth()+1);
+        let day = String(date.getDate());
+        if (month.length < 2) {
+            month = "0" + month;
+        }
+        if (day.length < 2) {
+            console.log("Day before: " + day);
+            day = "0" + day;
+            console.log("Day after: " + day);
+        }
+        
+        return year + "-" + month + "-" + day;
+    }
 
 // Firebase Cloud Function emailNotify - notifies leaders when their Event gets accepted or rejected via email
 exports.emailNotify = functions.database.ref('/pending-events/{eventID}').onDelete((snapshot, context) => {
