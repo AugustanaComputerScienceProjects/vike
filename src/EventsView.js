@@ -110,6 +110,7 @@ export class EventsView extends Component {
         confirmButton: "Save Changes",
         cancelButton: "Delete Event",
         popUpText: "delete",
+        adminSignedIn: false,
       }
 
       listeners = [];
@@ -156,7 +157,6 @@ export class EventsView extends Component {
 
     // Handles saving of edits once the save changes button is clicked
     handleSaveEdit = () => {
-        console.log(event["startDate"]);
         this.setState({ editing: false });
         let event = this.state.popUpEvent;
         let self = this;
@@ -183,7 +183,7 @@ export class EventsView extends Component {
                 //depending on the page running it - resolved
                 if (self.props.eventType === '/current-events') {
                     self.pushEvent(self, event, self.props.eventType, "Event Updated");
-                    console.log("event pushed");
+                    console.log("event pushed") 
                 } else {
                     self.submitAction(self, event);
                     console.log("Action Submitted");
@@ -252,18 +252,15 @@ export class EventsView extends Component {
 
     // Reads all of the current events from Firebase
     readEvents() {
-        console.log("called");
         let self = this;
         let reference = firebase.database.ref(this.props.eventType).orderByChild('name');
         this.listeners.push(reference);
         let eventType = this.props.eventType;
         reference.on('value', function(snapshot) {
-            console.log("reference");
             let listEvents = [];
             let listURLS = [];
             let index = -1;
             snapshot.forEach(function(childSnapshot) {
-                console.log("foreach");
                 let event = childSnapshot.val();
                 event["key"] = childSnapshot.key;
                 if (eventType === '/pending-events') {
@@ -271,9 +268,8 @@ export class EventsView extends Component {
                 }
                 listEvents.push(event);
                 index = index + 1;
-                self.getImage(self, index, childSnapshot, listEvents, listURLS, snapshot.numChildren());
+                self.getImage(self, index, listEvents, listURLS, snapshot.numChildren());
             });
-            console.log("Checkpoint 1");
             if (snapshot.numChildren() === 0) {
                 self.group.notify(function() {
                     self.setState({ events: [], originalEvents: [], urls: [], originalURLS: [] });
@@ -283,9 +279,7 @@ export class EventsView extends Component {
                 });
             }
             self.setState({ isInitial: false });
-            console.log("finished");
         });
-        console.log("skipped");
     }
 
     readLeaderEvents() {
@@ -307,25 +301,28 @@ export class EventsView extends Component {
                     listEvents.push(event);
                     index = index + 1;
                 }
-                if (listEvents.length > 0) {
-                    self.getImage(self, index, childSnapshot, listEvents, listURLS, listEvents.length);
-                }
             });
-            if (snapshot.numChildren() === 0) {
+
+            if (listEvents.length === 0) {
                 self.group.notify(function() {
                     self.setState({ events: [], originalEvents: [], urls: [], originalURLS: [] });
                     if (self.state.isInitial) {
                         self.setState({ hidden: "hidden", message: "No Events Found", open: true});
                     }
                 });
+            } else {
+                // for loop counting up i
+                for (let i = 0; i < listEvents.length; i++) {
+                    self.getImage(self, i, listEvents, listURLS, listEvents.length);
+                }
             }
             self.setState({ isInitial: false });
         });
     }
 
     // Retrieves a single image from Firebase storage
-    getImage(self, index, childSnapshot, listEvents, listURLS, endLength) {
-        firebase.storage.ref('Images').child(childSnapshot.child('imgid').val() + '.jpg').getDownloadURL().then((url) => {    
+    getImage(self, index, listEvents, listURLS, endLength) {
+        firebase.storage.ref('Images').child(listEvents[index].imgid + '.jpg').getDownloadURL().then((url) => {    
             listURLS[index] = url;
             if (endLength == listURLS.length) {
                 self.group.notify(function() {
@@ -589,8 +586,11 @@ export class EventsView extends Component {
         this.readTags();
         this.off = firebase.auth.onAuthStateChanged((user) => {
             if (user) {
+                console.log("Check Role Admin");
                 this.checkRole(user, 'admin');
+                console.log("Check Role Leader");
                 this.checkRole(user, 'leaders');
+                console.log("Finished Checking Roels");
             } else {
               this.setState({ adminSignedIn: false });  
             }
@@ -775,8 +775,7 @@ export class EventsView extends Component {
                         self.setState({confirmButton: 'Accept Event', cancelButton: 'Reject Event', popUpText: 'reject'});
                         self.readEvents();
                     }
-                } else if (role === 'leaders') {
-                    console.log("Is a leader");
+                } else if (role === 'leaders' && !self.state.adminSignedIn) {
                     self.setState({ leaderSignedIn: true, uid: user.uid});
                     self.readLeaderGroups();
                     //TODO: Change this from reading all pending events to checking

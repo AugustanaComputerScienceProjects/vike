@@ -228,7 +228,7 @@ class AddEvent extends Component {
                 if (role === 'admin') {
                     self.setState({ adminSignedIn: true, submitBtnText: "Add Event", uid: user.uid, email: user.email, qrChecked: true, qrDisabled: false });
                     self.readAllGroups();
-                } else if (role === 'leaders') {
+                } else if (role === 'leaders' && !self.state.adminSignedIn) {
                     self.setState({ leaderSignedIn: true, submitBtnText: "Request Event", uid: user.uid, email: user.email });
                     self.readLeaderGroups();
                 }

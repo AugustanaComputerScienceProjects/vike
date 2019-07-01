@@ -74,7 +74,7 @@ class PastEvents extends Component {
                 let arr = webEvent["startDate"].split(' ');
                 let arr2 = arr[0].split('-');
                 let arr3 = arr[1].split(':');
-                let date = arr2[2] + '-' + arr2[0] + '-' + arr2[1]
+                let date = arr2[0] + '-' + arr2[1] + '-' + arr2[2]
 
 
                 let event = new PastEventObj(webEvent["name"],date,len,webEvent["users"])

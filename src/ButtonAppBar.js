@@ -65,7 +65,7 @@ class NavBar extends React.Component {
         if (snapshot.hasChild(user.email.replace('.', ','))) {
             if (role === 'admin') {
                 self.setState({ adminSignedIn: true, userText: user.email + " (Admin)" });
-            } else if (role === 'leaders') {
+            } else if (role === 'leaders' && !self.state.adminSignedIn) {
                 self.setState({ leaderSignedIn: true, userText: user.email + " (Leader)" });
             }
         }
