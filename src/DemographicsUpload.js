@@ -3,6 +3,7 @@ import './App.css';
 import { FilePicker } from 'react-file-picker';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
@@ -53,15 +54,23 @@ class DemographicsUpload extends Component {
     render() {
         return (
             <div style={{display:'flex', justifyContent:'center'}}>
-                <Grid>
+                <Grid style={{alignItems: 'center'}}>
                 <DialogTitle>Choose a file to upload.</DialogTitle>
-                <CSVReader
-                    onFileLoaded={this.handleFileChanged}
-                    inputId="something"
-                    inputStyle={{color: 'purple'}} />
-                <Button onClick={this.uploadDemographics}>
-                    Submit
-                </Button>
+                <DialogActions style={{justifyContent: 'center'}}>
+                    <CSVReader
+                        onFileLoaded={this.handleFileChanged}
+                        inputId="something"
+                        inputStyle={{color: 'purple'}}
+                        style={{margin:'auto'}}/>
+                </DialogActions>
+                <DialogActions style={{justifyContent: 'center'}}>
+                    <Button variant="contained" 
+                            onClick={this.uploadDemographics} 
+                            style={{backgroundColor:"blue"}}
+                            color="primary">
+                        Submit
+                    </Button>
+                </DialogActions>
                 </Grid>
             </div>
         );
