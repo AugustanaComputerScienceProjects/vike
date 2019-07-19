@@ -179,14 +179,15 @@ class Users extends Component {
     //Otherwise, leaves it blank
     addGroupSelect() {
         if (this.state.type === "Leader") {
+            const { selectedOption } = this.state.organization
             return (
                 <Grid item>
                         <FormControl margin="normal" disabled={this.state.disabled}>
                         <InputLabel>Group</InputLabel>
                         <div style={{width: 500}}>
                         <Select
-                            value={this.state.organization}
-                            onChange={e => this.setState({ organization: e.target.value })}
+                            value={selectedOption}
+                            onChange={e => this.setState({ organization: e.value })}
                             options={this.state.groups.map(group => {return {value: group, label: group}})} /> 
                         </div> 
                         
