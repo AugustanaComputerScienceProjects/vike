@@ -83,6 +83,7 @@ export class EventsView extends Component {
         groups: [],
         originalEvents: [],
         editing: false,
+        requesting: false,
         open: false,
         popUpEvent: [],
         oldEvent: [],
@@ -122,6 +123,12 @@ export class EventsView extends Component {
         this.setState({ editing: true });
         this.token = this.group.enter();
     };
+
+    handleBeginRequest = () => {
+        this.handleClose();
+        this.setState({ requesting: true });
+        this.token = this.group.enter();
+    }
 
     // TODO: Change this to run differently depending on whether
     //          we are in Current or Pending Events - resolved
@@ -210,6 +217,10 @@ export class EventsView extends Component {
         revertEvents[this.state.index] = this.state.oldEvent;
         this.setState({ editing: false, events: revertEvents });
         this.group.leave(this.token);
+    }
+
+    handleCloseRequest = () => {
+        this.setState({ requesting: false });
     }
 
     // Pushes the given event to the given reference in Firebase database
@@ -388,10 +399,10 @@ export class EventsView extends Component {
         ref.on('value', function(snapshot) {
             let myGroups = [];
             snapshot.forEach(function(child) {
-                console.log(child.val());
                 myGroups.push(child.val());
             });
             self.setState({groups: myGroups});
+            
         });
       }
 
@@ -811,12 +822,22 @@ export class EventsView extends Component {
             minutes = minutes.length > 1 ? minutes : '0' + minutes;
             let fullDate = startDate + "-" + this.timeString(hours, minutes);
             if (this.props.eventType === '/current-events') {
-                children.push(<CurrentChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
+                if (this.state.adminSignedIn) {
+                    children.push(<CurrentChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
                     organization={'Group: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
                     editAction={() => this.editAction(event, index)} 
                     raffleOnclick={() => this.raffleOnclick(event,index)}
                     downloadQR={() => this.downloadQR(event)}
                 />);
+                } else {
+                    children.push(<CurrentChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
+                    organization={'Group: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
+                    editAction={() => this.handleBeginRequest()} 
+                    raffleOnclick={() => this.raffleOnclick(event,index)}
+                    downloadQR={() => this.downloadQR(event)}
+                />);  
+                }
+                
             } else {
                     children.push(<PendingChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
                     organization={'Group: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
@@ -1031,6 +1052,15 @@ export class EventsView extends Component {
               <SaveIcon/>
             </Button>
           </DialogActions>
+        </Dialog>
+        <Dialog onClose={this.handleCloseRequest}
+                aria-labelledby="Request"
+                open={this.state.requesting}>
+            <Card style={{minWidth: 150, minHeight: 125}}>
+                <div style={{fontSize: 25, justifyContent: 'center', padding: 20}}>
+                If you would like to make a change to your event, please email osleventsapp@augustana.edu with the change you would like for approval.
+                </div>
+            </Card>
         </Dialog>
         <Dialog
           open={this.state.openDelete}
