@@ -9,7 +9,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 import Typography from '@material-ui/core/Typography';
 import firebase from './config';
-import { Button } from '@material-ui/core';
+import { Button, DialogContentText } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import AddIcon from '@material-ui/icons/Add';
 import Dialog from '@material-ui/core/Dialog';
@@ -23,7 +23,7 @@ import DispatchGroup from './DispatchGroup';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from 'react-select';
-import { SingleSelect } from 'react-select-material-ui';
+import CSVReader from "react-csv-reader";
 
 // File for the Users page
 
@@ -44,7 +44,13 @@ class Users extends Component {
         type: '',
         deleting: false,
         hidden: "visible",
-        disabled: false
+        disabled: false,
+        uploading: false,
+        demographicsFile: null,
+        groupLeaders: new Map(),
+        groupsForLeaders: [],
+        leadersForGroups: [],
+        groupLeaderRemoved: ''
     }
 
     listeners = [];
@@ -55,14 +61,21 @@ class Users extends Component {
     }
 
     // Action for removing a given user - opens the confirm option
-    removeAction = (ref, user) => {
-        this.setState({ email: user, ref: ref});
+    removeAction = (ref, user, name) => {
+        this.setState({ email: user, ref: ref, groupLeaderRemoved: name});
         this.handleDeleteOpen();
     }
 
     // Deletes the user from the database once they hit the confirm button
     deleteUser = () => {
-        firebase.database.ref(this.state.ref + this.state.email.replace(".", ",")).remove();
+        let user = this.state.email.replace(".", ",");
+        if (this.state.ref === '/leaders/') {
+            let org = this.state.groupLeaderRemoved.replace('/', '-');
+            firebase.database.ref('/groups-to-leaders/' + org + '/leaders/' + user).remove();
+            firebase.database.ref('/leaders/' + user + '/groups/' + org).remove();
+        } else {
+            firebase.database.ref(this.state.ref + user).remove();
+        }
         this.handleDeleteClose();
     }
 
@@ -98,10 +111,36 @@ class Users extends Component {
         this.handleOpen();
     }
 
+    uploadAction = () => {
+        this.setState({ uploading: true });
+    }
+
+    uploadLeaders = () => {
+        let leadersCSVData = this.state.demographicsFile;
+        if (leadersCSVData === null) {
+            alert('Please select a file to upload.');
+        } else {
+            let columnNames = leadersCSVData[0]; // first row has column names
+            firebase.database.ref('/leaders').remove();
+            firebase.database.ref('/groups-to-leaders').remove();
+            for (let row = 1; row < leadersCSVData.length; row++) {
+                if (leadersCSVData[row].length > 1) { // avoid final blank row (if any)
+                    let group = leadersCSVData[row][0];
+                    for (let column = 1; column < columnNames.length; column++) {
+                        firebase.database.ref('/groups-to-leaders').child(group.replace('/', '-')).child('leaders').child((leadersCSVData[row][column]).replace('.', ',')).set(true);
+                        firebase.database.ref('/leaders').child((leadersCSVData[row][column]).replace('.', ',')).child('groups').child(group.replace('/', '-')).set(true);
+                    }
+                }
+            }
+            this.setState({demographicsFile: null, uploading: false});
+    }
+}
+
     // Handles adding of the user once the add user button is clicked
     handleSave = () => {
         if (this.state.ref === '/leaders/') {
-            firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).child('Groups').push(this.state.organization);
+            firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).child('groups').child(this.state.organization.replace('/', '-')).set(true);
+            firebase.database.ref('/groups-to-leaders/' + this.state.organization.replace('/', '-')).child('leaders').child(this.state.email.replace('.', ',')).set(true);
         } else {
             firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).set(true);
         }
@@ -117,6 +156,7 @@ class Users extends Component {
         let ref = firebase.database.ref('/admin');
         this.listeners.push(ref);
         ref.on('value', function(snapshot) {
+            console.log("reading admin");
             let admins = [];
             snapshot.forEach(function(child) {
                 admins.push(child.key.replace(",", "."));
@@ -157,11 +197,34 @@ class Users extends Component {
         })
       }
 
+    readGroupsWithLeaders() {
+        let self = this;
+        let ref = firebase.database.ref("/groups-to-leaders");
+        this.listeners.push(ref);
+        ref.on('value', function(snapshot) {
+            if (!snapshot.exists()) {
+                self.setState({groupLeaders: new Map()});
+            }
+            let groups = new Map();
+            snapshot.forEach(function(child) {
+                let leaders = [];
+                let name = child.key.replace('-', '/');
+                child.child('leaders').forEach(function(leader) {
+                    leaders.push(leader.key.replace(',', '.'));
+                });
+                groups.set(name, leaders);
+                self.setState({groupLeaders: groups});
+            });
+            console.log("Map: " + self.state.groupLeaders);
+        });
+    }
+
     // Component will mount - read the administrators and leaders, then hide the progress indicator
     componentWillMount() {
         this.readAdministrators();
         this.readLeaders();
         this.readGroups();
+        this.readGroupsWithLeaders();
         let self = this;
         this.group.notify(function() {
             self.setState({ hidden: "hidden" });
@@ -197,6 +260,13 @@ class Users extends Component {
         }
     }
 
+    handleFileChanged = data => {
+        console.log(data);
+        console.log(data[0]);
+        this.setState({demographicsFile: data});
+        console.log(this.state.demographicsFile.length);
+    }
+
     // Render the page
     render() {
         const adminChildren = [];
@@ -205,13 +275,21 @@ class Users extends Component {
         // Build the administrator components to display
         for (var i = 0; i < this.state.admins.length; i += 1) {
             let index = i;
-            adminChildren.push(<ChildComponent key={index} email={this.state.admins[index]} removeAction={() => this.removeAction("/admin/", this.state.admins[index])}></ChildComponent>)
+            adminChildren.push(<ChildComponent key={index} email={this.state.admins[index]} removeAction={() => this.removeAction("/admin/", this.state.admins[index], '')}></ChildComponent>)
         }
         
         // Build the leader components to display
-        for (var i = 0; i < this.state.leaders.length; i += 1) {
-            let index = i;
-            leaderChildren.push(<ChildComponent key={index} email={this.state.leaders[index]} removeAction={() => this.removeAction("/leaders/", this.state.leaders[index])}></ChildComponent>)
+        let index = 0;
+        if (this.state.groupLeaders.size > 0) {
+            for (var [name, value] of this.state.groupLeaders.entries()) {
+                leaderChildren.push(<GroupTitleComponent group={name}></GroupTitleComponent>);
+                for (var i = 0; i < value.length; i += 1) {
+                    let email = value[i];
+                    let org = name;
+                    leaderChildren.push(<ChildComponent key={index} email={email} removeAction={() => this.removeAction("/leaders/", email, org)}></ChildComponent>);
+                    index++;
+                }
+            }
         }
 
         return (
@@ -223,16 +301,16 @@ class Users extends Component {
             <Grid item container direction="row">
             <Grid item style={{width: "50%"}}>
             <Paper style={{padding: 20, marginRight: 20}}>
-            <ParentComponent title={"Administrators:"} addAction={() => this.addAction("/admin/", "Administrator")}>
+            <AdminParentComponent title={"Administrators:"} addAction={() => this.addAction("/admin/", "Administrator")}>
                 {adminChildren}
-            </ParentComponent>
+            </AdminParentComponent>
             </Paper>
             </Grid>
             <Grid item style={{width: "50%"}}>
             <Paper style={{padding: 20}}>
-            <ParentComponent title={"Leaders:"} addAction={() => this.addAction("/leaders/", "Leader")}>
+            <LeaderParentComponent title={"Leaders:"} addAction={() => this.addAction("/leaders/", "Leader")} upload={() => this.uploadAction()}>
                 {leaderChildren}
-            </ParentComponent>
+            </LeaderParentComponent>
             </Paper>
             </Grid>
             </Grid>
@@ -267,6 +345,42 @@ class Users extends Component {
           </DialogActions>
         </Dialog>
 
+        <Dialog onClose={this.handleCloseUpload}
+                aria-labelledby="customized-dialog-title"
+                open={this.state.uploading}>
+            <DialogTitle id="customized-dialog-title">
+                Upload Leaders
+            </DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    <h3>Make sure you are uploading a .csv file.</h3>
+                    <p><strong>How to make a .csv file from Excel</strong></p>
+                    <ol>
+                        <li>Start Excel and open the spreadsheet you would like to upload.</li>
+                        <li>At the top of your screen, click on "File", then "Save As".</li>
+                        <li>Click on the dropdown box for "File Format:" (should say "Excel Workbook 
+                            .xlsx).
+                        </li>
+                        <li>Select "CSV UTF-8 (Comma delimited) (.csv)</li>
+                        <li>Save the file to a location you can later find it.</li>
+                    </ol>
+                </DialogContentText>
+                <DialogActions>
+                <CSVReader
+                        onFileLoaded={this.handleFileChanged}
+                        inputId="something"
+                        inputStyle={{color: 'purple'}}
+                        style={{margin:'auto'}}/>
+                        <Button variant="contained" 
+                            onClick={this.uploadLeaders} 
+                            style={{backgroundColor:"blue"}}
+                            color="primary">
+                        Submit
+                    </Button>
+                </DialogActions>
+            </DialogContent>
+        </Dialog>
+
         <Dialog
           open={this.state.deleting}
           onClose={this.handleDeleteClose}
@@ -294,7 +408,7 @@ class Users extends Component {
 }
 
 // Parent component for a user to be displayed
-const ParentComponent = props => (
+const AdminParentComponent = props => (
     <div style={{width: 1000}}>
       <Grid container id="children-pane" direction="column" spacing={16}>
       <Grid item container><Typography variant="h5">{props.title}</Typography><Button style={{marginLeft: 10}} onClick={props.addAction} color="primary" variant="outlined"><AddIcon/>Add</Button></Grid>
@@ -302,8 +416,34 @@ const ParentComponent = props => (
       </Grid>
     </div>
 );
+
+const LeaderParentComponent = props => (
+    <div style={{width: 1000}}>
+        <Grid container id="children-pane" direction="column" spacing={16}>
+            <Grid item container>
+                <Typography variant="h5">{props.title}</Typography>
+                <Button style={{marginLeft: 10}} onClick={props.addAction} color="primary" variant="outlined"><AddIcon/>Add Single Leader</Button>
+                <Button style={{marginLeft: 10}} onClick={props.upload} color="primary" variant="outlined"><AddIcon/>Upload Leaders</Button>
+            </Grid>
+            {props.children}
+         </Grid>
+    </div>
+);
   
 // Child component for a user to be displayed
-const ChildComponent = props => <Grid item container><Typography component="p" style={{marginTop: 7}}>{props.email}</Typography><MuiThemeProvider theme={redTheme}><Button color="primary" onClick={props.removeAction}><CloseIcon/></Button></MuiThemeProvider></Grid>;
+const ChildComponent = props => (
+    <Grid item container>
+        <Typography component="p" style={{marginTop: 5, marginLeft: 10}}>
+            {props.email}
+        </Typography>
+        <MuiThemeProvider theme={redTheme}>
+            <Button color="primary" onClick={props.removeAction}><CloseIcon/></Button>
+        </MuiThemeProvider></Grid>);
+
+const GroupTitleComponent = props => (
+    <Typography component="p" style={{fontWeight: "bold"}}>
+        {props.group}
+    </Typography>
+);
 
 export default Users;
