@@ -233,6 +233,7 @@ export class EventsView extends Component {
             organization: event["organization"],
             imgid: event["imgid"],
             description: event["description"],
+            webLink: event["webLink"],
             tags: this.state.tags.toString(),
             email: event["email"],
         });
@@ -395,11 +396,11 @@ export class EventsView extends Component {
       readLeaderGroups() {
         let self = this;
         let email = firebase.auth.currentUser.email;
-        let ref = firebase.database.ref('/leaders').child(email.replace('.', ',')).child('Groups');
+        let ref = firebase.database.ref('/leaders').child(email.replace('.', ',')).child('groups');
         ref.on('value', function(snapshot) {
             let myGroups = [];
             snapshot.forEach(function(child) {
-                myGroups.push(child.val());
+                myGroups.push(child.key.replace('-', '/'));
             });
             self.setState({groups: myGroups});
             
@@ -471,6 +472,11 @@ export class EventsView extends Component {
         this.handleEventChange("tags", e.target.value.toString());
         this.setState({ tags: e.target.value });
     };
+
+    //Handles changing of the web link field in the edit pop up
+    handleWebLinkChange = e => {
+        this.handleEventChange("webLink", e.target.value);
+    }
 
     // Handles changing of the description field in the edit pop up
     handleDescriptionChange = e => {
@@ -825,6 +831,7 @@ export class EventsView extends Component {
                 if (this.state.adminSignedIn) {
                     children.push(<CurrentChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
                     organization={'Group: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
+                    webLink={'Web Link: ' + event["webLink"]}
                     editAction={() => this.editAction(event, index)} 
                     raffleOnclick={() => this.raffleOnclick(event,index)}
                     downloadQR={() => this.downloadQR(event)}
@@ -832,6 +839,7 @@ export class EventsView extends Component {
                 } else {
                     children.push(<CurrentChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
                     organization={'Group: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
+                    webLink={'Web Link: ' + event["webLink"]}
                     editAction={() => this.handleBeginRequest()} 
                     raffleOnclick={() => this.raffleOnclick(event,index)}
                     downloadQR={() => this.downloadQR(event)}
@@ -841,7 +849,7 @@ export class EventsView extends Component {
             } else {
                     children.push(<PendingChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
                     organization={'Group: ' + event["organization"]} description={'Description: ' + event["description"]} tags={'Tags: ' + event["tags"]} image={this.state.urls[index]}
-                    editAction={() => this.editAction(event, index)} email={event["status"]} 
+                    editAction={() => this.editAction(event, index)} email={event["status"]} webLink={'Web Link: ' + event["webLink"]}
                 />);
             }
             
@@ -1010,6 +1018,14 @@ export class EventsView extends Component {
                         </Grid>
                         <Grid item>
                             <TextField
+                                id="event-link"
+                                label="Web Link (Optional)"
+                                margin="normal"
+                                value={this.state.popUpEvent["webLink"]}
+                                onChange={this.handleWebLinkChange} />
+                        </Grid>
+                        <Grid item>
+                            <TextField
                                 id="event-desc"
                                 label="Description"
                                 multiline
@@ -1123,7 +1139,7 @@ const CurrentChildComponent = props => <Grid item><Card style={{minWidth: 350, m
     {/*<CardMedia style = {{ height: 0, paddingTop: '56.25%'}} image={props.image} title={props.name}/><CardContent>*/}
     <CardContent style = {{paddingTop: '0'}}>
     <img src={props.image} style={{height: 100}}></img>
-    <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}<br/>{props.email}</Typography>
+    <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}<br/>{props.webLink}<br/>{props.email}</Typography>
     </CardContent></CardActionArea><CardActions>
     {/*Write if statement for adding these two buttons */}
     <Button variant="outlined" onClick={props.downloadQR}>Download QR</Button>
@@ -1136,7 +1152,7 @@ const PendingChildComponent = props => <Grid item><Card style={{minWidth: 350, m
     {/*<CardMedia style = {{ height: 0, paddingTop: '56.25%'}} image={props.image} title={props.name}/><CardContent>*/}
     <CardContent style = {{paddingTop: '0'}}>
     <img src={props.image} style={{height: 100}}></img>
-    <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}<br/>{props.email}</Typography>
+    <Typography component="p">{props.location}<br/>{props.organization}<br/>{props.tags}<br/>{props.description}<br/>{props.email}<br/>{props.webLink}</Typography>
     </CardContent></CardActionArea><CardActions>
     {/*Write if statement for adding these two buttons */}
     </CardActions></Card></Grid>;

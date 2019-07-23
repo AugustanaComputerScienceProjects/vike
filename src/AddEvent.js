@@ -41,6 +41,7 @@ class AddEvent extends Component {
         organization: '',
         tags: [],
         description: '',
+        webLink: '',
         picId: 'default',
         uploading: false,
         message: 'Event Added',
@@ -138,6 +139,7 @@ class AddEvent extends Component {
             organization: self.state.organization,
             imgid: self.state.picId,
             description: self.state.description,
+            webLink: self.state.webLink,
             tags: self.state.tags.toString(),
             email: self.state.email
         }).then((snap) => {
@@ -206,6 +208,7 @@ class AddEvent extends Component {
             organization: '',
             tags: [],
             description: '',
+            webLink: '',
             picId: 'default',
             uploading: false,
             message: 'Event Added',
@@ -269,12 +272,11 @@ class AddEvent extends Component {
       readLeaderGroups() {
         let self = this;
         let email = firebase.auth.currentUser.email;
-        let ref = firebase.database.ref('/leaders').child(email.replace('.', ',')).child('Groups');
+        let ref = firebase.database.ref('/leaders').child(email.replace('.', ',')).child('groups');
         ref.on('value', function(snapshot) {
             let myGroups = [];
             snapshot.forEach(function(child) {
-                console.log(child.val());
-                myGroups.push(child.val());
+                myGroups.push(child.key);
             });
             self.setState({groups: myGroups});
         });
@@ -408,6 +410,15 @@ class AddEvent extends Component {
                                     ))}    
                                 </Select>
                             </FormControl>
+                        </Grid>
+                        <Grid item>
+                            <TextField
+                                id="event-link"
+                                label="Web Link (Optional)"
+                                margin="normal"
+                                value={this.state.webLink}
+                                onChange={e => this.setState({ webLink: e.target.value })}
+                                />
                         </Grid>
                         <Grid item>
                             <TextField
