@@ -10,6 +10,10 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { FormHelperText } from '@material-ui/core';
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
 
 class Pepsico extends Component {
 
@@ -17,7 +21,11 @@ class Pepsico extends Component {
         studentIdentifier: '',
         confirmation: false,
         title: "",
-        message: ""
+        message: "",
+        btnText: "Sign In",
+        signedIn: false,
+        userText: '',
+        mainTitle: "Pepsico Check-In"
     }
 
     entryChange = e => {
@@ -103,8 +111,52 @@ class Pepsico extends Component {
         this.setState({confirmation: false});
     }
 
+    // Action for signing the user in and signing the user out
+  signInAction = () => {
+    if (!this.state.signedIn) {
+      firebase.signIn();
+    } else {
+      this.setState({ adminSignedIn: false, leaderSignedIn: false });
+      firebase.signOut();
+    }
+  }
+
+  componentWillMount() {
+    
+    firebase.auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.setState({ btnText: "Sign Out", signedIn: true });
+        if (!this.state.adminSignedIn && !this.state.leaderSignedIn) {
+          this.setState({ userText: user.email + " (Student)" });
+        }
+      } else {
+        this.setState({ btnText: "Sign In", signedIn: false, userText: "" });  
+      }
+    });
+  }
+
     render() {
         return (
+            <div className="App">
+        <AppBar position="static">
+          <Toolbar variant="dense">
+            <Grid
+      justify="space-between" // Add it here :)
+      container 
+      spacing={24}>
+      <Grid item><Typography variant="h6" color="inherit">
+              {this.state.mainTitle}
+            </Typography></Grid>
+      <Grid item style={{marginRight: 10, marginTop: 5}}>
+        <Typography variant="h7" color="inherit">
+          {this.state.userText}
+        </Typography>
+      </Grid>
+    </Grid>
+    <Button color="inherit" onClick={this.signInAction} style={{width: 100}}>{this.state.btnText}</Button>
+            
+          </Toolbar>
+        </AppBar>
             <div style={{display: 'flex', justifyContent: 'center'}}>
                 <Card style={{minWidth: 500, maxWidth: 500, minHeight: 125, maxHeight: 125}}>
                     <Grid 
@@ -143,6 +195,7 @@ class Pepsico extends Component {
                         </Button>
                     </DialogActions>
                 </Dialog>
+            </div>
             </div>
         );
     }
