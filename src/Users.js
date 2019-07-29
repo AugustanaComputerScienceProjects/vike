@@ -99,6 +99,10 @@ class Users extends Component {
         this.setState({ deleting: true });
     }
 
+    handleCloseUpload = () => {
+        this.setState({ uploading: false });
+    }
+
     // Handles opening of the add user screen
     addAction = (ref, type) => {
         this.setState({ email: '', ref: ref, type: type });
@@ -123,13 +127,19 @@ class Users extends Component {
             let columnNames = leadersCSVData[0]; // first row has column names
             firebase.database.ref('/leaders').remove();
             firebase.database.ref('/groups-to-leaders').remove();
+            firebase.database.ref('/groups').remove();
             for (let row = 1; row < leadersCSVData.length; row++) {
-                if (leadersCSVData[row].length > 1) { // avoid final blank row (if any)
-                    let group = leadersCSVData[row][0];
+                let group = leadersCSVData[row][0];
+                console.log(group)
+                firebase.database.ref('/groups').push(group);
+                if (leadersCSVData[row][1] !== "") {    
                     for (let column = 1; column < columnNames.length; column++) {
+                        console.log(group + ": " + leadersCSVData[row][column])
                         firebase.database.ref('/groups-to-leaders').child(group.replace('/', '-')).child('leaders').child((leadersCSVData[row][column]).replace('.', ',')).set(true);
                         firebase.database.ref('/leaders').child((leadersCSVData[row][column]).replace('.', ',')).child('groups').child(group.replace('/', '-')).set(true);
                     }
+                } else {
+                    firebase.database.ref('/groups-to-leaders').child(group.replace('/', '-')).child('leaders').child('None').set(true);
                 }
             }
             this.setState({demographicsFile: null, uploading: false});
@@ -137,14 +147,20 @@ class Users extends Component {
 }
 
     // Handles adding of the user once the add user button is clicked
-    handleSave = () => {
-        if (this.state.ref === '/leaders/') {
-            firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).child('groups').child(this.state.organization.replace('/', '-')).set(true);
-            firebase.database.ref('/groups-to-leaders/' + this.state.organization.replace('/', '-')).child('leaders').child(this.state.email.replace('.', ',')).set(true);
+    handleSave = () => { 
+        if ((this.state.organization === '' && this.state.ref === '/leaders/') || this.state.email === '') {
+            alert("Please fill out all fields.");
         } else {
-            firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).set(true);
+            if (this.state.ref === '/leaders/') {
+                firebase.database.ref('/groups-to-leaders').child(this.state.organization.replace('/', '-')).child('leaders').child('None').remove();
+                firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).child('groups').child(this.state.organization.replace('/', '-')).set(true);
+                firebase.database.ref('/groups-to-leaders/' + this.state.organization.replace('/', '-')).child('leaders').child(this.state.email.replace('.', ',')).set(true);
+                this.setState({organization: ''});
+            } else {
+                firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).set(true);
+            }
+            this.handleClose();
         }
-        this.handleClose();
     }
 
 
