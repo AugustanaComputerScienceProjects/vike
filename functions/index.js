@@ -31,6 +31,8 @@ functions.pubsub.schedule('*/10 * * * *').timeZone('America/Chicago').onRun((con
             let event = child.val();
             let nowDate = new Date();
             let eventEndDate = getEndDate(event);
+            nowDate.setMinutes(nowDate.getMinutes() - 300);
+            console.log(nowDate + "vs." + eventEndDate);
             // add one hour buffer before we move to past events (e.g. for Raffle time)
             eventEndDate.setMinutes(eventEndDate.getMinutes() + 60);
             if (nowDate > eventEndDate) {
