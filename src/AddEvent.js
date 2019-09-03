@@ -262,7 +262,8 @@ class AddEvent extends Component {
         ref.on('value', function(snapshot) {
           let groupsList = [];
           snapshot.forEach(function(child) {
-            groupsList.push(child.val());
+             let decodedGroup = self.decodeGroup(child);
+            groupsList.push(decodedGroup.val());
           });
           self.setState({ groups: groupsList });
           console.log('Groups List: ' + groupsList);
@@ -276,7 +277,8 @@ class AddEvent extends Component {
         ref.on('value', function(snapshot) {
             let myGroups = [];
             snapshot.forEach(function(child) {
-                myGroups.push(child.key);
+                let decodedGroup = self.decodeGroup(child.key)
+                myGroups.push(decodedGroup);
             });
             self.setState({groups: myGroups});
         });
@@ -293,6 +295,31 @@ class AddEvent extends Component {
             this.setState({ adminSignedIn: false });  
           }
         });
+    }
+
+    decodeGroup = codedGroup => {
+        let group = codedGroup;
+        if (typeof group === 'string' || group instanceof String) {
+            while (group.includes('*%&')) {
+                group = group.replace("*%&", ".");
+            }
+            while (group.includes('@%*')) {
+                group = group.replace('@%*', '$');
+            }
+            while (group.includes('*<=')) {
+                group = group.replace('*<=', '[');
+            }
+            while (group.includes('<@+')) {
+                group = group.replace('<@+', ']');
+            }
+            while (group.includes('!*>')) {
+                group = group.replace('!*>', '#');
+            }
+            while (group.includes('!<^')) {
+                group = group.replace('!<^', '/');
+            }
+        }
+        return group
     }
 
     // Render the page

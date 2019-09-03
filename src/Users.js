@@ -70,7 +70,8 @@ class Users extends Component {
     deleteUser = () => {
         let user = this.state.email.replace(".", ",");
         if (this.state.ref === '/leaders/') {
-            let org = this.state.groupLeaderRemoved.replace('/', '-');
+            let org = this.codeGroup(this.state.groupLeaderRemoved);
+            console.log("Leader group: " + org);
             firebase.database.ref('/groups-to-leaders/' + org + '/leaders/' + user).remove();
             firebase.database.ref('/leaders/' + user + '/groups/' + org).remove();
         } else {
@@ -121,6 +122,7 @@ class Users extends Component {
 
     uploadLeaders = () => {
         let leadersCSVData = this.state.demographicsFile;
+        let self = this;
         if (leadersCSVData === null) {
             alert('Please select a file to upload.');
         } else {
@@ -132,19 +134,28 @@ class Users extends Component {
                 let group = leadersCSVData[row][0];
                 console.log(group)
                 firebase.database.ref('/groups').push(group);
-                if (leadersCSVData[row][1] !== "") {    
+                let codedGroup = this.codeGroup(group);  
+                console.log(codedGroup);
+                if (leadersCSVData[row][1] !== "") {  
                     for (let column = 1; column < columnNames.length; column++) {
-                        console.log(group + ": " + leadersCSVData[row][column])
-                        firebase.database.ref('/groups-to-leaders').child(group.replace('/', '-')).child('leaders').child((leadersCSVData[row][column]).replace('.', ',')).set(true);
-                        firebase.database.ref('/leaders').child((leadersCSVData[row][column]).replace('.', ',')).child('groups').child(group.replace('/', '-')).set(true);
+                        if (leadersCSVData[row][column] === "") {
+                            break
+                        }
+                        console.log(codedGroup + ": " + leadersCSVData[row][column])
+                        console.log([row][1]);
+                        firebase.database.ref('/groups-to-leaders').child(codedGroup).child('leaders').child((leadersCSVData[row][column]).replace('.', ',')).set(true);
+                        firebase.database.ref('/leaders').child((leadersCSVData[row][column]).replace('.', ',')).child('groups').child(codedGroup).set(true);
                     }
                 } else {
-                    firebase.database.ref('/groups-to-leaders').child(group.replace('/', '-')).child('leaders').child('None').set(true);
+                    if (codedGroup === "") {
+                        break
+                    }
+                    firebase.database.ref('/groups-to-leaders').child(codedGroup).child('leaders').child('None').set(true);
                 }
             }
             this.setState({demographicsFile: null, uploading: false});
+        }
     }
-}
 
     // Handles adding of the user once the add user button is clicked
     handleSave = () => { 
@@ -152,9 +163,10 @@ class Users extends Component {
             alert("Please fill out all fields.");
         } else {
             if (this.state.ref === '/leaders/') {
-                firebase.database.ref('/groups-to-leaders').child(this.state.organization.replace('/', '-')).child('leaders').child('None').remove();
-                firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).child('groups').child(this.state.organization.replace('/', '-')).set(true);
-                firebase.database.ref('/groups-to-leaders/' + this.state.organization.replace('/', '-')).child('leaders').child(this.state.email.replace('.', ',')).set(true);
+                let codedGroup = this.codeGroup(this.state.organization);
+                firebase.database.ref('/groups-to-leaders').child(codedGroup).child('leaders').child('None').remove();
+                firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).child('groups').child(codedGroup).set(true);
+                firebase.database.ref('/groups-to-leaders/' + codedGroup).child('leaders').child(this.state.email.replace('.', ',')).set(true);
                 this.setState({organization: ''});
             } else {
                 firebase.database.ref(this.state.ref + this.state.email.replace('.', ',')).set(true);
@@ -206,12 +218,65 @@ class Users extends Component {
         ref.on('value', function(snapshot) {
           let groupsList = [];
           snapshot.forEach(function(child) {
-            groupsList.push(child.val());
+            let decodedGroup = self.decodeGroup(child);
+            groupsList.push(decodedGroup.val());
           });
           self.setState({ groups: groupsList });
           console.log(groupsList);
         })
       }
+
+      codeGroup = uncodedGroup => {
+        let group = uncodedGroup;
+        if (typeof group === 'string' || group instanceof String) {
+            console.log("AHHHHHHH: " + group);
+            while (group.includes('.')) {
+                group = group.replace(".", "*%&");
+            }
+            while (group.includes('$')) {
+                group = group.replace('$', '@%*');
+            }
+            while (group.includes('[')) {
+                group = group.replace('[', '*&@');
+            }
+            while (group.includes(']')) {
+                group = group.replace(']', '<@+');
+            }
+            while (group.includes('#')) {
+                group = group.replace('#', '!*>');
+            }
+            while (group.includes('/')) {
+                group = group.replace("/", "!<^");
+            }
+        }
+        console.log("CODED GROUP: " + group);
+        return group;
+    }
+
+    decodeGroup = codedGroup => {
+        let group = codedGroup;
+        if (typeof group === 'string' || group instanceof String) {
+            while (group.includes('*%&')) {
+                group = group.replace("*%&", ".");
+            }
+            while (group.includes('@%*')) {
+                group = group.replace('@%*', '$');
+            }
+            while (group.includes('*<=')) {
+                group = group.replace('*<=', '[');
+            }
+            while (group.includes('<@+')) {
+                group = group.replace('<@+', ']');
+            }
+            while (group.includes('!*>')) {
+                group = group.replace('!*>', '#');
+            }
+            while (group.includes('!<^')) {
+                group = group.replace('!<^', '/');
+            }
+        }
+        return group
+    }
 
     readGroupsWithLeaders() {
         let self = this;
@@ -224,11 +289,11 @@ class Users extends Component {
             let groups = new Map();
             snapshot.forEach(function(child) {
                 let leaders = [];
-                let name = child.key.replace('-', '/');
+                let decodedGroup = self.decodeGroup(child.key);
                 child.child('leaders').forEach(function(leader) {
                     leaders.push(leader.key.replace(',', '.'));
                 });
-                groups.set(name, leaders);
+                groups.set(decodedGroup, leaders);
                 self.setState({groupLeaders: groups});
             });
             console.log("Map: " + self.state.groupLeaders);

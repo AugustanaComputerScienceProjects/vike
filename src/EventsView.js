@@ -385,7 +385,8 @@ export class EventsView extends Component {
         ref.on('value', function(snapshot) {
           let groupsList = [];
           snapshot.forEach(function(child) {
-            groupsList.push(child.val());
+            let decodedGroup = self.decodeGroup(child.val());
+            groupsList.push(decodedGroup);
           });
           self.setState({ groups: groupsList });
           console.log(groupsList);
@@ -400,7 +401,8 @@ export class EventsView extends Component {
         ref.on('value', function(snapshot) {
             let myGroups = [];
             snapshot.forEach(function(child) {
-                myGroups.push(child.key.replace('-', '/'));
+                let decodedGroup = self.decodeGroup(child.key);
+                myGroups.push(decodedGroup);
             });
             self.setState({groups: myGroups});
             
@@ -802,6 +804,31 @@ export class EventsView extends Component {
                 } 
             }
           });
+    }
+
+    decodeGroup = codedGroup => {
+        let group = codedGroup;
+        if (typeof group === 'string' || group instanceof String) {
+            while (group.includes('*%&')) {
+                group = group.replace("*%&", ".");
+            }
+            while (group.includes('@%*')) {
+                group = group.replace('@%*', '$');
+            }
+            while (group.includes('*<=')) {
+                group = group.replace('*<=', '[');
+            }
+            while (group.includes('<@+')) {
+                group = group.replace('<@+', ']');
+            }
+            while (group.includes('!*>')) {
+                group = group.replace('!*>', '#');
+            }
+            while (group.includes('!<^')) {
+                group = group.replace('!<^', '/');
+            }
+        }
+        return group
     }
 
     //render the EventsView for the Current Events and Pending Events pages
