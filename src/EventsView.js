@@ -16,7 +16,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import Typography from '@material-ui/core/Typography';
 import MenuItem from '@material-ui/core/MenuItem';
 import firebase from './config';
-import { CardActionArea, CardActions } from '@material-ui/core';
+import { CardActionArea, CardActions, ListItem } from '@material-ui/core';
 import {MuiPickersUtilsProvider, TimePicker, DatePicker} from 'material-ui-pickers';
 import MomentUtils from '@date-io/moment';
 import FormControl from '@material-ui/core/FormControl';
@@ -112,6 +112,9 @@ export class EventsView extends Component {
         cancelButton: "Delete Event",
         popUpText: "delete",
         adminSignedIn: false,
+        attendeesList: [],
+        attendeesOpen: false,
+        testThing: "Fail"
       }
 
       listeners = [];
@@ -715,6 +718,10 @@ export class EventsView extends Component {
         this.group.leave(this.token);
     }
 
+    attendeesClose = () => {
+        this.setState({attendeesOpen: false});
+    }
+
     // Handles changing of the number of winners in the raffle pop up
     numWinnersChange= e => {
         this.setState({numWinners:e.target.value})
@@ -758,6 +765,32 @@ export class EventsView extends Component {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);    
+        });
+    }
+
+    viewAttendees = (event) => {
+        this.setState({attendeesOpen:true});
+        let self = this;
+        let ref = firebase.database.ref('/current-events');
+        this.listeners.push(ref);
+        ref.on('value', function(snapshot) {
+          let usersList = [];
+          snapshot.forEach(function(child) {
+              console.log(child.key);
+              console.log(child.child("name").val());
+            if (child.child("name").val() === event["name"]) {
+                child.forEach(function(attribute) {
+                    if (attribute.key === "users") {
+                        attribute.forEach(function(user) {
+                            console.log(attribute.key);
+                            console.log(user.key);
+                            usersList.push(<ListItem>{user.key}</ListItem>);
+                        });
+                        self.setState({attendeesList: usersList, testThing: "Done"});
+                    }
+                }) ;
+            }
+          });
         });
     }
 
@@ -862,6 +895,7 @@ export class EventsView extends Component {
                     editAction={() => this.editAction(event, index)} 
                     raffleOnclick={() => this.raffleOnclick(event,index)}
                     downloadQR={() => this.downloadQR(event)}
+                    viewAttendees={() => this.viewAttendees(event)}
                 />);
                 } else {
                     children.push(<CurrentChildComponent key={i} name={event["name"]} date={fullDate} location={'Location: ' + event["location"]} 
@@ -870,6 +904,7 @@ export class EventsView extends Component {
                     editAction={() => this.handleBeginRequest()} 
                     raffleOnclick={() => this.raffleOnclick(event,index)}
                     downloadQR={() => this.downloadQR(event)}
+                    viewAttendees={() => this.viewAttendees(event)}
                 />);  
                 }
                 
@@ -948,6 +983,17 @@ export class EventsView extends Component {
           </div>
           </div>
           {this.addRafflePopUp()}
+          
+          <Dialog
+                onClose={this.attendeesClose}
+                open={this.state.attendeesOpen}>
+                <DialogTitle onClose={this.attendeesClose}>Attendees</DialogTitle>
+                <DialogContent>
+                    {this.state.attendeesList}
+                </DialogContent>
+            </Dialog>
+        
+
             <ParentComponent>
                     {children}
             </ParentComponent>
@@ -1171,6 +1217,7 @@ const CurrentChildComponent = props => <Grid item><Card style={{minWidth: 350, m
     {/*Write if statement for adding these two buttons */}
     <Button variant="outlined" onClick={props.downloadQR}>Download QR</Button>
     <Button variant="outlined" onClick={props.raffleOnclick}>Raffle</Button>
+    <Button variant="outlined" onClick={props.viewAttendees}>Attendees</Button>
     </CardActions></Card></Grid>;
 
 const PendingChildComponent = props => <Grid item><Card style={{minWidth: 350, maxWidth: 350, height: "auto"}}>

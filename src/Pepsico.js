@@ -13,6 +13,7 @@ import { FormHelperText } from '@material-ui/core';
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
+import Snackbar from '@material-ui/core/Snackbar';  
 import IconButton from "@material-ui/core/IconButton";
 
 class Pepsico extends Component {
@@ -25,7 +26,8 @@ class Pepsico extends Component {
         btnText: "Sign In",
         signedIn: false,
         userText: '',
-        mainTitle: "Pepsico Check-In"
+        mainTitle: "Pepsico Check-In",
+        open: false
     }
 
     entryChange = e => {
@@ -85,7 +87,7 @@ class Pepsico extends Component {
         let firstName = snapshot.child(userId).child('Pref_FirstName').val();
         let lastName = snapshot.child(userId).child('LastName').val()
         this.setState({message: firstName + ' ' + lastName +  ' has checked in.'});
-        this.setState({confirmation: true});
+        this.setState({open: true});
         firebase.database.ref('/pepsico').once('value').then(function(snapshot) {
 
             snapshot.forEach(function(child) {
@@ -96,9 +98,8 @@ class Pepsico extends Component {
     }
 
     failedCheckIn = () => {
-        this.setState({title: 'Check In Failed'});
-        this.setState({message: 'Not a student.'});
-        this.setState({confirmation: true});
+        this.displayMessage("Not a student/faculty.")
+        this.setState({open: true});
     }
 
     keyPress = e => {
@@ -108,7 +109,13 @@ class Pepsico extends Component {
     }
 
     handleClose = () => {
-        this.setState({confirmation: false});
+        this.setState({open: false});
+    }
+
+    displayMessage(message) {
+        this.handleClose();
+        this.setState({ message: message });
+        this.setState({ open: true });
     }
 
     // Action for signing the user in and signing the user out
@@ -180,6 +187,7 @@ class Pepsico extends Component {
                                 onClick={this.onSubmit}>Submit</Button>
                     </Grid>
                 </Card>
+                {/*
                 <Dialog onClose={this.confirmation}
                         aria-labelledby="customized-dialog-title"
                         open={this.state.confirmation}>
@@ -195,6 +203,29 @@ class Pepsico extends Component {
                         </Button>
                     </DialogActions>
                 </Dialog>
+                */}
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                    }}
+                    open={this.state.open}
+                    autoHideDuration={6000}
+                    onClose={this.handleClose}
+                    ContentProps={{
+                        'aria-describedby': 'message-id',
+                    }}
+                    message={this.state.message}
+                action={[
+                    <Button
+                        key="close"
+                        aria-label="Close"
+                        color="inherit"
+                        onClick={this.handleClose}
+                        > X
+                    </Button>,
+                ]}
+                />
             </div>
             </div>
         );
