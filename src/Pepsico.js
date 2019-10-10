@@ -55,14 +55,13 @@ class Pepsico extends Component {
         console.log("SID: " + idNum);
         let reference = firebase.database.ref('/id-to-email');
         let demoReference = firebase.database.ref('/demographics');
+        demoReference.remove();
         let self = this;
         reference.once('value').then(function(snapshot) {
             if (snapshot.hasChild(idNum)) {
                 self.setState({title: 'Checked In'});
                 let email = snapshot.child(idNum).val();
-                demoReference.once('value').then(function(snapshot) {
-                    self.checkedIn(email, snapshot);
-                });
+                self.checkedIn(email, snapshot);
             } else {
                 self.failedCheckIn();
             }
@@ -84,15 +83,16 @@ class Pepsico extends Component {
 
     checkedIn = (userId, snapshot) => {
         this.setState({title: 'Checked In'});
-        let firstName = snapshot.child(userId).child('Pref_FirstName').val();
-        let lastName = snapshot.child(userId).child('LastName').val()
-        this.setState({message: firstName + ' ' + lastName +  ' has checked in.'});
+        let currentDate = new Date();
+        let checkInTime = currentDate.toLocaleTimeString();
+        console.log(checkInTime);
+        this.setState({message: userId + ' has checked in.'});
         this.setState({open: true});
         firebase.database.ref('/pepsico').once('value').then(function(snapshot) {
 
             snapshot.forEach(function(child) {
                 let eventKey = child.key;
-                firebase.database.ref('/pepsico').child(eventKey).child('users').child(userId).set(true);
+                firebase.database.ref('/pepsico').child(eventKey).child('users').child(userId).set(checkInTime);
             });
         }); 
     }
