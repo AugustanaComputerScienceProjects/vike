@@ -40,6 +40,8 @@ class Tags extends Component {
     ref: '',
     type: '',
     deleting: false,
+    adminSignedIn: false,
+    leaderSignedIn: false,
     hidden: "visible"
   }
 
@@ -52,6 +54,12 @@ class Tags extends Component {
     let self = this;
     this.group.notify(function() {
       self.setState({ hidden: "hidden" });
+    });
+    this.off = firebase.auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.checkRole(user, 'leader');
+        this.checkRole(user, 'admin');
+      }
     });
   }
 
@@ -145,6 +153,33 @@ deleteData = () => {
   this.handleDeleteClose();
 }
 
+checkRole(user, role) {
+  let self = this;
+  firebase.database.ref(role).once('value').then(function(snapshot) {
+      if (snapshot.hasChild(user.email.replace('.', ','))) {
+          console.log("Snapshot: " + snapshot);
+          if (role === 'admin') {
+              self.setState({adminSignedIn: true});
+          } else if (role === 'leaders' && !self.state.adminSignedIn) {
+              self.setState({leaderSignedIn: true});
+          } 
+      }
+    });
+}
+
+  insertGroupsWidget(groupsChildren) {
+    if (this.state.adminSignedIn) {
+      return (<Grid item style={{width: "50%"}}>
+      <Paper style={{padding: 20, marginRight: 20}}>
+      <ParentComponent title={"Groups:"} addAction={() => this.addAction("/groups/", "Group")}>
+          {groupsChildren}
+      </ParentComponent>
+      </Paper>
+      </Grid>
+      )
+    }
+  }
+
     // Render the Groups/Tags page
     render() {
         const tagsChildren = [];
@@ -171,13 +206,7 @@ deleteData = () => {
           </div>
             <Grid container>
             <Grid item container direction="row">
-            <Grid item style={{width: "50%"}}>
-            <Paper style={{padding: 20, marginRight: 20}}>
-            <ParentComponent title={"Groups:"} addAction={() => this.addAction("/groups/", "Group")}>
-                {groupsChildren}
-            </ParentComponent>
-            </Paper>
-            </Grid>
+            {this.insertGroupsWidget(groupsChildren)}
             <Grid item style={{width: "50%"}}>
             <Paper style={{padding: 20}}>
             <ParentComponent title={"Tags:"} addAction={() => this.addAction("/tags/", "Tag")}>
