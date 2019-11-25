@@ -57,6 +57,7 @@ functions.pubsub.schedule('0 2 * * *').timeZone('America/Chicago').onRun((contex
         snapshot.forEach(function(child) {
             let event = child.val();
             databaseRef.ref('/past-events/' + child.key).set(event);
+            databaseRef.ref('/past-pepsico/' + child.key).set(event);
             databaseRef.ref("/pepsico").child(child.key).remove();
         });
         
@@ -138,7 +139,7 @@ exports.emailNotify = functions.database.ref('/pending-events/{eventID}').onDele
             } else {
                 console.log("Event Rejected: " + event["name"]);
                 subject = "Augie Events - Event Rejected: " + event["name"];
-                message = '<p>Your event was rejected. Contact OSL with any concerns or questions: studentactivity@augustana.edu</p>'
+                message = '<p>Your event was rejected. Contact OSL with any concerns or questions: osleventsapp@augustana.edu</p>'
             }
 
             const mailOptions = {
