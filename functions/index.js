@@ -26,8 +26,10 @@ exports.scheduledMoveEvents =
 functions.pubsub.schedule('*/10 * * * *').timeZone('America/Chicago').onRun((context) => {
     let db = admin.database();
     console.log("working"); 
-    db.ref('/current-events').once('value').then(function(snapshot) {
-        snapshot.forEach(function(child) {
+
+    return db.ref('/current-events').once('value').then(snapshot => {
+        let promises = [];
+        snapshot.forEach(child => {
             let event = child.val();
             let nowDate = new Date();
             let eventEndDate = getEndDate(event);
@@ -37,14 +39,14 @@ functions.pubsub.schedule('*/10 * * * *').timeZone('America/Chicago').onRun((con
             eventEndDate.setMinutes(eventEndDate.getMinutes() + 60);
             if (nowDate > eventEndDate) {
                 console.log("Moving Event: " + event["name"]);
-                db.ref('/past-events/' + child.key).set(event);
-                db.ref('/current-events/' + child.key).remove();
+                promises.push(db.ref('/past-events/' + child.key).set(event));
+                promises.push(db.ref('/current-events/' + child.key).remove());
                 if (event["imgid"] !== "default") {
-                    admin.storage().bucket('Images/' + event["imgid"] + '.jpg').delete();
+                    promises.push(admin.storage().bucket('Images/' + event["imgid"] + '.jpg').delete());
                 }
             }
         });
-        return;
+        return Promise.all(promises);
     }).catch(error => {console.log(error);});
 });
 
@@ -53,15 +55,16 @@ exports.pepsicoEventAutoScheduling =
 functions.pubsub.schedule('0 2 * * *').timeZone('America/Chicago').onRun((context) => {
     let databaseRef = admin.database();
     let nowDate = new Date();
-    databaseRef.ref('/pepsico').once('value').then(function(snapshot) {
-        snapshot.forEach(function(child) {
+    return databaseRef.ref('/pepsico').once('value').then(snapshot => {
+        let promises = [];
+        snapshot.forEach(child => {
             let event = child.val();
-            databaseRef.ref('/past-events/' + child.key).set(event);
-            databaseRef.ref('/past-pepsico/' + child.key).set(event);
-            databaseRef.ref("/pepsico").child(child.key).remove();
+            promises.push(databaseRef.ref('/past-events/' + child.key).set(event));
+            promises.push(databaseRef.ref('/past-pepsico/' + child.key).set(event));
+            promises.push(databaseRef.ref("/pepsico").child(child.key).remove());
         });
         
-        databaseRef.ref('/pepsico').push({
+        promises.push(databaseRef.ref('/pepsico').push({
             name: "Pepsico Attendance",
             startDate: formatDate(nowDate) + " " + "06:00",
             duration: (18*60-1), //almost 18 hours, until 11:59 PM
@@ -71,11 +74,11 @@ functions.pubsub.schedule('0 2 * * *').timeZone('America/Chicago').onRun((contex
             description: "(auto-generated Pepsico Event)",
             tags: "",
             email: "michaelwardach17@augustana.edu"
-        });
+        }));
         console.log(nowDate.getDay());
         console.log(nowDate.getMonth());
         console.log("Pepsico Moved and Created");
-        return;
+        return Promise.all(promises);
     }).catch(error => {console.log(error);});
 });
 
@@ -108,7 +111,7 @@ functions.pubsub.schedule('0 2 * * *').timeZone('America/Chicago').onRun((contex
 // Firebase Cloud Function emailNotify - notifies leaders when their Event gets accepted or rejected via email
 exports.emailNotify = functions.database.ref('/pending-events/{eventID}').onDelete((snapshot, context) => {
     console.log("Deleted");
-    admin.database().ref('/current-events/' + snapshot.key).once('value').then(function(snap) {
+    return admin.database().ref('/current-events/' + snapshot.key).once('value').then(snap => {
         console.log("Current Event: " + snap);
         let event = snapshot.val();
         console.log("Event: " + event);
