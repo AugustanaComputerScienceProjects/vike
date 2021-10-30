@@ -9,7 +9,7 @@
     "@material-ui/styles": "^3.0.0-alpha.10",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "firebase": "^5.10.0",
+    "firebase": "7.19.1",
     "lint": "^0.6.5",
     "material-ui-pickers": "^2.2.4",
     "moment": "^2.24.0",
