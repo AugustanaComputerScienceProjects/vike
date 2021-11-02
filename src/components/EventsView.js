@@ -44,8 +44,8 @@ import React, { Component } from 'react';
 import { FilePicker } from 'react-file-picker';
 import Resizer from 'react-image-file-resizer';
 import { Image } from 'react-native';
-import './App.css';
-import firebase from './config';
+
+import firebase from '../config';
 import DispatchGroup from './DispatchGroup';
 
 //Component for showing events and managing events on the

@@ -2,7 +2,6 @@ import { Button, Grid } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import React, { Component } from 'react';
 import XLSX from 'xlsx';
-import './App.css';
 
 //an individual past event, containing the information that each cell contains
 class PastEvent extends Component {

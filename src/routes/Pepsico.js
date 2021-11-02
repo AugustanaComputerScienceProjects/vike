@@ -7,8 +7,8 @@ import TextField from '@material-ui/core/TextField';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import React, { Component } from 'react';
-import './App.css';
-import firebase from './config';
+
+import firebase from '../config';
 
 class Pepsico extends Component {
   state = {

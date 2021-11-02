@@ -2,8 +2,8 @@ import Drawer from '@material-ui/core/Drawer';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 import React, { Component } from 'react';
-import './App.css';
-import firebase from './config';
+
+import firebase from '../config';
 
 // File for the navigation drawer (the menu that pops out when clicking the left menu button in the app bar)
 
