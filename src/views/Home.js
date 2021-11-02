@@ -1,8 +1,8 @@
 import Grid from '@material-ui/core/Grid';
 import React, { Component } from 'react';
 import { Image } from 'react-native';
-import './App.css';
-import defaultImage from './default.jpg';
+
+import defaultImage from '../default.jpg';
 
 // File for the home page
 

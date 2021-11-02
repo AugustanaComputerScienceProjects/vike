@@ -7,8 +7,8 @@ import Typography from '@material-ui/core/Typography';
 import HomeIcon from '@material-ui/icons/Home';
 import MenuIcon from '@material-ui/icons/Menu';
 import React from 'react';
-import firebase from './config';
-import NavDrawer from './NavDrawer';
+import firebase from '../config';
+import NavDrawer from '../components/NavDrawer';
 
 // File for managing the top app bar
 

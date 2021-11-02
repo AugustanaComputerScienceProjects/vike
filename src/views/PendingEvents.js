@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import './App.css';
-import firebase from './config';
-import { EventsView } from './EventsView';
+
+import firebase from '../config';
+import { EventsView } from '../components/EventsView';
 
 // File for managing the Pending Events page
 

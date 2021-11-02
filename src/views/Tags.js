@@ -13,9 +13,9 @@ import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
 import CloseIcon from '@material-ui/icons/Close';
 import React, { Component } from 'react';
-import './App.css';
-import firebase from './config.js';
-import DispatchGroup from './DispatchGroup';
+
+import firebase from '../config.js';
+import DispatchGroup from '../components/DispatchGroup';
 
 // File for manging the Groups/Tags screen
 

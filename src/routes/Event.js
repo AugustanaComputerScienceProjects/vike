@@ -4,8 +4,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import queryString from 'query-string';
 import React, { Component } from 'react';
-import './App.css';
-import firebase from './config';
+
+import firebase from '../config';
 
 // File for managing the event check in page
 

@@ -17,9 +17,9 @@ import CloseIcon from '@material-ui/icons/Close';
 import React, { Component } from 'react';
 import CSVReader from 'react-csv-reader';
 import Select from 'react-select';
-import './App.css';
-import firebase from './config';
-import DispatchGroup from './DispatchGroup';
+
+import firebase from '../config';
+import DispatchGroup from '../components/DispatchGroup';
 
 // File for the Users page
 

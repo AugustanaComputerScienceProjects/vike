@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import './App.css';
-import Home from './Home';
-import Events from './AddEvent';
-import PendingEvents from './PendingEvents';
-import CurrentEvents from './CurrentEvents';
-import PastEvents from './PastEvents';
-import Tags from './Tags';
-import Users from './Users';
-import NavBar from './ButtonAppBar';
-import Event from './Event';
+import Home from './views/Home';
+import Events from './views/AddEvent';
+import PendingEvents from './views/PendingEvents';
+import CurrentEvents from './views/CurrentEvents';
+import PastEvents from './views/PastEvents';
+import Tags from './views/Tags';
+import Users from './views/Users';
+import NavBar from './views/ButtonAppBar';
+import Event from './routes/Event';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 // Main application file that manages all the different views

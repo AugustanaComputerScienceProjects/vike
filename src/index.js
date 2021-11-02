@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom';
 import { Route, BrowserRouter as Router } from 'react-router-dom';
 import './index.css';
 import App from './App';
-import Pepsico from './Pepsico';
-import DemographicsUpload from './DemographicsUpload';
-import UploadSuccess from './UploadSuccess';
-import PepsicoCheckInLists from './PepsicoCheckInLists';
+import Pepsico from './routes/Pepsico';
+import DemographicsUpload from './routes/DemographicsUpload';
+import UploadSuccess from './routes/UploadSuccess';
+import PepsicoCheckInLists from './routes/PepsicoCheckInLists';
 import * as serviceWorker from './serviceWorker';
 
 const routing = (

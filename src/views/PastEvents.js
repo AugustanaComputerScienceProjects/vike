@@ -10,10 +10,10 @@ import CloseIcon from '@material-ui/icons/Close';
 import SearchIcon from '@material-ui/icons/Search';
 import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
 import React, { Component } from 'react';
-import './App.css';
-import firebase from './config';
-import PastEvent from './PastEvent';
-import PastEventObj from './PastEventObj';
+
+import firebase from '../config';
+import PastEvent from '../components/PastEvent';
+import PastEventObj from '../components/PastEventObj';
 
 //The main runner of the past event page, contains many past events
 class PastEvents extends Component {

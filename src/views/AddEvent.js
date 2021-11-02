@@ -24,9 +24,8 @@ import {
 import React, { Component } from 'react';
 import { FilePicker } from 'react-file-picker';
 import Resizer from 'react-image-file-resizer';
-import './App.css';
-import firebase from './config';
-import defaultImage from './default.jpg';
+import firebase from '../config';
+import defaultImage from '../default.jpg';
 
 // File for the Add Event Screen
 

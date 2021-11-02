@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import './App.css';
-import { EventsView } from './EventsView';
+
+import { EventsView } from '../components/EventsView';
 
 // File for managing the Current Events page
 
