@@ -24,7 +24,7 @@ let transporter = nodemailer.createTransport({
 exports.scheduledMoveEvents =
   //runs every 10 minutes
   functions.pubsub
-    .schedule('*/10 * * * *')
+    .schedule('*/10 * * * *') // every 10 minute
     .timeZone('America/Chicago')
     .onRun((context) => {
       let db = admin.database();
