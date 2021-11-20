@@ -8,15 +8,35 @@ import DemographicsUpload from './routes/DemographicsUpload';
 import UploadSuccess from './routes/UploadSuccess';
 import PepsicoCheckInLists from './routes/PepsicoCheckInLists';
 import * as serviceWorker from './serviceWorker';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { red } from '@mui/material/colors';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#556cd6',
+    },
+    secondary: {
+      main: '#19857b',
+    },
+    error: {
+      main: red.A400,
+    },
+  },
+});
 
 const routing = (
-  <Router>
-    <Route exact path='/' component={App} />
-    <Route path='/pepsico' component={Pepsico} />
-    <Route path='/upload' component={DemographicsUpload} />
-    <Route path='/success' component={UploadSuccess} />
-    <Route path='/checkins' component={PepsicoCheckInLists} />
-  </Router>
+  <React.StrictMode>
+    <ThemeProvider theme={theme}>
+      <Router>
+        <Route exact path='/' component={App} />
+        <Route path='/pepsico' component={Pepsico} />
+        <Route path='/upload' component={DemographicsUpload} />
+        <Route path='/success' component={UploadSuccess} />
+        <Route path='/checkins' component={PepsicoCheckInLists} />
+      </Router>
+    </ThemeProvider>
+  </React.StrictMode>
 );
 
 ReactDOM.render(routing, document.getElementById('root'));

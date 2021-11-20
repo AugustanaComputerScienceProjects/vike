@@ -1,7 +1,7 @@
 /* eslint-disable no-extend-native */
 /* eslint-disable react/no-direct-mutation-state */
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Grid from '@material-ui/core/Grid';
+import CircularProgress from '@mui/material/CircularProgress';
+import Grid from '@mui/material/Grid';
 import queryString from 'query-string';
 import React, { Component } from 'react';
 
