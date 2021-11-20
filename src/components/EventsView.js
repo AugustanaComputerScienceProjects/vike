@@ -1,40 +1,38 @@
 /* eslint-disable jsx-a11y/alt-text */
 import MomentUtils from '@date-io/moment';
-import { CardActionArea, CardActions, ListItem } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { red } from '@material-ui/core/colors';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Divider from '@material-ui/core/Divider';
-import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormLabel from '@material-ui/core/FormLabel';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import Input from '@material-ui/core/Input';
-import InputBase from '@material-ui/core/InputBase';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Paper from '@material-ui/core/Paper';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import Select from '@material-ui/core/Select';
-import Snackbar from '@material-ui/core/Snackbar';
-import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import Switch from '@material-ui/core/Switch';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import CloseIcon from '@material-ui/icons/Close';
-import DeleteIcon from '@material-ui/icons/Delete';
-import SaveIcon from '@material-ui/icons/Save';
-import SearchIcon from '@material-ui/icons/Search';
-import SortIcon from '@material-ui/icons/Sort';
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SaveIcon from '@mui/icons-material/Save';
+import SearchIcon from '@mui/icons-material/Search';
+import SortIcon from '@mui/icons-material/Sort';
+import { CardActionArea, CardActions, ListItem } from '@mui/material';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
+import CircularProgress from '@mui/material/CircularProgress';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Divider from '@mui/material/Divider';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormLabel from '@mui/material/FormLabel';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import Input from '@mui/material/Input';
+import InputBase from '@mui/material/InputBase';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Paper from '@mui/material/Paper';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import Select from '@mui/material/Select';
+import Snackbar from '@mui/material/Snackbar';
+import Switch from '@mui/material/Switch';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import {
   DatePicker,
   MuiPickersUtilsProvider,
@@ -43,8 +41,6 @@ import {
 import React, { Component } from 'react';
 import { FilePicker } from 'react-file-picker';
 import Resizer from 'react-image-file-resizer';
-import { Image } from 'react-native';
-
 import firebase from '../config';
 import DispatchGroup from './DispatchGroup';
 
@@ -54,7 +50,7 @@ import DispatchGroup from './DispatchGroup';
 var QRCode = require('qrcode');
 
 const uuidv4 = require('uuid/v4');
-const redTheme = createMuiTheme({ palette: { primary: red } });
+// const redTheme = createTheme({ palette: { primary: red } });
 
 // function getModalStyle() {
 //   const top = 50;
@@ -1334,9 +1330,9 @@ export class EventsView extends Component {
                     </FilePicker>
                   </Grid>
                   <Grid item>
-                    <Image
+                    <img
                       style={{ width: 192, height: 108 }}
-                      source={{ uri: this.state.image64 }}
+                      src={this.state.image64}
                     />
                   </Grid>
                 </Grid>
@@ -1344,16 +1340,16 @@ export class EventsView extends Component {
             </MuiPickersUtilsProvider>
           </DialogContent>
           <DialogActions style={{ justifyContent: 'center' }}>
-            <MuiThemeProvider theme={redTheme}>
-              <Button
-                variant='contained'
-                onClick={this.handleDeleteOpen}
-                color='primary'
-              >
-                {this.state.cancelButton}
-                <DeleteIcon />
-              </Button>
-            </MuiThemeProvider>
+            {/* <MuiThemeProvider theme={redTheme}> */}
+            <Button
+              variant='contained'
+              onClick={this.handleDeleteOpen}
+              color='primary'
+            >
+              {this.state.cancelButton}
+              <DeleteIcon />
+            </Button>
+            {/* </MuiThemeProvider> */}
             <Button
               variant='contained'
               onClick={this.handleSaveEdit}
@@ -1392,11 +1388,11 @@ export class EventsView extends Component {
             <Button onClick={this.handleDeleteClose} color='primary'>
               Cancel
             </Button>
-            <MuiThemeProvider theme={redTheme}>
-              <Button onClick={this.handleDelete} color='primary' autoFocus>
-                Confirm
-              </Button>
-            </MuiThemeProvider>
+            {/* <MuiThemeProvider theme={redTheme}> */}
+            <Button onClick={this.handleDelete} color='primary' autoFocus>
+              Confirm
+            </Button>
+            {/* </MuiThemeProvider> */}
           </DialogActions>
         </Dialog>
         <Snackbar

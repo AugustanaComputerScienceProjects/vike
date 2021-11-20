@@ -1,10 +1,10 @@
-import AppBar from '@material-ui/core/AppBar';
-import Button from '@material-ui/core/Button';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Grid from '@material-ui/core/Grid';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
+import AppBar from '@mui/material/AppBar';
+import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
+import Grid from '@mui/material/Grid';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
 import React, { Component } from 'react';
 import CSVReader from 'react-csv-reader';
 
@@ -32,8 +32,8 @@ class DemographicsUpload extends Component {
       alert('Please select a file to upload.');
     } else {
       // let columnNames = demographicsCSVData[0]; // first row has column names
-      firebase.database.ref('/demographics').remove();
-      firebase.database.ref('/id-to-email').remove();
+      // firebase.database.ref('/demographics').remove();
+      // firebase.database.ref('/id-to-email').remove();
       for (let row = 1; row < demographicsCSVData.length; row++) {
         console.log(demographicsCSVData[row][0]);
         if (demographicsCSVData[row].length > 1) {

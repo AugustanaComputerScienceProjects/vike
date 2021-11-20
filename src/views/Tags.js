@@ -1,25 +1,20 @@
-import Button from '@material-ui/core/Button';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { red } from '@material-ui/core/colors';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import AddIcon from '@material-ui/icons/Add';
-import CloseIcon from '@material-ui/icons/Close';
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import React, { Component } from 'react';
-
-import firebase from '../config.js';
 import DispatchGroup from '../components/DispatchGroup';
+import firebase from '../config.js';
 
 // File for manging the Groups/Tags screen
-
-const redTheme = createMuiTheme({ palette: { primary: red } });
 
 class Tags extends Component {
   group = new DispatchGroup();
@@ -305,11 +300,9 @@ class Tags extends Component {
             <Button onClick={this.handleDeleteClose} color='primary'>
               Cancel
             </Button>
-            <MuiThemeProvider theme={redTheme}>
-              <Button onClick={this.deleteData} color='primary' autoFocus>
-                Confirm
-              </Button>
-            </MuiThemeProvider>
+            <Button onClick={this.deleteData} color='primary' autoFocus>
+              Confirm
+            </Button>
           </DialogActions>
         </Dialog>
       </div>
@@ -344,11 +337,9 @@ const ChildComponent = (props) => (
     <Typography component='p' style={{ marginTop: 7 }}>
       {props.data}
     </Typography>
-    <MuiThemeProvider theme={redTheme}>
-      <Button color='primary' onClick={props.removeAction}>
-        <CloseIcon />
-      </Button>
-    </MuiThemeProvider>
+    <Button color='primary' onClick={props.removeAction}>
+      <CloseIcon />
+    </Button>
   </Grid>
 );
 

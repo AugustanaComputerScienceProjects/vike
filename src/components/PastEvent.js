@@ -1,5 +1,5 @@
 import { Button, Grid } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import React, { Component } from 'react';
 import XLSX from 'xlsx';
 

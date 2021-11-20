@@ -1,19 +1,17 @@
 import { Button, DialogContentText } from '@material-ui/core';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { red } from '@material-ui/core/colors';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import FormControl from '@material-ui/core/FormControl';
-import Grid from '@material-ui/core/Grid';
-import InputLabel from '@material-ui/core/InputLabel';
-import Paper from '@material-ui/core/Paper';
-import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import AddIcon from '@material-ui/icons/Add';
-import CloseIcon from '@material-ui/icons/Close';
+import CircularProgress from '@mui/material/CircularProgress';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import FormControl from '@mui/material/FormControl';
+import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 import React, { Component } from 'react';
 import CSVReader from 'react-csv-reader';
 import Select from 'react-select';
@@ -22,8 +20,6 @@ import firebase from '../config';
 import DispatchGroup from '../components/DispatchGroup';
 
 // File for the Users page
-
-const redTheme = createMuiTheme({ palette: { primary: red } });
 
 class Users extends Component {
   group = new DispatchGroup();
@@ -563,11 +559,9 @@ class Users extends Component {
             <Button onClick={this.handleDeleteClose} color='primary'>
               Cancel
             </Button>
-            <MuiThemeProvider theme={redTheme}>
-              <Button onClick={this.deleteUser} color='primary' autoFocus>
-                Confirm
-              </Button>
-            </MuiThemeProvider>
+            <Button onClick={this.deleteUser} color='primary' autoFocus>
+              Confirm
+            </Button>
           </DialogActions>
         </Dialog>
       </div>
@@ -578,7 +572,7 @@ class Users extends Component {
 // Parent component for a user to be displayed
 const AdminParentComponent = (props) => (
   <div style={{ width: 1000 }}>
-    <Grid container id='children-pane' direction='column' spacing={16}>
+    <Grid container id='children-pane' direction='column' spacing={2}>
       <Grid item container>
         <Typography variant='h5'>{props.title}</Typography>
         <Button
@@ -598,7 +592,7 @@ const AdminParentComponent = (props) => (
 
 const LeaderParentComponent = (props) => (
   <div style={{ width: 1000 }}>
-    <Grid container id='children-pane' direction='column' spacing={16}>
+    <Grid container id='children-pane' direction='column' spacing={2}>
       <Grid item container>
         <Typography variant='h5'>{props.title}</Typography>
         <Button
@@ -631,11 +625,9 @@ const ChildComponent = (props) => (
     <Typography component='p' style={{ marginTop: 5, marginLeft: 10 }}>
       {props.email}
     </Typography>
-    <MuiThemeProvider theme={redTheme}>
-      <Button color='primary' onClick={props.removeAction}>
-        <CloseIcon />
-      </Button>
-    </MuiThemeProvider>
+    <Button color='primary' onClick={props.removeAction}>
+      <CloseIcon />
+    </Button>
   </Grid>
 );
 

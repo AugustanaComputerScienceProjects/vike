@@ -1,149 +1,134 @@
-import Drawer from '@material-ui/core/Drawer';
-import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuList';
-import React, { Component } from 'react';
-
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import React, { useEffect, useState } from 'react';
 import firebase from '../config';
 
 // File for the navigation drawer (the menu that pops out when clicking the left menu button in the app bar)
 
-class NavDrawer extends Component {
-  constructor(props) {
-    super(props);
-    this.homeClicked = this.homeClicked.bind(this);
-    this.eventClicked = this.eventClicked.bind(this);
-    this.pendingClicked = this.pendingClicked.bind(this);
-    this.currentClicked = this.currentClicked.bind(this);
-    this.pastClicked = this.pastClicked.bind(this);
-    this.tagsClicked = this.tagsClicked.bind(this);
-    this.usersClicked = this.usersClicked.bind(this);
-    this.state = {
-      adminSignedIn: false,
-      leaderSignedIn: false,
-    };
-  }
+const NavDrawer = (props) => {
+  const [adminSignedIn, setAdminSignedIn] = useState(false);
+  const [leaderSignedIn, setLeaderSignedIn] = useState(false);
 
   // Actions for when each menu item is clicked
-  homeClicked() {
-    this.props.navChanged('Home');
-  }
+  const homeClicked = () => {
+    props.navChanged('Home');
+  };
 
-  eventClicked() {
-    this.props.navChanged('Add Event');
-  }
+  const eventClicked = () => {
+    props.navChanged('Add Event');
+  };
 
-  pendingClicked() {
-    this.props.navChanged('Pending Events');
-  }
+  const pendingClicked = () => {
+    props.navChanged('Pending Events');
+  };
 
-  currentClicked() {
-    this.props.navChanged('Current Events');
-  }
+  const currentClicked = () => {
+    props.navChanged('Current Events');
+  };
 
-  pastClicked() {
-    this.props.navChanged('Past Events');
-  }
+  const pastClicked = () => {
+    props.navChanged('Past Events');
+  };
 
-  tagsClicked() {
-    this.props.navChanged('Groups/Tags');
-  }
+  const tagsClicked = () => {
+    props.navChanged('Groups/Tags');
+  };
 
-  usersClicked() {
-    this.props.navChanged('Users');
-  }
+  const usersClicked = () => {
+    props.navChanged('Users');
+  };
 
   // Checks the role of the current user
-  checkRole(user, role) {
-    let self = this;
+  const checkRole = (user, role) => {
     firebase.database
       .ref(role)
       .once('value')
       .then(function(snapshot) {
         if (snapshot.hasChild(user.email.replace('.', ','))) {
           if (role === 'admin') {
-            self.setState({ adminSignedIn: true });
+            setAdminSignedIn(true);
           } else if (role === 'leaders') {
-            self.setState({ leaderSignedIn: true });
+            setLeaderSignedIn(true);
           }
         }
       });
-  }
+  };
 
   // Component will mount - initiate the Firebase auth listener
-  componentWillMount() {
+  useEffect(() => {
     firebase.auth.onAuthStateChanged((user) => {
       if (user) {
-        this.checkRole(user, 'admin');
-        this.checkRole(user, 'leaders');
+        checkRole(user, 'admin');
+        checkRole(user, 'leaders');
       } else {
-        this.setState({ adminSignedIn: false, leaderSignedIn: false });
+        setAdminSignedIn(false);
+        setLeaderSignedIn(false);
       }
     });
-  }
+  }, []);
 
   // Render the drawer
-  render() {
-    return (
-      <Drawer
-        open={this.props.drawerOpened}
-        onClose={this.props.toggleDrawer(false)}
-        anchor='left'
+  return (
+    <Drawer
+      anchor='left'
+      onClose={props.toggleDrawer(false)}
+      open={props.drawerOpened}
+    >
+      <div
+        onClick={props.toggleDrawer(false)}
+        onKeyDown={props.toggleDrawer(false)}
       >
-        <div
-          onClick={this.props.toggleDrawer(false)}
-          onKeyDown={this.props.toggleDrawer(false)}
-        >
-          <MenuList>
-            <MenuItem name='Home' onClick={this.homeClicked}>
-              Home
-            </MenuItem>
-            <MenuItem
-              name='Add Event'
-              onClick={this.eventClicked}
-              disabled={!this.state.adminSignedIn && !this.state.leaderSignedIn}
-            >
-              Add Event
-            </MenuItem>
-            <MenuItem
-              name='Pending Events'
-              onClick={this.pendingClicked}
-              disabled={!this.state.adminSignedIn && !this.state.leaderSignedIn}
-            >
-              Pending Events
-            </MenuItem>
-            <MenuItem
-              name='Current Events'
-              onClick={this.currentClicked}
-              disabled={!this.state.adminSignedIn && !this.state.leaderSignedIn}
-            >
-              Current Events
-            </MenuItem>
-            <MenuItem
-              name='Past Events'
-              onClick={this.pastClicked}
-              disabled={!this.state.adminSignedIn}
-            >
-              Past Events
-            </MenuItem>
-            <MenuItem
-              name='Groups/Tags'
-              onClick={this.tagsClicked}
-              disabled={!this.state.adminSignedIn && !this.state.leaderSignedIn}
-            >
-              Groups/Tags
-            </MenuItem>
-            <MenuItem
-              name='Users'
-              onClick={this.usersClicked}
-              disabled={!this.state.adminSignedIn}
-            >
-              Users
-            </MenuItem>
-          </MenuList>
-        </div>
-      </Drawer>
-    );
-  }
-}
+        <List>
+          <ListItemButton name='Home' onClick={homeClicked}>
+            Home
+          </ListItemButton>
+          <ListItemButton
+            name='Add Event'
+            onClick={eventClicked}
+            disabled={!adminSignedIn && !leaderSignedIn}
+          >
+            Add Event
+          </ListItemButton>
+          <ListItemButton
+            name='Pending Events'
+            onClick={pendingClicked}
+            disabled={!adminSignedIn && !leaderSignedIn}
+          >
+            Pending Events
+          </ListItemButton>
+          <ListItemButton
+            name='Current Events'
+            onClick={currentClicked}
+            disabled={!adminSignedIn && !leaderSignedIn}
+          >
+            Current Events
+          </ListItemButton>
+          <ListItemButton
+            name='Past Events'
+            onClick={pastClicked}
+            disabled={!adminSignedIn}
+          >
+            Past Events
+          </ListItemButton>
+          <ListItemButton
+            name='Groups/Tags'
+            onClick={tagsClicked}
+            disabled={!adminSignedIn && !leaderSignedIn}
+          >
+            Groups/Tags
+          </ListItemButton>
+          <ListItemButton
+            name='Users'
+            onClick={usersClicked}
+            disabled={!adminSignedIn}
+          >
+            Users
+          </ListItemButton>
+        </List>
+      </div>
+    </Drawer>
+  );
+};
 
 export default NavDrawer;
