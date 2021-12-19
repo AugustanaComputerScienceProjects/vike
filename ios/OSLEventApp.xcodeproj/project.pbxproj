@@ -29,6 +29,7 @@
 		B78738F8AF154047828A0766 /* BeVietnamPro-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F66CE4315E104CF7AB2957B8 /* BeVietnamPro-Regular.ttf */; };
 		B78974C9BB9B451384F3548D /* BeVietnamPro-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 25D036507D4F4903948840E3 /* BeVietnamPro-Thin.ttf */; };
 		C89CD9B96F5A4A94A6F44908 /* BeVietnamPro-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B10B6858D3A34FEC87AA4863 /* BeVietnamPro-Light.ttf */; };
+		C932B21B276EB923007BE826 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C932B21A276EB923007BE826 /* GoogleService-Info.plist */; };
 		D751E3426A7E4491B479C997 /* BeVietnamPro-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C41F7558D3744455A091268F /* BeVietnamPro-ThinItalic.ttf */; };
 		DBADDE65EDE440EDB76D0D65 /* BeVietnamPro-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9C27A71BF2054D419D73C376 /* BeVietnamPro-BoldItalic.ttf */; };
 		E7BCF55C5A0846F9894CC620 /* BeVietnamPro-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CCADD0F19E4643E9AC9E7651 /* BeVietnamPro-SemiBoldItalic.ttf */; };
@@ -72,6 +73,7 @@
 		BF71CB39AB9D4AD78616B7C3 /* BeVietnamPro-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "BeVietnamPro-ExtraLight.ttf"; path = "../assets/fonts/BeVietnamPro-ExtraLight.ttf"; sourceTree = "<group>"; };
 		C0A881CF5CF3F2B244570E2A /* Pods-OSLEventApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OSLEventApp.debug.xcconfig"; path = "Target Support Files/Pods-OSLEventApp/Pods-OSLEventApp.debug.xcconfig"; sourceTree = "<group>"; };
 		C41F7558D3744455A091268F /* BeVietnamPro-ThinItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "BeVietnamPro-ThinItalic.ttf"; path = "../assets/fonts/BeVietnamPro-ThinItalic.ttf"; sourceTree = "<group>"; };
+		C932B21A276EB923007BE826 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C96B267E276EA7970003C3BE /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialCommunityIcons.ttf; sourceTree = "<group>"; };
 		C96B267F276EA7970003C3BE /* Feather.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Feather.ttf; sourceTree = "<group>"; };
 		CCADD0F19E4643E9AC9E7651 /* BeVietnamPro-SemiBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "BeVietnamPro-SemiBoldItalic.ttf"; path = "../assets/fonts/BeVietnamPro-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
@@ -179,6 +181,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				C932B21A276EB923007BE826 /* GoogleService-Info.plist */,
 				C96B267D276EA7280003C3BE /* Fonts */,
 				13B07FAE1A68108700A75B9A /* OSLEventApp */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -337,6 +340,7 @@
 				E7BCF55C5A0846F9894CC620 /* BeVietnamPro-SemiBoldItalic.ttf in Resources */,
 				B78974C9BB9B451384F3548D /* BeVietnamPro-Thin.ttf in Resources */,
 				D751E3426A7E4491B479C997 /* BeVietnamPro-ThinItalic.ttf in Resources */,
+				C932B21B276EB923007BE826 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -601,7 +605,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = edu.augustana.osleventapp;
 				PRODUCT_NAME = OSLEventApp;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -626,7 +630,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = edu.augustana.osleventapp;
 				PRODUCT_NAME = OSLEventApp;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

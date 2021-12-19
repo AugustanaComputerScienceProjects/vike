@@ -11,15 +11,37 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {NativeBaseProvider} from 'native-base';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {StatusBar, StyleSheet} from 'react-native';
 import Tabs from './navigation/tabs';
 import EventDetail from './screens/event-detail';
 import theme from './theme';
+import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import Auth from './screens/auth';
+
+GoogleSignin.configure({
+  webClientId:
+    '559059413195-p4j61vpcbdgreua073t4st0vbb3vg343.apps.googleusercontent.com',
+  hostedDomain: 'augustana.edu',
+});
 
 const Stack = createStackNavigator();
 
 const App = () => {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+
+  useEffect(() => {
+    auth().onAuthStateChanged(userState => {
+      setUser(userState);
+
+      if (loading) {
+        setLoading(false);
+      }
+    });
+  }, []);
+
   return (
     <NavigationContainer>
       <NativeBaseProvider theme={theme}>
@@ -29,8 +51,16 @@ const App = () => {
             headerShown: false,
           }}
           initialRouteName="Featured">
-          <Stack.Screen name="Featured" component={Tabs} />
-          <Stack.Screen name="EventDetail" component={EventDetail} />
+          {user ? (
+            <>
+              <Stack.Screen name="Featured" component={Tabs} />
+              <Stack.Screen name="EventDetail" component={EventDetail} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen name="Auth" component={Auth} />
+            </>
+          )}
         </Stack.Navigator>
       </NativeBaseProvider>
     </NavigationContainer>
