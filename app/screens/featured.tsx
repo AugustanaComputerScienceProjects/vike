@@ -1,5 +1,6 @@
+import {Text} from 'native-base';
 import React from 'react';
-import {Text, View, StyleSheet, Button} from 'react-native';
+import {View, StyleSheet, Button} from 'react-native';
 
 const Featured = ({navigation}) => {
   return (

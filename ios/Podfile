@@ -12,6 +12,8 @@ target 'OSLEventApp' do
     :hermes_enabled => false
   )
 
+  pod 'GoogleSignIn', '~> 6.0.2'
+
 
   target 'OSLEventAppTests' do
     inherit! :complete

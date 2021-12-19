@@ -1,5 +1,6 @@
+import {Text} from 'native-base';
 import React from 'react';
-import {Text, View, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 
 const Tickets = ({params}) => {
   return (
