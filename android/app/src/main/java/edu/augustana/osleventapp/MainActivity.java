@@ -1,4 +1,4 @@
-package com.osleventapp;
+package edu.augustana.osleventapp;
 
 import com.facebook.react.ReactActivity;
 
