@@ -14,7 +14,7 @@ export interface IconStyle {
 type IProps = {
   color?: string;
   name: string;
-  size: number;
+  size?: number;
 };
 
 export const Icon = ({color, name, size}: IProps) => (
