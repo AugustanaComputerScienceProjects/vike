@@ -23,11 +23,10 @@ import {COLORS, dummyData, images, SIZES} from '../constants';
 
 const Featured = ({navigation}) => {
   const _renderItem = ({item}, index) => {
-    console.log(item);
     return (
       <TouchableWithoutFeedback
         onPress={() => {
-          navigation.navigate('EventDetail', {selectedEvent: item});
+          navigation.navigate('EventDetail', {event: item});
         }}>
         <View
           style={{
