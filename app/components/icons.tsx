@@ -15,10 +15,11 @@ type IProps = {
   color?: string;
   name: string;
   size?: number;
+  style?: any;
 };
 
-export const Icon = ({color, name, size}: IProps) => (
-  <Feather color={color} name={name} size={size} />
+export const Icon = ({color, name, size, style}: IProps) => (
+  <Feather color={color} name={name} size={size} style={style} />
 );
 
 export const EmailIcon = (props: IconStyle) => (
