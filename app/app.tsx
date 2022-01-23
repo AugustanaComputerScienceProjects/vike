@@ -15,6 +15,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {NativeBaseProvider} from 'native-base';
 import React, {useEffect, useState} from 'react';
 import {StatusBar} from 'react-native';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import Tabs from './navigation/tabs';
 import Auth from './screens/auth';
 import EventDetail from './screens/event-detail';
@@ -43,27 +44,29 @@ const App = () => {
   }, [loading]);
 
   return (
-    <NavigationContainer>
-      <NativeBaseProvider theme={theme}>
-        <StatusBar barStyle="light-content"></StatusBar>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-          }}
-          initialRouteName="Featured">
-          {user ? (
-            <>
-              <Stack.Screen name="Featured" component={Tabs} />
-              <Stack.Screen name="EventDetail" component={EventDetail} />
-            </>
-          ) : (
-            <>
-              <Stack.Screen name="Auth" component={Auth} />
-            </>
-          )}
-        </Stack.Navigator>
-      </NativeBaseProvider>
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <NativeBaseProvider theme={theme}>
+          {/* <StatusBar barStyle="light-content"></StatusBar> */}
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+            }}
+            initialRouteName="Featured">
+            {user ? (
+              <>
+                <Stack.Screen name="Tabs" component={Tabs} />
+                <Stack.Screen name="EventDetail" component={EventDetail} />
+              </>
+            ) : (
+              <>
+                <Stack.Screen name="Auth" component={Auth} />
+              </>
+            )}
+          </Stack.Navigator>
+        </NativeBaseProvider>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 };
 

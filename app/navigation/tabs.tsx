@@ -4,6 +4,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Featured, Schedule, Tickets, Mine} from '../screens';
 import {Icon, Text} from 'native-base';
 import Feather from 'react-native-vector-icons/Feather';
+import {COLORS} from '../constants';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,6 +34,7 @@ const TabIcon = ({focused, icon}) => {
 const TabLabel = ({focused, text}) => {
   return focused ? (
     <Text
+      color="white"
       fontSize="md"
       style={{
         marginTop: -25,
@@ -48,14 +50,15 @@ const TabLabel = ({focused, text}) => {
 const Tabs = ({params}) => {
   return (
     <Tab.Navigator
-      tabBarOptions={{
-        style: {
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
           position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
           elevation: 0,
-          backgroundColor: '#121212',
+          backgroundColor: COLORS.tabBar,
           opacity: 0.9,
           borderTopColor: 'transparent',
           height: 111,
@@ -66,9 +69,9 @@ const Tabs = ({params}) => {
         name="Featured"
         component={Featured}
         options={{
-          tabBarIcon: ({focused}) => (
-            <TabIcon focused={focused} icon={'compass'} />
-          ),
+          tabBarIcon: ({focused}) => {
+            return <TabIcon focused={focused} icon={'compass'} />;
+          },
           tabBarLabel: ({focused}) => (
             <TabLabel focused={focused} text="Featured" />
           ),
