@@ -1,58 +1,50 @@
 import MomentUtils from '@date-io/moment';
-import Card from '@mui/material/Card';
+import CloseIcon from '@mui/icons-material/Close';
+import SearchIcon from '@mui/icons-material/Search';
+import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import CloseIcon from '@mui/icons-material/Close';
-import SearchIcon from '@mui/icons-material/Search';
+import { DataGrid } from '@mui/x-data-grid';
 import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
-import React, { Component } from 'react';
-
-import firebase from '../config';
-import PastEvent from '../components/PastEvent';
+import React, { useEffect, useState } from 'react';
+import XLSX from 'xlsx';
 import PastEventObj from '../components/PastEventObj';
+import firebase from '../config';
 
 //The main runner of the past event page, contains many past events
-class PastEvents extends Component {
-  listener = null;
-  constructor(props) {
-    super(props);
-    this.state = {
-      sortDate1: '2017-05-24',
-      sortDate2: '2017-05-22',
-      displayedEvents: [],
-      filteredEvents: [],
-      events: [],
-      hidden: 'visible',
-      searchText: '',
-    };
-    this.handleDate1Change = this.handleDate1Change.bind(this);
-    this.handleDate2Change = this.handleDate2Change.bind(this);
-    this.readPastEvents = this.readPastEvents.bind(this);
-    this.createDisplayEvents = this.createDisplayEvents.bind(this);
-  }
+let listener = null;
+const PastEvents = (props) => {
+  const [sortDate1, setSortDate1] = useState('2017-05-24');
+  const [sortDate2, setSortDate2] = useState('2017-05-22');
+  const [eventsInRange, setEventsInRange] = useState([]);
+  const [sortModel, setSortModel] = useState([
+    {
+      field: 'date',
+      sort: 'desc',
+    },
+  ]);
 
-  componentDidMount() {
-    this.readPastEvents();
-  }
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [hidden, setHidden] = useState('visible');
+  const [searchText, setSearchText] = useState('');
 
-  componentWillUnmount() {
-    this.listener.off();
-  }
+  useEffect(() => {
+    readPastEvents();
+  }, []);
 
-  //reads in the past events from firebase
-  readPastEvents() {
-    let self = this;
-    this.listener = firebase.database
-      .ref('/past-events')
-      .orderByChild('startDate');
-    this.listener.on('value', function(snapshot) {
+  const readPastEvents = () => {
+    listener = firebase.database.ref('/past-events').orderByChild('startDate');
+
+    listener.on('value', function(snapshot) {
       let listEvents = [];
       snapshot.forEach(function(childSnapshot) {
         let webEvent = childSnapshot.val();
+        // console.log(childSnapshot.key);
 
         let len = 0;
 
@@ -70,6 +62,7 @@ class PastEvents extends Component {
         let date = arr2[0] + '-' + arr2[1] + '-' + arr2[2];
 
         let event = new PastEventObj(
+          childSnapshot.key,
           webEvent['name'],
           date,
           len,
@@ -77,100 +70,96 @@ class PastEvents extends Component {
         );
         listEvents.push(event);
       });
-      self.setState({
-        events: listEvents,
-        eventsInRange: listEvents,
-        filteredEvents: listEvents,
-      });
-      self.setState({
-        sortDate1: listEvents[0].getDate(),
-        sortDate2: listEvents[listEvents.length - 1].getDate(),
-        hidden: 'hidden',
-      });
+      setEvents(listEvents);
+      setEventsInRange(listEvents);
+      setFilteredEvents(listEvents);
+      setSortDate1(listEvents[0].getDate());
+      setSortDate2(listEvents[listEvents.length - 1].getDate());
+      setHidden('hidden');
     });
-  }
+  };
 
-  //makes an aray of the past events that should be displayed
-  async createDisplayEvents(d1, d2) {
-    let startInd = this.state.events.length;
+  const createDisplayEvents = async (d1, d2) => {
+    let startInd = events.length;
     let endInd = -2;
 
     var moment = require('moment');
 
-    for (let i = 0; i < this.state.events.length; i++) {
-      let date = this.state.events[i].getDate();
+    for (let i = 0; i < events.length; i++) {
+      let date = events[i].getDate();
       if (moment(date).isSameOrAfter(d1)) {
         startInd = i;
-        i = this.state.events.length;
+        i = events.length;
       }
     }
-    for (let i = startInd; i < this.state.events.length; i++) {
-      let date = new Date(this.state.events[i].getDate());
+    for (let i = startInd; i < events.length; i++) {
+      let date = new Date(events[i].getDate());
       if (moment(date).isAfter(d2)) {
         endInd = i;
-        i = this.state.events.length;
+        i = events.length;
       }
     }
 
     //if no end was found
     if (endInd === -2) {
-      endInd = this.state.events.length;
+      endInd = events.length;
     }
 
     let displayedEvents = [];
 
     for (let i = startInd; i < endInd; i++) {
-      displayedEvents.push(this.state.events[i]);
+      displayedEvents.push(events[i]);
     }
 
     //this was done to prevent a display bug (threading issues)
-    await this.setState({ eventsInRange: [] });
-    await this.setState({ eventsInRange: displayedEvents });
-    this.filterEvents(this.state.searchText, displayedEvents);
-  }
+    await setEventsInRange([]);
+    await setEventsInRange(displayedEvents);
+    filterEvents(searchText, displayedEvents);
+  };
 
   //changes the date for the first date picker (and updates the display)
-  handleDate1Change = (e) => {
+  const handleDate1Change = (e) => {
     let date = new Date(e);
     var month = (1 + date.getMonth()).toString();
     month = month.length > 1 ? month : '0' + month;
     var day = date.getDate().toString();
     day = day.length > 1 ? day : '0' + day;
 
-    let sortDate1 = date.getFullYear() + '-' + month + '-' + day;
+    let date1 = date.getFullYear() + '-' + month + '-' + day;
 
-    this.setState({ sortDate1: sortDate1 });
-    this.createDisplayEvents(sortDate1, this.state.sortDate2);
+    setSortDate1(date1);
+    createDisplayEvents(sortDate1, sortDate2);
   };
 
   //changes the date for the second date picker (and updates the display)
-  handleDate2Change = (e) => {
+  const handleDate2Change = (e) => {
     let date = new Date(e);
     var month = (1 + date.getMonth()).toString();
     month = month.length > 1 ? month : '0' + month;
     var day = date.getDate().toString();
     day = day.length > 1 ? day : '0' + day;
 
-    let sortDate2 = date.getFullYear() + '-' + month + '-' + day;
+    let date2 = date.getFullYear() + '-' + month + '-' + day;
 
-    this.setState({ sortDate2: sortDate2 });
-    this.createDisplayEvents(this.state.sortDate1, sortDate2);
+    setSortDate2(date2);
+    createDisplayEvents(sortDate1, sortDate2);
   };
 
   //handles the search bar changing
-  handleSearchChange = (e) => {
-    this.setState({ searchText: e.target.value });
-    this.filterEvents(e.target.value, this.state.eventsInRange);
+  const handleSearchChange = (e) => {
+    setSearchText(e.target.value);
+    filterEvents(e.target.value, eventsInRange);
   };
 
   //clears the search bar
-  handleClear = () => {
-    this.setState({ searchText: '' });
-    this.filterEvents('', this.state.eventsInRange);
+  const handleClear = () => {
+    setSearchText('');
+
+    filterEvents('', eventsInRange);
   };
 
   //filters the display based on search results
-  async filterEvents(text, originalEvents) {
+  const filterEvents = async (text, originalEvents) => {
     var index = 0;
     let filtered = [];
     originalEvents.forEach(function(event) {
@@ -179,102 +168,201 @@ class PastEvents extends Component {
       }
       index = index + 1;
     });
-    await this.setState({ filteredEvents: [] });
-    await this.setState({ filteredEvents: filtered });
-  }
 
-  render() {
-    const children = [];
-    this.state.filteredEvents.forEach(function(event) {
-      children.push(
-        <Card style={{ margin: '10px', padding: '4px' }}>
-          <PastEvent parentEvent={event} />
-        </Card>
-      );
-    });
+    await setFilteredEvents([]);
+    await setFilteredEvents(filtered);
+  };
 
-    return (
-      <div>
-        <div
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            margintop: '-50px',
-            marginleft: '-50px',
-            width: '100px',
-            height: '100px',
-          }}
-        >
-          <CircularProgress
-            disableShrink
-            style={{ visibility: this.state.hidden }}
-          ></CircularProgress>
+  //Uses XLSX - npm to run
+  //Downloads an XL doc onto the local machine
+  const downloadXLDoc = (title, studentList) => {
+    if (studentList) {
+      let workbook = XLSX.utils.book_new();
+      let users = Object.keys(studentList);
+
+      // eslint-disable-next-line no-array-constructor
+      let usersSheet = new Array();
+
+      users.forEach((userName) => {
+        usersSheet.push(JSON.parse('{"name":"' + userName + '"}'));
+      });
+
+      usersSheet = XLSX.utils.json_to_sheet(usersSheet);
+      XLSX.utils.book_append_sheet(workbook, usersSheet, 'Attendee List');
+
+      XLSX.writeFile(workbook, title + 'Attendees.xlsx');
+    }
+  };
+
+  return (
+    <div>
+      <div
+        style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          margintop: '-50px',
+          marginleft: '-50px',
+          width: '100px',
+          height: '100px',
+        }}
+      >
+        <CircularProgress
+          disableShrink
+          style={{ visibility: hidden }}
+        ></CircularProgress>
+      </div>
+      <div style={{ textAlign: 'center', marginBottom: 20 }}>
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          <Paper
+            style={{
+              padding: '2px 4px',
+              display: 'flex',
+              alignItems: 'center',
+              width: 400,
+            }}
+            elevation={1}
+          >
+            <SearchIcon style={{ padding: 10 }} />
+            <InputBase
+              style={{ width: 300 }}
+              placeholder='Search Events'
+              value={searchText}
+              onChange={handleSearchChange}
+            />
+            <IconButton onClick={handleClear}>
+              <CloseIcon />
+            </IconButton>
+          </Paper>
         </div>
-        <div style={{ textAlign: 'center', marginBottom: 20 }}>
-          <div style={{ position: 'relative', display: 'inline-block' }}>
-            <Paper
-              style={{
-                padding: '2px 4px',
-                display: 'flex',
-                alignItems: 'center',
-                width: 400,
-              }}
-              elevation={1}
-            >
-              <SearchIcon style={{ padding: 10 }} />
-              <InputBase
-                style={{ width: 300 }}
-                placeholder='Search Events'
-                value={this.state.searchText}
-                onChange={this.handleSearchChange}
+      </div>
+
+      <Grid container direction='row' justify='center'>
+        <MuiPickersUtilsProvider utils={MomentUtils}>
+          <Grid
+            container
+            direction='row'
+            justify='center'
+            alignItems='flex-start'
+          >
+            <Grid item>
+              <DatePicker
+                margin='normal'
+                label='Start Date'
+                value={sortDate1}
+                onChange={handleDate1Change}
+              />{' '}
+            </Grid>
+
+            <Grid item>
+              <Typography variant='subtitle1' style={{ padding: '30px' }}>
+                To
+              </Typography>
+            </Grid>
+
+            <Grid item>
+              <DatePicker
+                margin='normal'
+                label='End Date'
+                value={sortDate2}
+                onChange={handleDate2Change}
               />
-              <IconButton onClick={this.handleClear}>
-                <CloseIcon />
-              </IconButton>
-            </Paper>
+            </Grid>
+          </Grid>
+        </MuiPickersUtilsProvider>
+        <div style={{ display: 'flex', height: '80vh', width: '100vw' }}>
+          <div style={{ flexGrow: 1 }}>
+            <DataGrid
+              sortModel={sortModel}
+              onSortModelChange={(model) => setSortModel(model)}
+              rows={filteredEvents}
+              columns={[
+                { field: 'title', headerName: 'Title', minWidth: 150, flex: 1 },
+                { field: 'id', headerName: 'ID', minWidth: 200 },
+                {
+                  field: 'date',
+                  headerName: 'Date',
+                  minWidth: 30,
+                  flex: 1,
+                },
+                {
+                  field: 'numAttend',
+                  headerName: 'Total Attendance',
+                  minWidth: 150,
+                },
+                {
+                  field: 'action',
+                  headerName: 'Action',
+                  sortable: false,
+                  flex: 1,
+                  renderCell: (params) => {
+                    let buttonDisabled = false;
+                    if (params.getValue(params.id, 'stuList') == null)
+                      buttonDisabled = true;
+                    return (
+                      <Button
+                        onClick={() =>
+                          downloadXLDoc(
+                            params.getValue(params.id, 'title'),
+                            params.getValue(params.id, 'stuList')
+                          )
+                        }
+                        disabled={buttonDisabled}
+                      >
+                        Download XL Doc
+                      </Button>
+                    );
+                  },
+                },
+              ]}
+              checkboxSelection
+            />
           </div>
         </div>
 
-        <Grid container direction='row' justify='center'>
-          <MuiPickersUtilsProvider utils={MomentUtils}>
-            <Grid
-              container
-              direction='row'
-              justify='center'
-              alignItems='flex-start'
-            >
-              <Grid item>
-                <DatePicker
-                  margin='normal'
-                  label='Start Date'
-                  value={this.state.sortDate1}
-                  onChange={this.handleDate1Change}
-                />{' '}
-              </Grid>
+        {/* <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Title</TableCell>
+                  <TableCell align='right'>Total Attendance</TableCell>
+                  <TableCell align='right'>Date</TableCell>
+                  <TableCell align='right'>Student List</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {this.state.filteredEvents.map((row) => {
+                  return (
+                    <TableRow
+                      key={row.getTitle()}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      <TableCell component='th' scope='row'>
+                        {row.getTitle()}
+                      </TableCell>
+                      <TableCell align='right'>{row.getAttend()}</TableCell>
+                      <TableCell align='right'>{row.getDate()}</TableCell>
+                      <TableCell align='right'>
+                        <Button
+                          onClick={() =>
+                            this.downloadXLDoc(row.getTitle(), row.getStuList())
+                          }
+                          disabled={this.state.buttonDisabled}
+                        >
+                          Download XL Doc
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer> */}
 
-              <Grid item>
-                <Typography variant='subtitle1' style={{ padding: '30px' }}>
-                  To
-                </Typography>
-              </Grid>
-
-              <Grid item>
-                <DatePicker
-                  margin='normal'
-                  label='End Date'
-                  value={this.state.sortDate2}
-                  onChange={this.handleDate2Change}
-                />
-              </Grid>
-            </Grid>
-          </MuiPickersUtilsProvider>
-
-          {children}
-        </Grid>
-      </div>
-    );
-  }
-}
+        {/* {children} */}
+      </Grid>
+    </div>
+  );
+};
 
 export default PastEvents;
