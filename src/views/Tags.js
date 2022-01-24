@@ -313,7 +313,7 @@ class Tags extends Component {
 // Parent component for displaying a single group/tag
 const ParentComponent = (props) => (
   <div style={{ width: 1000 }}>
-    <Grid container id='children-pane' direction='column' spacing={16}>
+    <Grid container id='children-pane' direction='column' spacing={1}>
       <Grid item container>
         <Typography variant='h5'>{props.title}</Typography>
         <Button

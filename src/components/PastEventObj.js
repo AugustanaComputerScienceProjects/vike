@@ -1,6 +1,7 @@
 //this object contains the necessary information for the past event to display/know about
 class PastEventObj {
-  constructor(title, date, numAttend, stuList) {
+  constructor(id, title, date, numAttend, stuList) {
+    this.id = id;
     this.title = title;
     this.date = date;
     this.numAttend = numAttend;
