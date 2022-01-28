@@ -5,37 +5,37 @@
  * -> The screen can be seperated 4 sections and 1 fixed bottom bar
  *
  * TODO:
- * [] Build the header image background section
- *    [] Rendering the image background sub section (ImageBackground)
- *    [] Rendering the header sub section
- *    [] Rendering the footer sub section (LinearGradient)
- * [] Build the buttons group section
- * [] Build the description section
- * [] Build the location section (google map in dark mode)
- * [] Build the fixed bottom bar
+ * [x] Build the header image background section
+ *    [x] Rendering the image background sub section (ImageBackground)
+ *    [x] Rendering the header sub section
+ *    [x] Rendering the footer sub section (LinearGradient)
+ * [x] Build the buttons group section
+ * [x] Build the description section
+ * [x] Build the location section (google map in dark mode)
+ * [x] Build the fixed bottom bar
  */
 
+import moment from 'moment';
 import {Text} from 'native-base';
 import React, {useEffect, useState} from 'react';
 import {
-  View,
-  StyleSheet,
-  ScrollView,
-  ImageBackground,
   ActivityIndicator,
+  ImageBackground,
   Platform,
+  ScrollView,
+  StyleSheet,
+  View,
 } from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import LinearGradient from 'react-native-linear-gradient';
+import MapView from 'react-native-maps';
+import styled from 'styled-components/native';
 import {Icon} from '../components/icons';
 import {COLORS, dummyData, SIZES} from '../constants';
-import styled from 'styled-components/native';
-import LinearGradient from 'react-native-linear-gradient';
-import moment from 'moment';
-
-import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
+import {Event} from './featured';
 
 const EventDetail = ({navigation, route}) => {
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState<Event>();
 
   useEffect(() => {
     let {event} = route.params;
@@ -53,7 +53,7 @@ const EventDetail = ({navigation, route}) => {
         style={{width: '100%', backgroundColor: COLORS.black}}>
         <ImageBackground
           resizeMode="cover"
-          source={selectedEvent?.image}
+          source={{uri: selectedEvent?.image}}
           style={{
             width: '100%',
             height:
@@ -127,10 +127,10 @@ const EventDetail = ({navigation, route}) => {
                       color="white"
                       fontSize={'md'}
                       style={{opacity: 0.5, letterSpacing: 2}}>
-                      {selectedEvent?.type}
+                      {selectedEvent?.tags}
                     </Text>
                     <Text color="white" fontWeight={'bold'} fontSize={'2xl'}>
-                      {selectedEvent?.title}
+                      {selectedEvent?.name}
                     </Text>
 
                     <Text
@@ -138,7 +138,7 @@ const EventDetail = ({navigation, route}) => {
                       fontSize={'md'}
                       style={{opacity: 0.5, letterSpacing: 2}}>
                       STARTING{' '}
-                      {moment(selectedEvent?.startingTime).format('hh:mm A')}
+                      {moment(selectedEvent?.startDate).format('hh:mm A')}
                     </Text>
                   </View>
                   <LinearGradient
@@ -150,8 +150,8 @@ const EventDetail = ({navigation, route}) => {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    <Text color="white" style={{letterSpace: 1}}>
-                      {moment(selectedEvent?.startingTime)
+                    <Text color="white" style={{letterSpacing: 1}}>
+                      {moment(selectedEvent?.startDate)
                         .format('MMM')
                         .toUpperCase()}
                     </Text>
@@ -159,8 +159,8 @@ const EventDetail = ({navigation, route}) => {
                       color="white"
                       fontSize="md"
                       fontWeight="bold"
-                      style={{letterSpace: 1}}>
-                      {moment(selectedEvent?.startingTime)
+                      style={{letterSpacing: 1}}>
+                      {moment(selectedEvent?.startDate)
                         .format('DD')
                         .toUpperCase()}
                     </Text>
@@ -262,11 +262,11 @@ const EventDetail = ({navigation, route}) => {
                 alignItems: 'flex-end',
               }}>
               <Text fontSize="xl" fontWeight="bold" color="white">
-                $17.60
+                FREE
               </Text>
-              <Text fontSize="lg" fontWeight="bold" color="white">
+              {/* <Text fontSize="lg" fontWeight="bold" color="white">
                 /person
-              </Text>
+              </Text> */}
             </View>
           </View>
           <TouchableOpacity>
@@ -286,13 +286,13 @@ const EventDetail = ({navigation, route}) => {
                   alignItems: 'center',
                 }}>
                 <Text color="white" fontSize="lg" fontWeight="bold">
-                  BUY A TICKET
+                  Register
                 </Text>
-                <Icon
+                {/* <Icon
                   color="white"
                   name="hexagon"
                   size={18}
-                  style={{marginLeft: 11}}></Icon>
+                  style={{marginLeft: 11}}></Icon> */}
               </View>
             </LinearGradient>
           </TouchableOpacity>
