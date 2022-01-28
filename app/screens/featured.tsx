@@ -4,11 +4,11 @@
 //[x] Build the header section
 //[x] Build the search section
 //[x] Build FEATURED section
-//[] Build FOR YOU section
+//[x] Build FOR YOU section
 
 import moment from 'moment';
 import {Avatar, Input, Text} from 'native-base';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   FlatList,
   ImageBackground,
@@ -20,9 +20,60 @@ import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import styled from 'styled-components/native';
 import {Icon} from '../components/icons';
 import {COLORS, dummyData, images, SIZES} from '../constants';
+import database from '@react-native-firebase/database';
+import {DataSnapshot, getStorageImgURL} from '../firebase';
+
+export interface Event {
+  id: string;
+  name: string;
+  description: string;
+  startDate: string;
+  duration: number;
+  location: string;
+  email: string;
+  image: string;
+  organization?: string;
+  tags?: string;
+  webLink?: string;
+}
+type Entries<T> = {
+  [K in keyof T]: [K, T[K]];
+}[keyof T][];
+
+function entries<T>(obj: T): Entries<T> {
+  return Object.entries(obj) as any;
+}
 
 const Featured = ({navigation}) => {
-  const _renderItem = ({item}, index) => {
+  const [events, setEvents] = useState<Event[]>();
+
+  useEffect(() => {
+    const fetchEvents = () => {
+      return database()
+        .ref('/current-events')
+        .on('value', async (snapshot: DataSnapshot) => {
+          const unresolved = entries(snapshot.val()).map(
+            async childSnapShot => {
+              const [key, value] = childSnapShot;
+
+              const imgURL = await getStorageImgURL(value.imgid);
+
+              return {
+                id: key,
+                image: imgURL,
+                ...value,
+              };
+            },
+          );
+          const resolved = await Promise.all(unresolved);
+
+          setEvents(resolved);
+        });
+    };
+    fetchEvents();
+  }, []);
+
+  const _renderItem = ({item}: any, index: number) => {
     return (
       <TouchableWithoutFeedback
         onPress={() => {
@@ -34,7 +85,7 @@ const Featured = ({navigation}) => {
             marginRight: index === dummyData.Events.length - 1 ? 30 : 0,
           }}>
           <ImageBackground
-            source={item.image}
+            source={{uri: item.image}}
             resizeMode="cover"
             borderRadius={SIZES.radius}
             style={{
@@ -50,10 +101,10 @@ const Featured = ({navigation}) => {
               }}>
               <DateBox>
                 <Text color={COLORS.black} opacity="0.5" letterSpacing={2}>
-                  {moment(item.startingTime).format('MMM').toUpperCase()}
+                  {moment(item.startDate).format('MMM').toUpperCase()}
                 </Text>
                 <Text fontSize="md" fontWeight="bold" color={COLORS.black}>
-                  {moment(item.startingTime).format('DD').toUpperCase()}
+                  {moment(item.startDate).format('DD').toUpperCase()}
                 </Text>
               </DateBox>
             </View>
@@ -64,10 +115,10 @@ const Featured = ({navigation}) => {
                 marginBottom: 25,
               }}>
               <Text color="white" fontSize="sm" opacity={0.5}>
-                {item.type}
+                {item.tags}
               </Text>
               <Text fontSize="lg" color="white" fontWeight={'bold'}>
-                {item.title}
+                {item.name}
               </Text>
             </View>
           </ImageBackground>
@@ -116,7 +167,7 @@ const Featured = ({navigation}) => {
           horizontal
           contentContainerStyle={{}}
           keyExtractor={item => 'event_' + item.id}
-          data={dummyData.Events}
+          data={events}
           showsHorizontalScrollIndicator={false}
           renderItem={_renderItem}></FlatList>
       </View>
@@ -154,7 +205,7 @@ const SectionTitle = styled.View`
 const DateBox = styled.View`
   width: 60px;
   height: 60px;
-  border-radius: 15;
+  border-radius: 15px;
   background-color: ${COLORS.white};
   justify-content: center;
   align-items: center;

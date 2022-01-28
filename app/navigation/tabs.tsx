@@ -82,10 +82,10 @@ const Tabs = ({params}) => {
         component={Schedule}
         options={{
           tabBarIcon: ({focused}) => (
-            <TabIcon focused={focused} icon={'calendar'} />
+            <TabIcon focused={focused} icon={'heart'} />
           ),
           tabBarLabel: ({focused}) => (
-            <TabLabel focused={focused} text="Schedule" />
+            <TabLabel focused={focused} text="Favorites" />
           ),
         }}
       />
@@ -109,7 +109,7 @@ const Tabs = ({params}) => {
             <TabIcon focused={focused} icon={'user'} />
           ),
           tabBarLabel: ({focused}) => (
-            <TabLabel focused={focused} text="Mine" />
+            <TabLabel focused={focused} text="Profile" />
           ),
         }}
       />
