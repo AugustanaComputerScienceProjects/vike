@@ -249,7 +249,7 @@ const EventDetail = ({navigation, route}) => {
             marginHorizontal: 30,
           }}>
           <View>
-            <Text
+            {/* <Text
               color="white"
               fontSize="lg"
               style={{opacity: 0.5, letterSpacing: 1}}>
@@ -264,12 +264,13 @@ const EventDetail = ({navigation, route}) => {
               <Text fontSize="xl" fontWeight="bold" color="white">
                 FREE
               </Text>
-              {/* <Text fontSize="lg" fontWeight="bold" color="white">
+              <Text fontSize="lg" fontWeight="bold" color="white">
                 /person
-              </Text> */}
-            </View>
+              </Text>
+            </View> */}
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('CameraScanner')}>
             <LinearGradient
               colors={COLORS.linear}
               style={{
@@ -286,8 +287,9 @@ const EventDetail = ({navigation, route}) => {
                   alignItems: 'center',
                 }}>
                 <Text color="white" fontSize="lg" fontWeight="bold">
-                  Register
+                  Check In
                 </Text>
+
                 {/* <Icon
                   color="white"
                   name="hexagon"
