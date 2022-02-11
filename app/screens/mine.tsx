@@ -1,11 +1,21 @@
 import {Text} from 'native-base';
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import auth from '@react-native-firebase/auth';
 
 const Mine = ({params}) => {
   return (
     <View style={styles.container}>
-      <Text>Mine</Text>
+      <TouchableOpacity
+        color={'#fff'}
+        onPress={() => {
+          auth()
+            .signOut()
+            .then(() => console.log('User signed out!'));
+        }}>
+        <Text color="#fff">Sign Out!</Text>
+      </TouchableOpacity>
     </View>
   );
 };
