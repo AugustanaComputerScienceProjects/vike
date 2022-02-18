@@ -15,6 +15,7 @@ import {
   SafeAreaView,
   StyleSheet,
   View,
+  Image,
 } from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import styled from 'styled-components/native';
@@ -46,6 +47,29 @@ function entries<T>(obj: T): Entries<T> {
 
 const Featured = ({navigation}) => {
   const [events, setEvents] = useState<Event[]>();
+
+  const [query, setQuery] = useState('');
+  const [searchData, setSearchData] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  // console.log(searchData);
+
+  const handleSearch = (text: string) => {
+    const formattedQuery = text.toLowerCase();
+    const filteredData = events?.filter(event => {
+      return event.name.toLowerCase().includes(formattedQuery);
+    });
+    setSearchData(filteredData);
+    setQuery(text);
+  };
+
+  // const contains = ({name}: Event, query: string) => {
+  //   console.log(name, query);
+  //   if (name.includes(query)) {
+  //     return true;
+  //   }
+
+  //   return false;
+  // };
 
   useEffect(() => {
     const fetchEvents = () => {
@@ -130,47 +154,87 @@ const Featured = ({navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header Section */}
-      <SectionHeader>
-        <View>
-          <Text color="white" opacity={0.5}>
-            DECEMBER 21 0:10PM
-          </Text>
-          <Text fontSize={'3xl'} fontWeight={'bold'} color="white">
-            Explore events
-          </Text>
-        </View>
-        <Avatar source={images.avatar} />
-      </SectionHeader>
+      {!isSearching && query === '' && (
+        <SectionHeader>
+          <View>
+            <Text color="white" opacity={0.5}>
+              DECEMBER 21 0:10PM
+            </Text>
+            <Text fontSize={'3xl'} fontWeight={'bold'} color="white">
+              Explore events
+            </Text>
+          </View>
+          <Avatar source={images.avatar} />
+        </SectionHeader>
+      )}
       {/* Search Section */}
       <SectionSearch>
         <SearchView>
-          <Icon color="white" size={18} name="search" />
+          {/* <Icon color="white" size={18} name="search" /> */}
           <Input
+            clearButtonMode="while-editing"
+            value={query}
+            onChangeText={queryText => handleSearch(queryText)}
             placeholder="Search"
             placeholderTextColor={COLORS.gray1}
             color={COLORS.white}
-            width={'85%'}
+            width={'100%'}
             variant="unstyled"
+            borderRadius="10"
+            py="1"
+            px="2"
+            fontSize="14"
+            onFocus={() => setIsSearching(true)}
+            onBlur={() => setIsSearching(false)}
+            returnKeyType="search"
+            borderWidth="0"
+            InputLeftElement={<Icon color="white" size={18} name="search" />}
           />
-          <Icon color="white" size={18} name="filter" />
+          {/* <Icon color="white" size={18} name="filter" /> */}
         </SearchView>
       </SectionSearch>
 
+      {query !== '' && (
+        <View>
+          <FlatList
+            data={searchData}
+            keyExtractor={item => item.id}
+            renderItem={({item}) => (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  navigation.navigate('EventDetail', {event: item});
+                }}>
+                <View style={styles.listItem}>
+                  <Image source={{uri: item.image}} style={styles.coverImage} />
+                  <View style={styles.metaInfo}>
+                    <Text style={styles.title}>{`${item.name}`}</Text>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            )}
+          />
+        </View>
+      )}
+
       {/* FEATURED */}
-      <SectionTitle>
-        <Text color="white" fontSize={'md'} fontWeight={'bold'}>
-          FEATURED
-        </Text>
-      </SectionTitle>
-      <View>
-        <FlatList
-          horizontal
-          contentContainerStyle={{}}
-          keyExtractor={item => 'event_' + item.id}
-          data={events}
-          showsHorizontalScrollIndicator={false}
-          renderItem={_renderItem}></FlatList>
-      </View>
+      {!isSearching && query === '' && (
+        <>
+          <SectionTitle>
+            <Text color="white" fontSize={'md'} fontWeight={'bold'}>
+              FEATURED
+            </Text>
+          </SectionTitle>
+          <View>
+            <FlatList
+              horizontal
+              contentContainerStyle={{}}
+              keyExtractor={item => 'event_' + item.id}
+              data={events}
+              showsHorizontalScrollIndicator={false}
+              renderItem={_renderItem}></FlatList>
+          </View>
+        </>
+      )}
     </SafeAreaView>
   );
 };
@@ -215,6 +279,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.black,
+  },
+  title: {
+    fontSize: 18,
+    width: 200,
+    padding: 10,
+    color: '#fff',
+  },
+  coverImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+  },
+  listItem: {
+    marginTop: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    // backgroundColor: '#fff',
+    flexDirection: 'row',
   },
 });
 

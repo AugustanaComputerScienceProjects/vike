@@ -6,7 +6,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "iphone11": "react-native run-ios --simulator=\"iPhone 11\"",
-    "iphone": "react-native run-ios --device \"Hung’s iPhone\"",
+    "iphone": "react-native run-ios --device",
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"

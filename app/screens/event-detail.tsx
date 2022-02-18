@@ -129,7 +129,13 @@ const EventDetail = ({navigation, route}) => {
                       style={{opacity: 0.5, letterSpacing: 2}}>
                       {selectedEvent?.tags}
                     </Text>
-                    <Text color="white" fontWeight={'bold'} fontSize={'2xl'}>
+                    <Text
+                      // numberOfLines={0}
+                      // style={{flex: 1, textAlign: 'left'}}
+                      style={styles.title}
+                      color="white"
+                      fontWeight={'bold'}
+                      fontSize={'2xl'}>
                       {selectedEvent?.name}
                     </Text>
 
@@ -350,6 +356,7 @@ const BottomBarSection = styled.View`
 `;
 
 const styles = StyleSheet.create({
+  // title: {flexWrap: 'wrap'},
   container: {
     flex: 1,
     backgroundColor: '#000',
