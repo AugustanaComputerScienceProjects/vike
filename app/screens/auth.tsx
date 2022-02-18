@@ -51,7 +51,6 @@ const Auth = ({params}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // height: '',
     backgroundColor: 'black',
     justifyContent: 'center',
     alignItems: 'center',

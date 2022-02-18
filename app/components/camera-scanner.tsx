@@ -1,11 +1,9 @@
 import {useToast} from 'native-base';
 import * as React from 'react';
 import {useRef} from 'react';
-
-import {StyleSheet, Text, View} from 'react-native';
-import {useCameraDevices} from 'react-native-vision-camera';
-import {Camera} from 'react-native-vision-camera';
-import {useScanBarcodes, BarcodeFormat} from 'vision-camera-code-scanner';
+import {StyleSheet, View} from 'react-native';
+import {Camera, useCameraDevices} from 'react-native-vision-camera';
+import {BarcodeFormat, useScanBarcodes} from 'vision-camera-code-scanner';
 import {currentEventsRef, currentUser, DataSnapshot} from '../firebase';
 
 function CameraScanner() {
@@ -88,7 +86,7 @@ function CameraScanner() {
   return (
     device != null &&
     hasPermission && (
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <View style={styles.container}>
         <Camera
           style={StyleSheet.absoluteFill}
           device={device}
@@ -96,17 +94,17 @@ function CameraScanner() {
           frameProcessor={frameProcessor}
           frameProcessorFps={5}
         />
-        {/* {barcodes.map((barcode, idx) => (
-          <Text key={idx} style={styles.barcodeTextURL}>
-            {barcode.displayValue}
-          </Text>
-        ))} */}
       </View>
     )
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   barcodeTextURL: {
     fontSize: 20,
     color: 'white',
