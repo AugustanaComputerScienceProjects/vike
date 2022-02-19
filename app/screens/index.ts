@@ -1,7 +1,7 @@
 import Featured from './featured';
 import EventDetail from './event-detail';
-import Schedule from './schedule';
+import Favorites from './favorites';
 import Tickets from './tickets';
 import Mine from './mine';
 
-export {Featured, EventDetail, Schedule, Tickets, Mine};
+export {Featured, EventDetail, Favorites, Tickets, Mine};
