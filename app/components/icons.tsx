@@ -2,9 +2,10 @@ import React from 'react';
 import {ImageStyle} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Icon as NBIcon, IIconProps} from 'native-base';
 
 // export const GithubIcon = () => <Icon name="github" fill="red" />
-export interface IconStyle {
+export interface IconStyle extends IIconProps {
   size?: number;
   style?: ImageStyle;
   fill?: string;
@@ -18,8 +19,15 @@ type IProps = {
   style?: any;
 };
 
-export const Icon = ({color, name, size, style}: IProps) => (
-  <Feather color={color} name={name} size={size} style={style} />
+export const Icon = (props: IconStyle) => (
+  <NBIcon
+    as={Feather}
+    {...props}
+    color={props.color}
+    name={props.name}
+    size={props.size}
+    style={props.style}
+  />
 );
 
 export const EmailIcon = (props: IconStyle) => (

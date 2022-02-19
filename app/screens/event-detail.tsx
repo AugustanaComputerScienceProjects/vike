@@ -1,19 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/self-closing-comp */
-/**
- * React Native Event Booking App UI - Event Detail Screnn
- * -> The screen can be seperated 4 sections and 1 fixed bottom bar
- *
- * TODO:
- * [x] Build the header image background section
- *    [x] Rendering the image background sub section (ImageBackground)
- *    [x] Rendering the header sub section
- *    [x] Rendering the footer sub section (LinearGradient)
- * [x] Build the buttons group section
- * [x] Build the description section
- * [x] Build the location section (google map in dark mode)
- * [x] Build the fixed bottom bar
- */
 
 import moment from 'moment';
 import {Text} from 'native-base';
