@@ -19,6 +19,7 @@ import styled from 'styled-components/native';
 import {Icon} from '../components/icons';
 import {COLORS, dummyData, SIZES} from '../constants';
 import {Event} from './featured';
+import FastImage from 'react-native-fast-image';
 
 const EventDetail = ({navigation, route}) => {
   const [selectedEvent, setSelectedEvent] = useState<Event>();
@@ -37,7 +38,7 @@ const EventDetail = ({navigation, route}) => {
           backgroundColor: COLORS.black,
         }}
         style={{width: '100%', backgroundColor: COLORS.black}}>
-        <ImageBackground
+        <FastImage
           resizeMode="cover"
           source={{uri: selectedEvent?.image}}
           style={{
@@ -161,7 +162,7 @@ const EventDetail = ({navigation, route}) => {
               </LinearGradient>
             </SectionImageFooter>
           </View>
-        </ImageBackground>
+        </FastImage>
 
         {/* Button Group Section */}
 

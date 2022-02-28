@@ -1,10 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/self-closing-comp */
-//TODO:
-//[x] Build the header section
-//[x] Build the search section
-//[x] Build FEATURED section
-//[x] Build FOR YOU section
 
 import database from '@react-native-firebase/database';
 import moment from 'moment';
@@ -30,6 +25,7 @@ import {COLORS, dummyData, SIZES} from '../constants';
 import {DataSnapshot, getStorageImgURL} from '../firebase';
 import Animated, {SlideInUp, FadeIn} from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
+import FastImage from 'react-native-fast-image';
 
 export interface Event {
   id: string;
@@ -109,7 +105,7 @@ const Featured = ({navigation}: IProps) => {
             marginLeft: index === 0 ? 30 : 20,
             marginRight: index === dummyData.Events.length - 1 ? 30 : 0,
           }}>
-          <ImageBackground
+          <FastImage
             source={{uri: item.image}}
             resizeMode="cover"
             borderRadius={SIZES.radius}
@@ -159,7 +155,7 @@ const Featured = ({navigation}: IProps) => {
                 </Text>
               </View>
             </LinearGradient>
-          </ImageBackground>
+          </FastImage>
         </View>
       </TouchableWithoutFeedback>
     );
@@ -238,7 +234,10 @@ const Featured = ({navigation}: IProps) => {
                   setQuery('');
                 }}>
                 <View style={styles.listItem}>
-                  <Image source={{uri: item.image}} style={styles.coverImage} />
+                  <FastImage
+                    source={{uri: item.image}}
+                    style={styles.coverImage}
+                  />
                   <View style={styles.metaInfo}>
                     <Text color="#ccc">{`${item.startDate} `}</Text>
                     <Text style={styles.title}>{`${item.name}`}</Text>
