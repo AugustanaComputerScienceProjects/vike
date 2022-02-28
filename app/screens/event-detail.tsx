@@ -1,19 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/self-closing-comp */
-/**
- * React Native Event Booking App UI - Event Detail Screnn
- * -> The screen can be seperated 4 sections and 1 fixed bottom bar
- *
- * TODO:
- * [x] Build the header image background section
- *    [x] Rendering the image background sub section (ImageBackground)
- *    [x] Rendering the header sub section
- *    [x] Rendering the footer sub section (LinearGradient)
- * [x] Build the buttons group section
- * [x] Build the description section
- * [x] Build the location section (google map in dark mode)
- * [x] Build the fixed bottom bar
- */
 
 import moment from 'moment';
 import {Text} from 'native-base';
@@ -33,6 +19,7 @@ import styled from 'styled-components/native';
 import {Icon} from '../components/icons';
 import {COLORS, dummyData, SIZES} from '../constants';
 import {Event} from './featured';
+import FastImage from 'react-native-fast-image';
 
 const EventDetail = ({navigation, route}) => {
   const [selectedEvent, setSelectedEvent] = useState<Event>();
@@ -51,7 +38,7 @@ const EventDetail = ({navigation, route}) => {
           backgroundColor: COLORS.black,
         }}
         style={{width: '100%', backgroundColor: COLORS.black}}>
-        <ImageBackground
+        <FastImage
           resizeMode="cover"
           source={{uri: selectedEvent?.image}}
           style={{
@@ -129,7 +116,13 @@ const EventDetail = ({navigation, route}) => {
                       style={{opacity: 0.5, letterSpacing: 2}}>
                       {selectedEvent?.tags}
                     </Text>
-                    <Text color="white" fontWeight={'bold'} fontSize={'2xl'}>
+                    <Text
+                      // numberOfLines={0}
+                      // style={{flex: 1, textAlign: 'left'}}
+                      style={styles.title}
+                      color="white"
+                      fontWeight={'bold'}
+                      fontSize={'2xl'}>
                       {selectedEvent?.name}
                     </Text>
 
@@ -169,7 +162,7 @@ const EventDetail = ({navigation, route}) => {
               </LinearGradient>
             </SectionImageFooter>
           </View>
-        </ImageBackground>
+        </FastImage>
 
         {/* Button Group Section */}
 
@@ -249,7 +242,7 @@ const EventDetail = ({navigation, route}) => {
             marginHorizontal: 30,
           }}>
           <View>
-            <Text
+            {/* <Text
               color="white"
               fontSize="lg"
               style={{opacity: 0.5, letterSpacing: 1}}>
@@ -264,12 +257,13 @@ const EventDetail = ({navigation, route}) => {
               <Text fontSize="xl" fontWeight="bold" color="white">
                 FREE
               </Text>
-              {/* <Text fontSize="lg" fontWeight="bold" color="white">
+              <Text fontSize="lg" fontWeight="bold" color="white">
                 /person
-              </Text> */}
-            </View>
+              </Text>
+            </View> */}
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('CameraScanner')}>
             <LinearGradient
               colors={COLORS.linear}
               style={{
@@ -286,8 +280,9 @@ const EventDetail = ({navigation, route}) => {
                   alignItems: 'center',
                 }}>
                 <Text color="white" fontSize="lg" fontWeight="bold">
-                  Register
+                  Check In
                 </Text>
+
                 {/* <Icon
                   color="white"
                   name="hexagon"
@@ -348,6 +343,7 @@ const BottomBarSection = styled.View`
 `;
 
 const styles = StyleSheet.create({
+  // title: {flexWrap: 'wrap'},
   container: {
     flex: 1,
     backgroundColor: '#000',

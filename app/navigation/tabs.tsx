@@ -1,7 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {Featured, Schedule, Tickets, Mine} from '../screens';
+import {Featured, Favorites, Tickets, Mine} from '../screens';
 import {Icon, Text} from 'native-base';
 import Feather from 'react-native-vector-icons/Feather';
 import {COLORS} from '../constants';
@@ -78,8 +78,8 @@ const Tabs = ({params}) => {
         }}
       />
       <Tab.Screen
-        name="Schedule"
-        component={Schedule}
+        name="Favorites"
+        component={Favorites}
         options={{
           tabBarIcon: ({focused}) => (
             <TabIcon focused={focused} icon={'heart'} />

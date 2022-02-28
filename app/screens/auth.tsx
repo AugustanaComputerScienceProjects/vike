@@ -34,7 +34,9 @@ const Auth = ({params}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={{color: '#fff', fontSize: 30}}>Auth</Text>
+      <Text style={{color: '#fff'}} fontSize="3xl">
+        Augustana Vike Life
+      </Text>
       <GoogleSigninButton
         style={{width: 192, height: 48}}
         size={GoogleSigninButton.Size.Wide}
