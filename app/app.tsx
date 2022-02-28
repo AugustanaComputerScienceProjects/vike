@@ -11,11 +11,14 @@
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import {
+  CardStyleInterpolators,
+  createStackNavigator,
+} from '@react-navigation/stack';
 import {NativeBaseProvider} from 'native-base';
 import React, {useEffect, useState} from 'react';
-import {StatusBar} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import CameraScanner from './components/camera-scanner';
 import Tabs from './navigation/tabs';
 import Auth from './screens/auth';
 import EventDetail from './screens/event-detail';
@@ -55,8 +58,21 @@ const App = () => {
             initialRouteName="Featured">
             {user ? (
               <>
-                <Stack.Screen name="Tabs" component={Tabs} />
-                <Stack.Screen name="EventDetail" component={EventDetail} />
+                <Stack.Group>
+                  <Stack.Screen name="Tabs" component={Tabs} />
+                  <Stack.Screen name="EventDetail" component={EventDetail} />
+                </Stack.Group>
+                <Stack.Group
+                  screenOptions={{
+                    presentation: 'modal',
+                    cardStyleInterpolator:
+                      CardStyleInterpolators.forVerticalIOS,
+                  }}>
+                  <Stack.Screen
+                    name="CameraScanner"
+                    component={CameraScanner}
+                  />
+                </Stack.Group>
               </>
             ) : (
               <>
