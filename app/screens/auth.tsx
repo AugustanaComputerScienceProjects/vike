@@ -8,7 +8,11 @@ import {
 import auth from '@react-native-firebase/auth';
 import {Text} from 'native-base';
 
-const Auth = ({params}) => {
+interface IProps {
+  params: any;
+}
+
+const Auth = ({params}: IProps) => {
   const signIn = async () => {
     try {
       // Get the users ID token

@@ -5,6 +5,7 @@ import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Avatar} from 'native-base';
+import {SIZES, COLORS} from '../constants';
 
 const getInitials = (fullName: string) => {
   const allNames = fullName.trim().split(' ');
@@ -39,13 +40,13 @@ const Mine = ({params}) => {
         </View>
 
         <TouchableOpacity
-          color={'#fff'}
+          color={COLORS.text}
           onPress={() => {
             auth()
               .signOut()
               .then(() => console.log('User signed out!'));
           }}>
-          <Text color="#fff" fontWeight={'bold'}>
+          <Text color={COLORS.text} fontWeight={'bold'}>
             Sign Out
           </Text>
         </TouchableOpacity>
@@ -57,7 +58,7 @@ const Mine = ({params}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: COLORS.background,
     flexGrow: 1,
     alignItems: 'center',
   },
@@ -78,8 +79,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'column',
     marginBottom: 100,
-
-    // backgroundColor: '#FFF',
   },
   sceneContainer: {
     marginTop: 10,
@@ -91,9 +90,7 @@ const styles = StyleSheet.create({
   socialRow: {
     flexDirection: 'row',
   },
-  tabBar: {
-    // backgroundColor: '#EEE',
-  },
+  tabBar: {},
   tabContainer: {
     flex: 1,
     marginBottom: 12,
@@ -104,7 +101,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   tabLabelText: {
-    color: 'black',
+    color: COLORS.text,
     fontSize: 22.5,
     fontWeight: '600',
     textAlign: 'center',
@@ -128,7 +125,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   userNameText: {
-    color: '#fff',
+    color: COLORS.text,
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',

@@ -2,7 +2,7 @@ import {Text} from 'native-base';
 import React from 'react';
 import {View, StyleSheet, SafeAreaView} from 'react-native';
 import styled from 'styled-components/native';
-import {SIZES} from '../constants';
+import {SIZES, COLORS} from '../constants';
 
 const Favorites = ({props}) => {
   return (
@@ -12,7 +12,7 @@ const Favorites = ({props}) => {
           {/* <Text color="white" opacity={0.5}>
               DECEMBER 21 0:10PM
             </Text> */}
-          <Text fontSize={'3xl'} fontWeight={'bold'} color="white">
+          <Text fontSize={'3xl'} fontWeight={'bold'} color={COLORS.text}>
             Favorites
           </Text>
         </View>
@@ -32,7 +32,7 @@ const SectionHeader = styled.View`
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: COLORS.background,
     // justifyContent: 'center',
     // alignItems: 'center',
   },

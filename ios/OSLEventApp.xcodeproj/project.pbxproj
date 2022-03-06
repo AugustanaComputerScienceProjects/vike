@@ -30,6 +30,7 @@
 		B78974C9BB9B451384F3548D /* BeVietnamPro-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 25D036507D4F4903948840E3 /* BeVietnamPro-Thin.ttf */; };
 		C89CD9B96F5A4A94A6F44908 /* BeVietnamPro-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B10B6858D3A34FEC87AA4863 /* BeVietnamPro-Light.ttf */; };
 		C932B21B276EB923007BE826 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C932B21A276EB923007BE826 /* GoogleService-Info.plist */; };
+		C9B4B2EA27D41ED900B078C4 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C9B4B2E927D41ED900B078C4 /* BootSplash.storyboard */; };
 		D751E3426A7E4491B479C997 /* BeVietnamPro-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C41F7558D3744455A091268F /* BeVietnamPro-ThinItalic.ttf */; };
 		DBADDE65EDE440EDB76D0D65 /* BeVietnamPro-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9C27A71BF2054D419D73C376 /* BeVietnamPro-BoldItalic.ttf */; };
 		E7BCF55C5A0846F9894CC620 /* BeVietnamPro-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CCADD0F19E4643E9AC9E7651 /* BeVietnamPro-SemiBoldItalic.ttf */; };
@@ -76,6 +77,7 @@
 		C932B21A276EB923007BE826 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C96B267E276EA7970003C3BE /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialCommunityIcons.ttf; sourceTree = "<group>"; };
 		C96B267F276EA7970003C3BE /* Feather.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Feather.ttf; sourceTree = "<group>"; };
+		C9B4B2E927D41ED900B078C4 /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = OSLEventApp/BootSplash.storyboard; sourceTree = "<group>"; };
 		CCADD0F19E4643E9AC9E7651 /* BeVietnamPro-SemiBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "BeVietnamPro-SemiBoldItalic.ttf"; path = "../assets/fonts/BeVietnamPro-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
 		D00AAFFCFCFDA5787532823F /* Pods-OSLEventApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OSLEventApp.release.xcconfig"; path = "Target Support Files/Pods-OSLEventApp/Pods-OSLEventApp.release.xcconfig"; sourceTree = "<group>"; };
 		DD66E541FC3F47EF8FCB5FEE /* BeVietnamPro-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "BeVietnamPro-ExtraBold.ttf"; path = "../assets/fonts/BeVietnamPro-ExtraBold.ttf"; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 			children = (
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
+				C9B4B2E927D41ED900B078C4 /* BootSplash.storyboard */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
@@ -321,6 +324,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				C9B4B2EA27D41ED900B078C4 /* BootSplash.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				92B147DE6238492DA8DDAE52 /* BeVietnamPro-Black.ttf in Resources */,
 				702F6886ED33431B81BB1375 /* BeVietnamPro-BlackItalic.ttf in Resources */,
@@ -592,6 +596,7 @@
 			baseConfigurationReference = C0A881CF5CF3F2B244570E2A /* Pods-OSLEventApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7A2WQNQZNP;
@@ -619,6 +624,7 @@
 			baseConfigurationReference = D00AAFFCFCFDA5787532823F /* Pods-OSLEventApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7A2WQNQZNP;
