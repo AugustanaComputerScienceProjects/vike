@@ -1,13 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
-
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {NavigationContainer} from '@react-navigation/native';
@@ -19,6 +9,7 @@ import {NativeBaseProvider} from 'native-base';
 import React, {useEffect, useState} from 'react';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import CameraScanner from './components/camera-scanner';
+import SplashScreen from './components/splash-screen';
 import Tabs from './navigation/tabs';
 import Auth from './screens/auth';
 import EventDetail from './screens/event-detail';
@@ -81,28 +72,10 @@ const App = () => {
             )}
           </Stack.Navigator>
         </NativeBaseProvider>
+        <SplashScreen />
       </NavigationContainer>
     </SafeAreaProvider>
   );
 };
-
-// const styles = StyleSheet.create({
-//   sectionContainer: {
-//     marginTop: 32,
-//     paddingHorizontal: 24,
-//   },
-//   sectionTitle: {
-//     fontSize: 24,
-//     fontWeight: '600',
-//   },
-//   sectionDescription: {
-//     marginTop: 8,
-//     fontSize: 18,
-//     fontWeight: '400',
-//   },
-//   highlight: {
-//     fontWeight: '700',
-//   },
-// });
 
 export default App;

@@ -5,27 +5,18 @@ import database from '@react-native-firebase/database';
 import moment from 'moment';
 import {Input, Text} from 'native-base';
 import React, {useEffect, useState} from 'react';
-import {
-  FlatList,
-  Image,
-  ImageBackground,
-  Keyboard,
-  SafeAreaView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import {FlatList, Keyboard, SafeAreaView, StyleSheet, View} from 'react-native';
+import FastImage from 'react-native-fast-image';
 import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
-import {StackScreenProps} from '@react-navigation/stack';
+import LinearGradient from 'react-native-linear-gradient';
+import Animated, {FadeIn} from 'react-native-reanimated';
 import styled from 'styled-components/native';
 import {Icon} from '../components/icons';
-import {COLORS, dummyData, SIZES} from '../constants';
+import {COLORS, dummyData, metrics, SIZES} from '../constants';
 import {DataSnapshot, getStorageImgURL} from '../firebase';
-import Animated, {SlideInUp, FadeIn} from 'react-native-reanimated';
-import LinearGradient from 'react-native-linear-gradient';
-import FastImage from 'react-native-fast-image';
 
 export interface Event {
   id: string;
@@ -51,7 +42,7 @@ interface IProps {
   navigation: any;
 }
 
-const Featured = ({navigation}: IProps) => {
+const Home = ({navigation}: IProps) => {
   const [events, setEvents] = useState<Event[]>();
 
   const [query, setQuery] = useState('');
@@ -108,10 +99,10 @@ const Featured = ({navigation}: IProps) => {
           <FastImage
             source={{uri: item.image}}
             resizeMode="cover"
-            borderRadius={SIZES.radius}
             style={{
+              borderRadius: 25,
               width: SIZES.width / 2 + 70,
-              height: SIZES.width / 2 + 70,
+              height: SIZES.width / 2 + 100,
               justifyContent: 'space-between',
             }}>
             <View
@@ -121,10 +112,10 @@ const Featured = ({navigation}: IProps) => {
                 marginVertical: 15,
               }}>
               <DateBox>
-                <Text color={COLORS.black} opacity="0.5" letterSpacing={2}>
+                <Text color={COLORS.text} opacity="0.5" letterSpacing={2}>
                   {moment(item.startDate).format('MMM').toUpperCase()}
                 </Text>
-                <Text fontSize="md" fontWeight="bold" color={COLORS.black}>
+                <Text fontSize="md" fontWeight="bold" color={COLORS.text}>
                   {moment(item.startDate).format('DD').toUpperCase()}
                 </Text>
               </DateBox>
@@ -144,13 +135,13 @@ const Featured = ({navigation}: IProps) => {
               }}>
               <View
                 style={{
-                  marginLeft: 20,
+                  marginLeft: 10,
                   marginBottom: 25,
                 }}>
-                <Text color="white" fontSize="sm" opacity={0.5}>
+                <Text color={COLORS.white} fontSize="sm" opacity={0.7}>
                   {item.tags}
                 </Text>
-                <Text fontSize="lg" color="white" fontWeight={'bold'}>
+                <Text fontSize="lg" color={COLORS.white} fontWeight={'bold'}>
                   {item.name}
                 </Text>
               </View>
@@ -163,15 +154,16 @@ const Featured = ({navigation}: IProps) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* <ScrollView showsVerticalScrollIndicator={false}> */}
       {/* Header Section */}
       {!isSearching && query === '' && (
         <Animated.View entering={FadeIn.duration(500)}>
           <SectionHeader>
             <View>
-              {/* <Text color="white" opacity={0.5}>
+              {/* <Text color={COLORS.text} opacity={0.5}>
               DECEMBER 21 0:10PM
             </Text> */}
-              <Text fontSize={'3xl'} fontWeight={'bold'} color="white">
+              <Text fontSize={'3xl'} fontWeight={'bold'} color={COLORS.text}>
                 Explore events
               </Text>
             </View>
@@ -182,15 +174,18 @@ const Featured = ({navigation}: IProps) => {
       {/* Search Section */}
       <SectionSearch>
         <SearchView>
-          {/* <Icon color="white" size={18} name="search" /> */}
+          {/* <Icon color={COLORS.text} size={18} name="search" /> */}
           <Input
+            // style={{
+            //   backgroundColor: COLORS.gray5,
+            // }}
             clearButtonMode="while-editing"
             value={query}
             onChangeText={queryText => handleSearch(queryText)}
             placeholder="Search"
             placeholderTextColor={COLORS.gray1}
-            backgroundColor={COLORS.input}
-            color={COLORS.white}
+            backgroundColor={COLORS.gray5}
+            color={COLORS.input}
             width={!isSearching ? '100%' : '85%'}
             variant="unstyled"
             borderRadius="10"
@@ -201,9 +196,8 @@ const Featured = ({navigation}: IProps) => {
             onFocus={() => setIsSearching(true)}
             onBlur={() => setIsSearching(false)}
             returnKeyType="search"
-            borderWidth="0"
             InputLeftElement={
-              <Icon ml={4} color="white" size={18} name="search" />
+              <Icon ml={4} color={COLORS.text} size={18} name="search" />
             }
           />
           {isSearching && (
@@ -213,16 +207,17 @@ const Featured = ({navigation}: IProps) => {
                 setIsSearching(false);
                 setQuery('');
               }}>
-              <Text color="#fff">Cancel</Text>
+              <Text color={COLORS.text}>Cancel</Text>
             </TouchableOpacity>
           )}
-          {/* <Icon color="white" size={18} name="filter" /> */}
+          {/* <Icon color={COLORS.text} size={18} name="filter" /> */}
         </SearchView>
       </SectionSearch>
 
       {query !== '' && (
         <View>
           <FlatList
+            scrollEnabled={false}
             data={searchData}
             keyExtractor={item => item.id}
             renderItem={({item}: {item: Event}) => (
@@ -239,9 +234,9 @@ const Featured = ({navigation}: IProps) => {
                     style={styles.coverImage}
                   />
                   <View style={styles.metaInfo}>
-                    <Text color="#ccc">{`${item.startDate} `}</Text>
+                    <Text color={COLORS.text}>{`${item.startDate} `}</Text>
                     <Text style={styles.title}>{`${item.name}`}</Text>
-                    <Text color="#ccc">{`${item.location} `}</Text>
+                    <Text color={COLORS.text}>{`${item.location} `}</Text>
                   </View>
                 </View>
               </TouchableWithoutFeedback>
@@ -254,7 +249,7 @@ const Featured = ({navigation}: IProps) => {
       {!isSearching && query === '' && (
         <Animated.View entering={FadeIn.duration(300)}>
           <SectionTitle>
-            <Text color="white" fontSize={'md'} fontWeight={'bold'}>
+            <Text color={COLORS.text} fontSize={'md'} fontWeight={'bold'}>
               FEATURED
             </Text>
           </SectionTitle>
@@ -267,8 +262,43 @@ const Featured = ({navigation}: IProps) => {
               showsHorizontalScrollIndicator={false}
               renderItem={_renderItem}></FlatList>
           </View>
+          <View
+            style={{
+              // flex: 1,
+              // width: '100%',
+              marginTop: metrics.extraLargeSize * 1.5,
+              marginBottom: metrics.extraLargeSize * 4,
+            }}>
+            <FlatList
+              scrollEnabled={false}
+              data={events}
+              keyExtractor={item => item.id}
+              renderItem={({item}: {item: Event}) => (
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    navigation.navigate('EventDetail', {event: item});
+                    Keyboard.dismiss();
+                    setIsSearching(false);
+                    setQuery('');
+                  }}>
+                  <View style={styles.listItem}>
+                    <FastImage
+                      source={{uri: item.image}}
+                      style={styles.coverImage}
+                    />
+                    <View style={styles.metaInfo}>
+                      <Text color={COLORS.text}>{`${item.startDate} `}</Text>
+                      <Text style={styles.title}>{`${item.name}`}</Text>
+                      <Text color={COLORS.text}>{`${item.location} `}</Text>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              )}
+            />
+          </View>
         </Animated.View>
       )}
+      {/* </ScrollView> */}
     </SafeAreaView>
   );
 };
@@ -310,7 +340,9 @@ const DateBox = styled.View`
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.black,
+    backgroundColor: COLORS.background,
+    width: '100%',
+    height: '100%',
   },
   metaInfo: {
     paddingLeft: 10,
@@ -318,7 +350,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: COLORS.text,
   },
   coverImage: {
     width: 100,
@@ -334,4 +366,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Featured;
+export default Home;

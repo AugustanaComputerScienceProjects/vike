@@ -2,7 +2,7 @@
 /* eslint-disable react/self-closing-comp */
 
 import moment from 'moment';
-import {Text} from 'native-base';
+import {IconButton, Text} from 'native-base';
 import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
@@ -18,10 +18,16 @@ import MapView from 'react-native-maps';
 import styled from 'styled-components/native';
 import {Icon} from '../components/icons';
 import {COLORS, dummyData, SIZES} from '../constants';
-import {Event} from './featured';
+import {Event} from './home';
 import FastImage from 'react-native-fast-image';
+import Share from 'react-native-share';
 
-const EventDetail = ({navigation, route}) => {
+interface IProps {
+  params: any;
+  route: any;
+}
+
+const EventDetail = ({navigation, route}: IProps) => {
   const [selectedEvent, setSelectedEvent] = useState<Event>();
 
   useEffect(() => {
@@ -29,15 +35,29 @@ const EventDetail = ({navigation, route}) => {
     setSelectedEvent(event);
   }, [route.params]);
 
+  const onShare = async () => {
+    console.log('share');
+    try {
+      const result = await Share.open({
+        title: selectedEvent?.name,
+        // message:
+        //   'Please install this app and stay safe , AppLink :https://play.google.com/store/apps/details?id=nic.goi.aarogyasetu&hl=en',
+        url: 'https://play.google.com/store/apps/details?id=nic.goi.aarogyasetu&hl=en',
+      });
+      console.log(result.message);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   return selectedEvent ? (
     <View style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           flexGrow: 1,
-          backgroundColor: COLORS.black,
         }}
-        style={{width: '100%', backgroundColor: COLORS.black}}>
+        style={{width: '100%'}}>
         <FastImage
           resizeMode="cover"
           source={{uri: selectedEvent?.image}}
@@ -60,7 +80,7 @@ const EventDetail = ({navigation, route}) => {
                   alignItems: 'center',
                   borderRadius: 10,
                 }}>
-                <Icon name="arrow-left" size={18} color="white"></Icon>
+                <Icon name="arrow-left" size={18} color={COLORS.white}></Icon>
               </TouchableOpacity>
 
               <View
@@ -77,21 +97,25 @@ const EventDetail = ({navigation, route}) => {
                   <Icon
                     name="heart"
                     size={18}
-                    color="white"
+                    color={COLORS.white}
                     style={{
                       marginLeft: 16,
                       // tinyColor: COLORS.white,
                     }}></Icon>
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={async () => {
+                    await onShare();
+                  }}>
                   <Icon
                     name="share"
                     size={18}
-                    color="white"
+                    color={COLORS.white}
                     style={{
                       marginRight: 16,
                       // tinyColor: COLORS.white,
-                    }}></Icon>
+                    }}
+                  />
                 </TouchableOpacity>
               </View>
             </SectionImageHeader>
@@ -105,13 +129,13 @@ const EventDetail = ({navigation, route}) => {
                 // end={{x: 0, y: 1}}
                 style={{
                   width: '100%',
-                  height: 300,
+                  height: 200,
                   justifyContent: 'flex-end',
                 }}>
                 <FooterContentView>
                   <View>
                     <Text
-                      color="white"
+                      color={COLORS.white}
                       fontSize={'md'}
                       style={{opacity: 0.5, letterSpacing: 2}}>
                       {selectedEvent?.tags}
@@ -120,14 +144,14 @@ const EventDetail = ({navigation, route}) => {
                       // numberOfLines={0}
                       // style={{flex: 1, textAlign: 'left'}}
                       style={styles.title}
-                      color="white"
+                      color={COLORS.white}
                       fontWeight={'bold'}
                       fontSize={'2xl'}>
                       {selectedEvent?.name}
                     </Text>
 
                     <Text
-                      color="white"
+                      color={COLORS.white}
                       fontSize={'md'}
                       style={{opacity: 0.5, letterSpacing: 2}}>
                       STARTING{' '}
@@ -135,6 +159,8 @@ const EventDetail = ({navigation, route}) => {
                     </Text>
                   </View>
                   <LinearGradient
+                    start={{x: 0, y: 0}}
+                    end={{x: 1, y: 0}}
                     colors={COLORS.linear}
                     style={{
                       width: 60,
@@ -143,13 +169,13 @@ const EventDetail = ({navigation, route}) => {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    <Text color="white" style={{letterSpacing: 1}}>
+                    <Text color={COLORS.white} style={{letterSpacing: 1}}>
                       {moment(selectedEvent?.startDate)
                         .format('MMM')
                         .toUpperCase()}
                     </Text>
                     <Text
-                      color="white"
+                      color={COLORS.white}
                       fontSize="md"
                       fontWeight="bold"
                       style={{letterSpacing: 1}}>
@@ -187,13 +213,13 @@ const EventDetail = ({navigation, route}) => {
               width: 124,
               height: 32,
               borderRadius: 10,
-              backgroundColor: COLORS.input,
+              backgroundColor: COLORS.white,
               justifyContent: 'center',
               alignItems: 'center',
             }}>
             <Text
               fontSize={'sm'}
-              color="white"
+              color={COLORS.text}
               style={{opacity: 0.5, letterSpacing: 1}}>
               PARTICIPANTS
             </Text>
@@ -203,15 +229,15 @@ const EventDetail = ({navigation, route}) => {
         {/* Description */}
 
         <DescriptionSection>
-          <Text color="white" fontSize={'sm'}>
+          <Text color={COLORS.text} fontSize={'sm'}>
             {selectedEvent?.description}
           </Text>
         </DescriptionSection>
 
-        {/* Loction Section */}
+        {/* Location Section */}
 
         <LocationSection>
-          <Text color="white" fontSize={'xl'} fontWeight="bold">
+          <Text color={COLORS.text} fontSize={'xl'} fontWeight="bold">
             LOCATION
           </Text>
           <View style={{height: 250}}>
@@ -233,7 +259,12 @@ const EventDetail = ({navigation, route}) => {
         {/* <Text>This is a ScrollView example FOOTER.</Text> */}
       </ScrollView>
 
-      <BottomBarSection>
+      <BottomBarSection
+        style={{
+          shadowColor: '#000',
+          shadowOffset: {width: 1, height: 3},
+          shadowOpacity: 0.2,
+        }}>
         <View
           style={{
             flexDirection: 'row',
@@ -241,30 +272,12 @@ const EventDetail = ({navigation, route}) => {
             alignItems: 'center',
             marginHorizontal: 30,
           }}>
-          <View>
-            {/* <Text
-              color="white"
-              fontSize="lg"
-              style={{opacity: 0.5, letterSpacing: 1}}>
-              PRICE
-            </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                alignItems: 'flex-end',
-              }}>
-              <Text fontSize="xl" fontWeight="bold" color="white">
-                FREE
-              </Text>
-              <Text fontSize="lg" fontWeight="bold" color="white">
-                /person
-              </Text>
-            </View> */}
-          </View>
+          <View></View>
           <TouchableOpacity
             onPress={() => navigation.navigate('CameraScanner')}>
             <LinearGradient
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 0}}
               colors={COLORS.linear}
               style={{
                 width: 173,
@@ -279,15 +292,9 @@ const EventDetail = ({navigation, route}) => {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                <Text color="white" fontSize="lg" fontWeight="bold">
+                <Text color={COLORS.white} fontSize="lg" fontWeight="bold">
                   Check In
                 </Text>
-
-                {/* <Icon
-                  color="white"
-                  name="hexagon"
-                  size={18}
-                  style={{marginLeft: 11}}></Icon> */}
               </View>
             </LinearGradient>
           </TouchableOpacity>
@@ -316,6 +323,7 @@ const FooterContentView = styled.View`
   justify-content: space-between;
   flex-direction: row;
   align-items: center;
+  padding-bottom: 20px;
   margin: 0px 30px;
 `;
 
@@ -333,10 +341,10 @@ const LocationSection = styled.View`
 `;
 
 const BottomBarSection = styled.View`
-  height: 130px;
+  height: 111px;
   width: ${SIZES.width};
   border-radius: ${SIZES.radius + 'px'};
-  background-color: ${COLORS.tabBar};
+  background-color: ${COLORS.white};
   position: absolute;
   bottom: 0px;
   justify-content: center;
@@ -346,7 +354,7 @@ const styles = StyleSheet.create({
   // title: {flexWrap: 'wrap'},
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: COLORS.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
