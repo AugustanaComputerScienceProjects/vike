@@ -10,7 +10,7 @@ import React, {useEffect, useState} from 'react';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import CameraScanner from './components/camera-scanner';
 import SplashScreen from './components/splash-screen';
-import Tabs from './navigation/tabs';
+import Root from './navigation/tabs';
 import Auth from './screens/auth';
 import EventDetail from './screens/event-detail';
 import theme from './theme';
@@ -50,7 +50,7 @@ const App = () => {
             {user ? (
               <>
                 <Stack.Group>
-                  <Stack.Screen name="Tabs" component={Tabs} />
+                  <Stack.Screen name="Root" component={Root} />
                   <Stack.Screen name="EventDetail" component={EventDetail} />
                 </Stack.Group>
                 <Stack.Group
