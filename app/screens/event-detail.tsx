@@ -2,25 +2,24 @@
 /* eslint-disable react/self-closing-comp */
 
 import moment from 'moment';
-import {IconButton, Text} from 'native-base';
+import {Text} from 'native-base';
 import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
-  ImageBackground,
   Platform,
   ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import LinearGradient from 'react-native-linear-gradient';
 import MapView from 'react-native-maps';
 import styled from 'styled-components/native';
+import EventShare from '../components/event-detail/event-share';
 import {Icon} from '../components/icons';
 import {COLORS, dummyData, SIZES} from '../constants';
 import {Event} from './home';
-import FastImage from 'react-native-fast-image';
-import Share from 'react-native-share';
 
 interface IProps {
   params: any;
@@ -34,21 +33,6 @@ const EventDetail = ({navigation, route}: IProps) => {
     let {event} = route.params;
     setSelectedEvent(event);
   }, [route.params]);
-
-  const onShare = async () => {
-    console.log('share');
-    try {
-      const result = await Share.open({
-        title: selectedEvent?.name,
-        // message:
-        //   'Please install this app and stay safe , AppLink :https://play.google.com/store/apps/details?id=nic.goi.aarogyasetu&hl=en',
-        url: 'https://play.google.com/store/apps/details?id=nic.goi.aarogyasetu&hl=en',
-      });
-      console.log(result.message);
-    } catch (error) {
-      alert(error.message);
-    }
-  };
 
   return selectedEvent ? (
     <View style={styles.container}>
@@ -103,20 +87,7 @@ const EventDetail = ({navigation, route}: IProps) => {
                       // tinyColor: COLORS.white,
                     }}></Icon>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={async () => {
-                    await onShare();
-                  }}>
-                  <Icon
-                    name="share"
-                    size={18}
-                    color={COLORS.white}
-                    style={{
-                      marginRight: 16,
-                      // tinyColor: COLORS.white,
-                    }}
-                  />
-                </TouchableOpacity>
+                <EventShare event={selectedEvent} />
               </View>
             </SectionImageHeader>
 
@@ -193,7 +164,7 @@ const EventDetail = ({navigation, route}: IProps) => {
         {/* Button Group Section */}
 
         <ButtonSection>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{
               width: 76,
               height: 32,
@@ -223,7 +194,10 @@ const EventDetail = ({navigation, route}: IProps) => {
               style={{opacity: 0.5, letterSpacing: 1}}>
               PARTICIPANTS
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <Text color={COLORS.text} fontSize={'xl'} fontWeight="bold">
+            About
+          </Text>
         </ButtonSection>
 
         {/* Description */}
@@ -238,7 +212,10 @@ const EventDetail = ({navigation, route}: IProps) => {
 
         <LocationSection>
           <Text color={COLORS.text} fontSize={'xl'} fontWeight="bold">
-            LOCATION
+            Location
+          </Text>
+          <Text color={COLORS.text} fontSize={'sm'}>
+            {selectedEvent?.location}
           </Text>
           <View style={{height: 250}}>
             <MapView
@@ -265,40 +242,43 @@ const EventDetail = ({navigation, route}: IProps) => {
           shadowOffset: {width: 1, height: 3},
           shadowOpacity: 0.2,
         }}>
-        <View
+        {/* <View
           style={{
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             alignItems: 'center',
             marginHorizontal: 30,
-          }}>
-          <View></View>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('CameraScanner')}>
-            <LinearGradient
-              start={{x: 0, y: 0}}
-              end={{x: 1, y: 0}}
-              colors={COLORS.linear}
-              style={{
-                width: 173,
-                height: 53,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 15,
-              }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Text color={COLORS.white} fontSize="lg" fontWeight="bold">
-                  Check In
-                </Text>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
+          }}> */}
+        {/* <View></View> */}
+        <TouchableOpacity
+          style={{marginHorizontal: 30}}
+          onPress={() => navigation.navigate('CameraScanner')}>
+          <LinearGradient
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 0}}
+            colors={COLORS.linear}
+            style={{
+              // width: 173,
+              height: 53,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 15,
+            }}>
+            <View
+              style={
+                {
+                  // flexDirection: 'row',
+                  // justifyContent: 'center',
+                  // alignItems: 'center',
+                }
+              }>
+              <Text color={COLORS.white} fontSize="lg" fontWeight="bold">
+                Check In
+              </Text>
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
+        {/* </View> */}
       </BottomBarSection>
     </View>
   ) : (
@@ -342,9 +322,9 @@ const LocationSection = styled.View`
 
 const BottomBarSection = styled.View`
   height: 111px;
-  width: ${SIZES.width};
+  width: ${SIZES.width + 'px'};
   border-radius: ${SIZES.radius + 'px'};
-  background-color: ${COLORS.white};
+  background-color: 'transparent';
   position: absolute;
   bottom: 0px;
   justify-content: center;
