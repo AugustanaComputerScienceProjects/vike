@@ -1,14 +1,34 @@
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createStackNavigator} from '@react-navigation/stack';
+import {Icon, Text} from 'native-base';
 import React from 'react';
 import {View} from 'react-native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {Home, Favorites, Tickets, Mine} from '../screens';
-import {Icon, Text} from 'native-base';
+import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
+import {Icon as IconComponent} from '../components/icons';
 import {COLORS} from '../constants';
+import {Home, Profile} from '../screens';
+import About from '../screens/profile/about';
+import Feedback from '../screens/profile/feedback';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
-const TabIcon = ({focused, icon}) => {
+interface TabIconProps {
+  focused: boolean;
+  icon: string;
+}
+
+interface TabLabelProps {
+  focused: boolean;
+  text: string;
+}
+
+interface RootProps {
+  navigation: any;
+}
+
+const TabIcon = ({focused, icon}: TabIconProps) => {
   return (
     <View style={{alignItems: 'center', justifyContent: 'center'}}>
       <Icon
@@ -23,7 +43,7 @@ const TabIcon = ({focused, icon}) => {
     </View>
   );
 };
-const TabLabel = ({focused, text}) => {
+const TabLabel = ({focused, text}: TabLabelProps) => {
   return focused ? (
     <Text
       color={COLORS.text}
@@ -39,7 +59,7 @@ const TabLabel = ({focused, text}) => {
   );
 };
 
-const Tabs = ({params}) => {
+const Tabs = () => {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -70,7 +90,7 @@ const Tabs = ({params}) => {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Favorites"
         component={Favorites}
         options={{
@@ -81,7 +101,7 @@ const Tabs = ({params}) => {
             <TabLabel focused={focused} text="Favorites" />
           ),
         }}
-      />
+      /> */}
       {/* <Tab.Screen
         name="Tickets"
         component={Tickets}
@@ -95,8 +115,8 @@ const Tabs = ({params}) => {
         }}
       /> */}
       <Tab.Screen
-        name="Mine"
-        component={Mine}
+        name="Profile"
+        component={Profile}
         options={{
           tabBarIcon: ({focused}) => (
             <TabIcon focused={focused} icon={'user'} />
@@ -110,4 +130,36 @@ const Tabs = ({params}) => {
   );
 };
 
-export default Tabs;
+const Root = ({navigation}: RootProps) => (
+  <Stack.Navigator
+    initialRouteName="Profile"
+    screenOptions={{
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+      headerLeft: () => (
+        <TouchableWithoutFeedback
+          onPress={() => navigation.goBack()}
+          style={{marginLeft: 10}}>
+          <IconComponent
+            color={COLORS.text}
+            size={19}
+            name="chevron-left"
+            style={{marginLeft: 'auto'}}
+          />
+        </TouchableWithoutFeedback>
+      ),
+    }}>
+    <Stack.Screen
+      name="Tabs"
+      component={Tabs}
+      options={{
+        headerShown: false,
+      }}
+    />
+    <Stack.Screen name="About" component={About} />
+    <Stack.Screen name="Feedback" component={Feedback} />
+  </Stack.Navigator>
+);
+
+export default Root;
