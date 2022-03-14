@@ -20,7 +20,7 @@ export const COLORS = {
   background: '#F9F9FB',
   transparentWhite: 'rgba(255, 255, 255, 0.2)',
   transparentBlack: 'rgba(0, 0, 0, 0.4)',
-  linear: ['#8ECAE6', '#FB8500'],
+  linear: ['#8ECAE6', '#023047'],
 };
 export const SIZES = {
   // global sizes

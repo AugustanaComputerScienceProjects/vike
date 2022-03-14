@@ -56,8 +56,6 @@ const App = () => {
                 <Stack.Group
                   screenOptions={{
                     presentation: 'modal',
-                    cardStyleInterpolator:
-                      CardStyleInterpolators.forVerticalIOS,
                   }}>
                   <Stack.Screen
                     name="CameraScanner"

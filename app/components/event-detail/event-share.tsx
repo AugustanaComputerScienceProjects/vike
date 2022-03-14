@@ -109,15 +109,17 @@ const EventShare = ({event}: IProps) => {
     }
   };
   return (
-    <TouchableOpacity onPress={onSharePress}>
-      <Icon
-        name="share"
-        size={18}
-        color={COLORS.white}
-        style={{
-          marginRight: 16,
-        }}
-      />
+    <TouchableOpacity
+      style={{
+        width: 40,
+        height: 40,
+        backgroundColor: COLORS.white,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 100,
+      }}
+      onPress={onSharePress}>
+      <Icon name="share" size={18} color={COLORS.black} style={{}} />
     </TouchableOpacity>
   );
 };
