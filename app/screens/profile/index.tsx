@@ -41,18 +41,18 @@ const Profile = () => {
     //   subTitle: null,
     //   onPress: () => {},
     // },
-    {
-      title: 'Terms of Service',
-      icon: 'file-text',
-      subTitle: null,
-      onPress: () => {},
-    },
-    {
-      title: 'Privacy Policy',
-      icon: 'file-text',
-      subTitle: null,
-      onPress: () => {},
-    },
+    // {
+    //   title: 'Terms of Service',
+    //   icon: 'file-text',
+    //   subTitle: null,
+    //   onPress: () => {},
+    // },
+    // {
+    //   title: 'Privacy Policy',
+    //   icon: 'file-text',
+    //   subTitle: null,
+    //   onPress: () => {},
+    // },
   ];
   return (
     <SafeAreaView style={styles.container}>

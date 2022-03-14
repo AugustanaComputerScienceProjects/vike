@@ -5,6 +5,7 @@ import React from 'react';
 import {View} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
+import CameraScanner from '../components/camera-scanner';
 import {Icon as IconComponent} from '../components/icons';
 import {COLORS} from '../constants';
 import {Home, Profile} from '../screens';
@@ -27,6 +28,8 @@ interface TabLabelProps {
 interface RootProps {
   navigation: any;
 }
+
+const PlaceholderComponent = () => <View />;
 
 const TabIcon = ({focused, icon}: TabIconProps) => {
   return (
@@ -90,6 +93,21 @@ const Tabs = () => {
           ),
         }}
       />
+      <Tab.Screen
+        name="Camera"
+        component={PlaceholderComponent}
+        listeners={({navigation}) => ({
+          tabPress: e => {
+            e.preventDefault();
+            navigation.navigate('CameraScanner');
+          },
+        })}
+        options={{
+          tabBarIcon: ({focused}) => (
+            <TabIcon focused={focused} icon={'camera'} />
+          ),
+        }}
+      />
       {/* <Tab.Screen
         name="Favorites"
         component={Favorites}
@@ -143,9 +161,9 @@ const Root = ({navigation}: RootProps) => (
           style={{marginLeft: 10}}>
           <IconComponent
             color={COLORS.text}
-            size={19}
+            size={30}
             name="chevron-left"
-            style={{marginLeft: 'auto'}}
+            style={{marginLeft: 'auto', width: 60}}
           />
         </TouchableWithoutFeedback>
       ),

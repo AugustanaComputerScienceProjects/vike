@@ -24,8 +24,8 @@ export const Events = [
 ];
 
 export const Region = {
-  latitude: 37.58817,
-  longitude: -122.4903973,
+  latitude: 41.503,
+  longitude: -90.5504,
   latitudeDelta: 0.005,
   longitudeDelta: 0.005 * (SIZES.width / SIZES.height),
 };

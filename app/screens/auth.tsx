@@ -7,6 +7,8 @@ import {
 } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 import {Text} from 'native-base';
+import FastImage from 'react-native-fast-image';
+import {COLORS} from '../constants';
 
 interface IProps {
   params: any;
@@ -38,9 +40,13 @@ const Auth = ({params}: IProps) => {
 
   return (
     <View style={styles.container}>
-      <Text style={{color: '#fff'}} fontSize="3xl">
+      <Text style={{color: COLORS.white}} fontSize="3xl">
         Augustana Vike Life
       </Text>
+      <FastImage
+        style={{marginTop: 20, marginBottom: 20, width: 100, height: 100}}
+        source={require('../../assets/vike.png')}
+      />
       <GoogleSigninButton
         style={{width: 192, height: 48}}
         size={GoogleSigninButton.Size.Wide}
@@ -55,7 +61,7 @@ const Auth = ({params}: IProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },

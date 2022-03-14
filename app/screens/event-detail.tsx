@@ -3,18 +3,18 @@
 
 import moment from 'moment';
 import {Text} from 'native-base';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
+  Animated,
+  Linking,
   Platform,
-  ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import LinearGradient from 'react-native-linear-gradient';
-import MapView from 'react-native-maps';
+import MapView, {Marker} from 'react-native-maps';
 import styled from 'styled-components/native';
 import EventShare from '../components/event-detail/event-share';
 import {Icon} from '../components/icons';
@@ -26,8 +26,13 @@ interface IProps {
   route: any;
 }
 
+const AnimatedFastImage = Animated.createAnimatedComponent(FastImage);
+const HEADER_HEIGHT =
+  SIZES.height < 700 ? SIZES.height * 0.3 : SIZES.height * 0.4;
+
 const EventDetail = ({navigation, route}: IProps) => {
   const [selectedEvent, setSelectedEvent] = useState<Event>();
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     let {event} = route.params;
@@ -36,165 +41,96 @@ const EventDetail = ({navigation, route}: IProps) => {
 
   return selectedEvent ? (
     <View style={styles.container}>
-      <ScrollView
+      <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           flexGrow: 1,
         }}
+        onScroll={Animated.event(
+          [
+            {
+              nativeEvent: {
+                contentOffset: {
+                  y: scrollY,
+                },
+              },
+            },
+          ],
+          {useNativeDriver: true},
+        )}
         style={{width: '100%'}}>
-        <FastImage
+        <AnimatedFastImage
           resizeMode="cover"
           source={{uri: selectedEvent?.image}}
           style={{
             width: '100%',
-            height:
-              SIZES.height < 700 ? SIZES.height * 0.4 : SIZES.height * 0.5,
-          }}>
+            height: HEADER_HEIGHT,
+          }}
+        />
+
+        <InfoContentView>
           <View style={{flex: 1}}>
-            <SectionImageHeader>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.goBack();
-                }}
-                style={{
-                  width: 56,
-                  height: 40,
-                  backgroundColor: 'rgba(0,0,0,0.5)',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 10,
-                }}>
-                <Icon name="arrow-left" size={18} color={COLORS.white}></Icon>
-              </TouchableOpacity>
+            <Text color={COLORS.black} fontWeight={'bold'} fontSize={'2xl'}>
+              {selectedEvent?.name}
+            </Text>
 
-              <View
-                style={{
-                  width: 96,
-                  height: 40,
-                  backgroundColor: 'rgba(0,0,0,0.5)',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                  borderRadius: 10,
-                }}>
-                <TouchableOpacity>
-                  <Icon
-                    name="heart"
-                    size={18}
-                    color={COLORS.white}
-                    style={{
-                      marginLeft: 16,
-                      // tinyColor: COLORS.white,
-                    }}></Icon>
-                </TouchableOpacity>
-                <EventShare event={selectedEvent} />
-              </View>
-            </SectionImageHeader>
-
-            {/* Image Footer */}
-
-            <SectionImageFooter>
-              <LinearGradient
-                colors={['transparent', '#000']}
-                // start={{x: 0, y: 1}}
-                // end={{x: 0, y: 1}}
-                style={{
-                  width: '100%',
-                  height: 200,
-                  justifyContent: 'flex-end',
-                }}>
-                <FooterContentView>
-                  <View>
-                    <Text
-                      color={COLORS.white}
-                      fontSize={'md'}
-                      style={{opacity: 0.5, letterSpacing: 2}}>
-                      {selectedEvent?.tags}
-                    </Text>
-                    <Text
-                      // numberOfLines={0}
-                      // style={{flex: 1, textAlign: 'left'}}
-                      style={styles.title}
-                      color={COLORS.white}
-                      fontWeight={'bold'}
-                      fontSize={'2xl'}>
-                      {selectedEvent?.name}
-                    </Text>
-
-                    <Text
-                      color={COLORS.white}
-                      fontSize={'md'}
-                      style={{opacity: 0.5, letterSpacing: 2}}>
-                      STARTING{' '}
-                      {moment(selectedEvent?.startDate).format('hh:mm A')}
-                    </Text>
-                  </View>
-                  <LinearGradient
-                    start={{x: 0, y: 0}}
-                    end={{x: 1, y: 0}}
-                    colors={COLORS.linear}
-                    style={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: 15,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <Text color={COLORS.white} style={{letterSpacing: 1}}>
-                      {moment(selectedEvent?.startDate)
-                        .format('MMM')
-                        .toUpperCase()}
-                    </Text>
-                    <Text
-                      color={COLORS.white}
-                      fontSize="md"
-                      fontWeight="bold"
-                      style={{letterSpacing: 1}}>
-                      {moment(selectedEvent?.startDate)
-                        .format('DD')
-                        .toUpperCase()}
-                    </Text>
-                  </LinearGradient>
-                </FooterContentView>
-              </LinearGradient>
-            </SectionImageFooter>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 8,
+              }}>
+              <Icon name="clock" size={18} color={COLORS.primary} />
+              <Text
+                color={COLORS.black}
+                // fontWeight={'bold'}
+                fontSize={'sm'}
+                style={{opacity: 0.7, marginLeft: 4}}>
+                {`${moment(selectedEvent?.startDate).format(
+                  'hh:mm',
+                )} - ${moment(selectedEvent?.startDate)
+                  .add(selectedEvent.duration, 'minute')
+                  .format('hh:mm')}`}
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 4,
+              }}>
+              <Icon name="map" size={18} color={COLORS.primary} />
+              <Text
+                color={COLORS.text}
+                fontSize={'sm'}
+                style={{opacity: 0.7, marginLeft: 4}}>
+                {selectedEvent?.location}
+              </Text>
+            </View>
           </View>
-        </FastImage>
-
-        {/* Button Group Section */}
+          <View
+            style={{
+              width: 60,
+              height: 60,
+              borderRadius: 15,
+              backgroundColor: COLORS.primary,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Text color={COLORS.gray5} style={{letterSpacing: 1}}>
+              {moment(selectedEvent?.startDate).format('MMM').toUpperCase()}
+            </Text>
+            <Text
+              color={COLORS.white}
+              fontSize="md"
+              fontWeight="bold"
+              style={{letterSpacing: 1}}>
+              {moment(selectedEvent?.startDate).format('DD').toUpperCase()}
+            </Text>
+          </View>
+        </InfoContentView>
 
         <ButtonSection>
-          {/* <TouchableOpacity
-            style={{
-              width: 76,
-              height: 32,
-              borderRadius: 10,
-              marginRight: 16,
-              backgroundColor: COLORS.white,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Text fontSize={'sm'} style={{letterSpacing: 1}}>
-              ABOUT
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              width: 124,
-              height: 32,
-              borderRadius: 10,
-              backgroundColor: COLORS.white,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Text
-              fontSize={'sm'}
-              color={COLORS.text}
-              style={{opacity: 0.5, letterSpacing: 1}}>
-              PARTICIPANTS
-            </Text>
-          </TouchableOpacity> */}
           <Text color={COLORS.text} fontSize={'xl'} fontWeight="bold">
             About
           </Text>
@@ -207,6 +143,24 @@ const EventDetail = ({navigation, route}: IProps) => {
             {selectedEvent?.description}
           </Text>
         </DescriptionSection>
+
+        {selectedEvent?.webLink ? (
+          <>
+            <ButtonSection>
+              <Text color={COLORS.text} fontSize={'xl'} fontWeight="bold">
+                Web Link
+              </Text>
+            </ButtonSection>
+            <DescriptionSection>
+              <Text
+                color={COLORS.blue}
+                fontSize={'sm'}
+                onPress={() => Linking.openURL(selectedEvent?.webLink)}>
+                {selectedEvent?.webLink}
+              </Text>
+            </DescriptionSection>
+          </>
+        ) : null}
 
         {/* Location Section */}
 
@@ -226,15 +180,20 @@ const EventDetail = ({navigation, route}: IProps) => {
                 marginTop: 20,
               }}
               minZoomLevel={15}
+              onPress={() => console.log('Map Pressed')}
               initialRegion={dummyData.Region}
-              customMapStyle={dummyData.MapStyle}></MapView>
+              customMapStyle={dummyData.MapStyle}
+              zoomEnabled={false}
+              scrollEnabled={false}>
+              <Marker
+                coordinate={{latitude: 41.503, longitude: -90.5504}}
+                title={selectedEvent.location}
+              />
+            </MapView>
           </View>
           <View style={{paddingBottom: 150}}></View>
         </LocationSection>
-
-        {/*  */}
-        {/* <Text>This is a ScrollView example FOOTER.</Text> */}
-      </ScrollView>
+      </Animated.ScrollView>
 
       <BottomBarSection
         style={{
@@ -251,35 +210,109 @@ const EventDetail = ({navigation, route}: IProps) => {
           }}> */}
         {/* <View></View> */}
         <TouchableOpacity
-          style={{marginHorizontal: 30}}
+          style={{
+            marginHorizontal: 30,
+            height: 53,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 15,
+            backgroundColor: COLORS.primary,
+          }}
           onPress={() => navigation.navigate('CameraScanner')}>
-          <LinearGradient
-            start={{x: 0, y: 0}}
-            end={{x: 1, y: 0}}
-            colors={COLORS.linear}
-            style={{
-              // width: 173,
-              height: 53,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 15,
-            }}>
-            <View
-              style={
-                {
-                  // flexDirection: 'row',
-                  // justifyContent: 'center',
-                  // alignItems: 'center',
-                }
-              }>
-              <Text color={COLORS.white} fontSize="lg" fontWeight="bold">
-                Check In
-              </Text>
-            </View>
-          </LinearGradient>
+          <View
+            style={
+              {
+                // flexDirection: 'row',
+                // justifyContent: 'center',
+                // alignItems: 'center',
+              }
+            }>
+            <Text color={COLORS.white} fontSize="lg" fontWeight="bold">
+              Check In
+            </Text>
+          </View>
         </TouchableOpacity>
         {/* </View> */}
       </BottomBarSection>
+      <SectionImageHeader>
+        <Animated.View
+          style={{
+            position: 'absolute',
+            top: -100,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: COLORS.white,
+            borderBottomColor: COLORS.gray3,
+            borderBottomWidth: 1,
+
+            opacity: scrollY.interpolate({
+              inputRange: [HEADER_HEIGHT - 100, HEADER_HEIGHT - 70],
+              outputRange: [0, 1],
+            }),
+          }}
+        />
+        <TouchableOpacity
+          onPress={() => {
+            navigation.goBack();
+          }}
+          style={{
+            width: 40,
+            height: 40,
+            backgroundColor: COLORS.white,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 100,
+          }}>
+          <Icon name="arrow-left" size={18} color={COLORS.black}></Icon>
+        </TouchableOpacity>
+
+        <View
+          style={{
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexDirection: 'row',
+            // borderRadius: 10,
+          }}>
+          {/* <Animated.View>
+            style=
+            {{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: COLORS.white,
+              opacity: scrollY.interpolate({
+                inputRange: [0, HEADER_SCROLL_DISTANCE],
+              }),
+            }}
+          </Animated.View> */}
+          {/* <TouchableOpacity
+            style={{
+              width: 40,
+              height: 40,
+              backgroundColor: COLORS.white,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 100,
+              marginRight: 8,
+            }}>
+            <Icon
+              name="heart"
+              size={18}
+              color={COLORS.black}
+              style={
+                {
+                  // marginLeft: 16,
+                  // tinyColor: COLORS.white,
+                }
+              }
+            />
+          </TouchableOpacity> */}
+          <EventShare event={selectedEvent} />
+        </View>
+      </SectionImageHeader>
     </View>
   ) : (
     <ActivityIndicator />
@@ -287,11 +320,17 @@ const EventDetail = ({navigation, route}: IProps) => {
 };
 
 const SectionImageHeader = styled.View`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
   justify-content: space-between;
   flex-direction: row;
-  margin-top: ${Platform.OS == 'ios' ? '40px' : '20px'};
-  margin-left: 30px;
-  margin-right: 30px;
+  align-items: center;
+  margin-top: ${Platform.OS === 'ios' ? '40px' : '20px'};
+  padding-left: 20px;
+  padding-right: 20px;
 `;
 
 const SectionImageFooter = styled.View`
@@ -299,12 +338,11 @@ const SectionImageFooter = styled.View`
   justify-content: flex-end;
 `;
 
-const FooterContentView = styled.View`
+const InfoContentView = styled.View`
   justify-content: space-between;
   flex-direction: row;
-  align-items: center;
-  padding-bottom: 20px;
-  margin: 0px 30px;
+  align-items: flex-start;
+  margin: 20px 30px 10px;
 `;
 
 const ButtonSection = styled.View`
@@ -334,7 +372,7 @@ const styles = StyleSheet.create({
   // title: {flexWrap: 'wrap'},
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.white,
     justifyContent: 'center',
     alignItems: 'center',
   },

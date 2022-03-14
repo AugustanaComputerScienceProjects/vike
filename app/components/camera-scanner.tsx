@@ -1,15 +1,43 @@
 import {useToast} from 'native-base';
 import * as React from 'react';
-import {useRef} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Camera, useCameraDevices} from 'react-native-vision-camera';
+import {useRef, useState, useEffect, useCallback} from 'react';
+import {
+  AppState,
+  AppStateStatus,
+  StyleSheet,
+  View,
+  LoadingIndicator,
+} from 'react-native';
+import {
+  Camera,
+  CameraRuntimeError,
+  useCameraDevices,
+} from 'react-native-vision-camera';
 import {BarcodeFormat, useScanBarcodes} from 'vision-camera-code-scanner';
 import {currentEventsRef, currentUser, DataSnapshot} from '../firebase';
+import {useIsFocused} from '@react-navigation/native';
 
-function CameraScanner() {
+export const useIsAppForeground = (): boolean => {
+  const [isForeground, setIsForeground] = useState(true);
+
+  useEffect(() => {
+    const onChange = (state: AppStateStatus): void => {
+      setIsForeground(state === 'active');
+    };
+    const listener = AppState.addEventListener('change', onChange);
+    return () => listener.remove();
+  }, [setIsForeground]);
+
+  return isForeground;
+};
+
+const CameraScanner = () => {
   const [hasPermission, setHasPermission] = React.useState(false);
   const devices = useCameraDevices();
   const device = devices.back;
+  const isFocused = useIsFocused();
+  const isAppForeground = useIsAppForeground();
+
   const toast = useToast();
   const didLoad = useRef<boolean>(false);
 
@@ -82,6 +110,9 @@ function CameraScanner() {
       });
     }
   };
+  const onError = useCallback((error: CameraRuntimeError) => {
+    console.error(error);
+  }, []);
 
   return (
     device != null &&
@@ -90,14 +121,15 @@ function CameraScanner() {
         <Camera
           style={StyleSheet.absoluteFill}
           device={device}
-          isActive={true}
+          isActive={isFocused && isAppForeground}
           frameProcessor={frameProcessor}
           frameProcessorFps={5}
+          onError={onError}
         />
       </View>
     )
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
