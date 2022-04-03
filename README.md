@@ -1,7 +1,9 @@
 # OSL-Event-App
-Augustana Event app.
+
+Vike app - Augustana College.
 
 ## Tech Stack
+
 - React Native
 - React Navigation
 - TypeScript
