@@ -1,5 +1,4 @@
 /* eslint-disable jsx-a11y/alt-text */
-import MomentUtils from '@date-io/moment';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
@@ -33,11 +32,9 @@ import Snackbar from '@mui/material/Snackbar';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import {
-  DatePicker,
-  MuiPickersUtilsProvider,
-  TimePicker,
-} from 'material-ui-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import React, { Component } from 'react';
 import { FilePicker } from 'react-file-picker';
 import Resizer from 'react-image-file-resizer';
@@ -1204,140 +1201,127 @@ export class EventsView extends Component {
             Edit Event
           </DialogTitle>
           <DialogContent>
-            <MuiPickersUtilsProvider utils={MomentUtils}>
-              <Grid container>
-                <Grid item container direction='column' spacing={0}>
-                  <Grid item>
-                    <TextField
-                      label='Event Title'
-                      id='event-name'
-                      margin='normal'
-                      value={this.state.popUpEvent['name']}
-                      onChange={this.handleNameChange}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <DatePicker
-                      margin='normal'
-                      label='Start Date'
+            <Grid container>
+              <Grid item container direction='column' spacing={0}>
+                <Grid item>
+                  <TextField
+                    label='Event Title'
+                    id='event-name'
+                    margin='normal'
+                    value={this.state.popUpEvent['name']}
+                    onChange={this.handleNameChange}
+                  />
+                </Grid>
+                <Grid item>
+                  <LocalizationProvider dateAdapter={AdapterMoment}>
+                    <DateTimePicker
+                      renderInput={(props) => <TextField {...props} />}
+                      label='Start Date/Time'
                       value={this.state.date}
                       onChange={this.handleDateChange}
                     />
-                  </Grid>
-                  <Grid item>
-                    <TimePicker
-                      margin='normal'
-                      label='Start Time'
-                      value={this.state.date}
-                      onChange={this.handleDateChange}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <TextField
-                      id='event-dur'
-                      label='Duration (minutes)'
-                      margin='normal'
-                      value={this.state.popUpEvent['duration']}
-                      type='number'
-                      onChange={this.handleDurationChange}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <TextField
-                      id='event-org'
-                      label='Location'
-                      margin='normal'
-                      value={this.state.popUpEvent['location']}
-                      onChange={this.handleLocationChange}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <FormControl margin='normal'>
-                      <InputLabel>Group</InputLabel>
-                      <Select
-                        displayEmpty
-                        value={this.state.popUpEvent['organization']}
-                        style={{ minWidth: 200, maxWidth: 200 }}
-                        onChange={this.handleOrganizationChange}
-                        variant='outlined'
-                      >
-                        {this.state.groups.map((group) => (
-                          <MenuItem key={group} value={group}>
-                            {group}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item>
-                    <FormControl margin='normal'>
-                      <InputLabel htmlFor='select-multiple'>Tags</InputLabel>
-                      <Select
-                        multiple
-                        displayEmpty
-                        input={<Input id='select-multiple' />}
-                        value={this.state.tags}
-                        style={{ minWidth: 200, maxWidth: 200 }}
-                        onChange={(e) =>
-                          this.setState({ tags: e.target.value })
-                        }
-                        variant='outlined'
-                      >
-                        <MenuItem disabled value=''>
-                          <em>Select Tags</em>
-                        </MenuItem>
-                        {this.state.databaseTags.map((tag) => (
-                          <MenuItem key={tag} value={tag}>
-                            {tag}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item>
-                    <TextField
-                      id='event-link'
-                      label='Web Link (Optional)'
-                      margin='normal'
-                      value={this.state.popUpEvent['webLink']}
-                      onChange={this.handleWebLinkChange}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <TextField
-                      id='event-desc'
-                      label='Description'
-                      multiline
-                      rows='5'
-                      margin='normal'
+                  </LocalizationProvider>
+                </Grid>
+                <Grid item>
+                  <TextField
+                    id='event-dur'
+                    label='Duration (minutes)'
+                    margin='normal'
+                    value={this.state.popUpEvent['duration']}
+                    type='number'
+                    onChange={this.handleDurationChange}
+                  />
+                </Grid>
+                <Grid item>
+                  <TextField
+                    id='event-org'
+                    label='Location'
+                    margin='normal'
+                    value={this.state.popUpEvent['location']}
+                    onChange={this.handleLocationChange}
+                  />
+                </Grid>
+                <Grid item>
+                  <FormControl margin='normal'>
+                    <InputLabel>Group</InputLabel>
+                    <Select
+                      displayEmpty
+                      value={this.state.popUpEvent['organization']}
+                      style={{ minWidth: 200, maxWidth: 200 }}
+                      onChange={this.handleOrganizationChange}
                       variant='outlined'
-                      value={this.state.popUpEvent['description']}
-                      onChange={this.handleDescriptionChange}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <FilePicker
-                      extensions={['jpg', 'jpeg', 'png']}
-                      onChange={this.handleImageFileChanged}
-                      onError={(errMsg) => this.displayMessage(this, errMsg)}
                     >
-                      <Button
-                        variant='contained'
-                        disabled={this.state.uploading}
-                      >
-                        Select Image
-                      </Button>
-                    </FilePicker>
-                  </Grid>
-                  <Grid item>
-                    <img
-                      style={{ width: 192, height: 108 }}
-                      src={this.state.image64}
-                    />
-                  </Grid>
+                      {this.state.groups.map((group) => (
+                        <MenuItem key={group} value={group}>
+                          {group}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item>
+                  <FormControl margin='normal'>
+                    <InputLabel htmlFor='select-multiple'>Tags</InputLabel>
+                    <Select
+                      multiple
+                      displayEmpty
+                      input={<Input id='select-multiple' />}
+                      value={this.state.tags}
+                      style={{ minWidth: 200, maxWidth: 200 }}
+                      onChange={(e) => this.setState({ tags: e.target.value })}
+                      variant='outlined'
+                    >
+                      <MenuItem disabled value=''>
+                        <em>Select Tags</em>
+                      </MenuItem>
+                      {this.state.databaseTags.map((tag) => (
+                        <MenuItem key={tag} value={tag}>
+                          {tag}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item>
+                  <TextField
+                    id='event-link'
+                    label='Web Link (Optional)'
+                    margin='normal'
+                    value={this.state.popUpEvent['webLink']}
+                    onChange={this.handleWebLinkChange}
+                  />
+                </Grid>
+                <Grid item>
+                  <TextField
+                    id='event-desc'
+                    label='Description'
+                    multiline
+                    rows='5'
+                    margin='normal'
+                    variant='outlined'
+                    value={this.state.popUpEvent['description']}
+                    onChange={this.handleDescriptionChange}
+                  />
+                </Grid>
+                <Grid item>
+                  <FilePicker
+                    extensions={['jpg', 'jpeg', 'png']}
+                    onChange={this.handleImageFileChanged}
+                    onError={(errMsg) => this.displayMessage(this, errMsg)}
+                  >
+                    <Button variant='contained' disabled={this.state.uploading}>
+                      Select Image
+                    </Button>
+                  </FilePicker>
+                </Grid>
+                <Grid item>
+                  <img
+                    style={{ width: 192, height: 108 }}
+                    src={this.state.image64}
+                  />
                 </Grid>
               </Grid>
-            </MuiPickersUtilsProvider>
+            </Grid>
           </DialogContent>
           <DialogActions style={{ justifyContent: 'center' }}>
             {/* <MuiThemeProvider theme={redTheme}> */}
