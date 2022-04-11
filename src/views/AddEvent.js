@@ -1,97 +1,137 @@
-import MomentUtils from '@date-io/moment';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
 import Checkbox from '@mui/material/Checkbox';
+import Chip from '@mui/material/Chip';
+import Container from '@mui/material/Container';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
-import Input from '@mui/material/Input';
+import moment from 'moment';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import OutlinedInput from '@mui/material/OutlinedInput';
 import Select from '@mui/material/Select';
 import Snackbar from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import {
-  DatePicker,
-  MuiPickersUtilsProvider,
-  TimePicker,
-} from 'material-ui-pickers';
-import React, { Component } from 'react';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import React, { useEffect, useState } from 'react';
 import { FilePicker } from 'react-file-picker';
 import Resizer from 'react-image-file-resizer';
-import firebase from '../config';
 import defaultImage from '../assets/default.jpg';
+import firebase from '../config';
 
 // File for the Add Event Screen
 
 var QRCode = require('qrcode');
 
 const uuidv4 = require('uuid/v4');
+const listeners = [];
 
-class AddEvent extends Component {
-  state = {
-    open: false,
-    name: '',
-    date: new Date(),
-    duration: '',
-    location: '',
-    organization: '',
-    tags: [],
-    description: '',
-    webLink: '',
-    picId: 'default',
-    uploading: false,
-    message: 'Event Added',
-    image64: defaultImage,
-    submitBtnText: 'Request Event',
-    uid: '',
-    qrChecked: false,
-    qrDisabled: true,
-    databaseTags: [],
-    groups: [],
-  };
+// Parent component for the preview
+const ParentComponent = (props) => (
+  <div>
+    <Grid container id='children-pane' direction='row' spacing={8}>
+      {props.children}
+    </Grid>
+  </div>
+);
 
-  listeners = [];
+// Child component for the preview
+const ChildComponent = (props) => (
+  <Grid item>
+    <Card style={{ minHeight: 400, minWidth: 300 }}>
+      <CardHeader title={props.title} subheader={props.date}></CardHeader>
+      <CardMedia
+        style={{ height: 0, paddingTop: '56.25%' }}
+        image={props.image}
+        title={props.title}
+      />
+      <CardContent>
+        <Typography component='p'>
+          {props.location}
+          <br />
+          {props.organization}
+          <br />
+          {props.tags}
+          <br />
+          {props.description}
+        </Typography>
+      </CardContent>
+    </Card>
+  </Grid>
+);
 
-  // Component will unmount, turn of the Firebase listeners
-  componentWillUnmount() {
-    this.listeners.forEach(function(listener) {
-      listener.off();
+const AddEvent = () => {
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [duration, setDuration] = useState('');
+  const [email, setEmail] = useState();
+  const [location, setLocation] = useState('');
+  const [organization, setOrganization] = useState('');
+  const [description, setDescription] = useState('');
+  const [webLink, setWebLink] = useState('');
+  const [tags, setTags] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState('EventAdded');
+  const [image64, setImage64] = useState(defaultImage);
+  const [submitBtnText, setSubmitBtnText] = useState('Request Event');
+  // eslint-disable-next-line no-unused-vars
+  const [uid, setUid] = useState('');
+  const [qrChecked, setQrChecked] = useState(false);
+  const [qrDisabled, setQrDisabled] = useState(true);
+  const [databaseTags, setDatabaseTags] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [leaderSignedIn, setLeaderSignedIn] = useState();
+  const [adminSignedIn, setAdminSignedIn] = useState();
+
+  useEffect(() => {
+    // Component will mount - read tags, groups, auth listener
+    readTags();
+    firebase.auth.onAuthStateChanged((user) => {
+      if (user) {
+        checkRole(user, 'admin');
+        checkRole(user, 'leaders');
+      } else {
+        setAdminSignedIn(false);
+      }
     });
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle opening of the Snackbar
-  handleOpen = () => {
-    this.setState({ open: true });
+  const handleOpen = () => {
+    setOpen(true);
   };
 
   // Handle closing of the Snackbar
-  handleClose = (event, reason) => {
+  const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
-    this.setState({ open: false });
+    setOpen(false);
   };
 
   // Handle changing of the event for the date/time pickers
-  handleDateChange = (event) => {
-    this.setState({ date: new Date(event) });
+  const handleDateChange = (event) => {
+    setDate(new Date(event));
   };
 
   // Save image to Firebase
-  saveImage(ref, image, imageName, onSuccess, onError) {
-    let self = this;
-    if (this.state.image64 !== defaultImage) {
-      this.setState({ uploading: true });
-      self.displayMessage(self, 'Uploading Image...');
+  const saveImage = (ref, image, imageName, onSuccess, onError) => {
+    if (image64 !== defaultImage) {
+      setUploading(true);
+      displayMessage('Uploading Image...');
       var firebaseStorageRef = firebase.storage.ref(ref);
       const id = uuidv4();
       const imageRef = firebaseStorageRef.child(id + '.jpg');
-      this.setState({ picId: id });
 
       const i = image.indexOf('base64,');
       const buffer = Buffer.from(image.slice(i + 7), 'base64');
@@ -104,81 +144,61 @@ class AddEvent extends Component {
         })
         .then(function(url) {
           console.log(url);
-          self.submitEvent(self);
+          submitEvent(id);
         })
         .catch(function(error) {
           console.log(error);
-          self.displayMessage(self, 'Error Uploading Image');
+          displayMessage('Error Uploading Image');
         });
     } else {
-      self.submitEvent(self);
+      submitEvent();
     }
-  }
+  };
 
   // Check authorization and add to Firebase
-  submitEvent(self) {
-    if (self.state.adminSignedIn) {
-      self.pushEvent(self, '/current-events', 'Event Added');
-    } else if (self.state.leaderSignedIn) {
-      self.pushEvent(self, '/pending-events/', 'Event Requested');
+  const submitEvent = (id = 'default') => {
+    if (adminSignedIn) {
+      pushEvent('/current-events', 'Event Added', id);
+    } else if (leaderSignedIn) {
+      pushEvent('/pending-events/', 'Event Requested', id);
     }
-  }
+  };
 
   // Push event to Firebase
-  pushEvent(self, ref, message) {
-    let name = self.state.name;
-    // Adding leading 0s
-    var month = (1 + self.state.date.getMonth()).toString();
-    month = month.length > 1 ? month : '0' + month;
-    var day = self.state.date.getDate().toString();
-    day = day.length > 1 ? day : '0' + day;
-    var hours = self.state.date.getHours().toString();
-    hours = hours.length > 1 ? hours : '0' + hours;
-    var minutes = self.state.date.getMinutes().toString();
-    minutes = minutes.length > 1 ? minutes : '0' + minutes;
-    // eslint-disable-next-line no-unused-vars
-    var newRef = firebase.database
+  const pushEvent = (ref, message, id) => {
+    firebase.database
       .ref(ref)
       .push({
-        name: name,
-        startDate:
-          self.state.date.getFullYear() +
-          '-' +
-          month +
-          '-' +
-          day +
-          ' ' +
-          hours +
-          ':' +
-          minutes,
-        duration: parseInt(self.state.duration),
-        location: self.state.location,
-        organization: self.state.organization,
-        imgid: self.state.picId,
-        description: self.state.description,
-        webLink: self.state.webLink,
-        tags: self.state.tags.toString(),
-        email: self.state.email,
+        name: title,
+        startDate: moment(date).format('YYYY-MM-DD hh:mm'),
+        duration: parseInt(duration),
+        location: location,
+        organization: organization,
+        imgid: id,
+        description: description,
+        webLink: webLink,
+        tags: tags.toString(),
+        email: email,
       })
       .then((snap) => {
-        if (this.state.qrChecked) {
-          self.downloadQR(snap.key, name);
+        if (qrChecked) {
+          downloadQR(snap.key, title);
         }
       });
-    self.resetState(self);
-    self.setState({ uploading: false });
-    self.displayMessage(self, message);
-  }
+    resetState();
+    setUploading(false);
+    displayMessage(message);
+  };
 
   // Download the QR code as a jpg
-  downloadQR(key, name) {
+  const downloadQR = (key, name) => {
     QRCode.toDataURL(
       'https://osl-events-app.firebaseapp.com/event?id=' +
         key +
         '&name=' +
         name.replaceAll(' ', '+'),
       function(err, url) {
-        console.log(url);
+        // console.log(url);
         var link = document.createElement('a');
         link.href = url;
         link.download = name + '-QR Code.png';
@@ -187,135 +207,126 @@ class AddEvent extends Component {
         document.body.removeChild(link);
       }
     );
-  }
+  };
 
   // Add event button action
-  submitAction = (event) => {
+  const submitAction = (event) => {
     // Check inputs
     if (
-      this.state.name !== '' &&
-      this.state.location !== '' &&
-      this.state.organization !== '' &&
-      this.state.duration !== ''
+      title !== '' &&
+      location !== '' &&
+      organization !== '' &&
+      duration !== ''
     ) {
-      this.saveImage('Images', this.state.image64);
+      saveImage('Images', image64);
     } else {
       alert('Required fields are not filled in.');
     }
   };
 
   // Handle changing of the image file
-  handleImageFileChanged = (theFile) => {
+  const handleImageFileChanged = (theFile) => {
     //https://www.npmjs.com/package/react-image-file-resizer
     Resizer.imageFileResizer(
       theFile,
-      300,
-      300,
+      2160,
+      1080,
       'JPEG',
-      95, // compression quality
+      100, // compression quality
       0, // no rotation
       (uri) => {
-        this.setState({ image64: uri });
+        setImage64(uri);
       },
       'base64'
     );
   };
 
   // Toggle checking of the "Downlod QR Code" Checkbox
-  toggleChecked = () => {
-    this.setState({ qrChecked: !this.state.qrChecked });
+  const toggleChecked = () => {
+    setQrChecked(!qrChecked);
   };
 
   // Resets the state after adding/requesting an event
-  resetState(self) {
-    self.setState({
-      open: false,
-      name: '',
-      date: new Date(),
-      duration: '',
-      location: '',
-      organization: '',
-      tags: [],
-      description: '',
-      webLink: '',
-      picId: 'default',
-      uploading: false,
-      message: 'Event Added',
-      image64: defaultImage,
-    });
-  }
+  const resetState = (self) => {
+    setOpen(false);
+    setTitle('');
+    setDate(new Date());
+    setDuration('');
+    setLocation('');
+    setOrganization('');
+    setTags([]);
+    setDescription('');
+    setWebLink('');
+    setUploading(false);
+    setMessage('Event Added');
+    setImage64(defaultImage);
+  };
 
   // Display a message using the Snackbar
-  displayMessage(self, message) {
-    self.handleClose();
-    self.setState({ message: message });
-    self.handleOpen();
-  }
+  const displayMessage = (message) => {
+    handleClose();
+    setMessage(message);
+    handleOpen();
+  };
 
   // Checks what role the current user signed in has
-  checkRole(user, role) {
-    let self = this;
+  const checkRole = (user, role) => {
     firebase.database
       .ref(role)
       .once('value')
       .then(function(snapshot) {
         if (snapshot.hasChild(user.email.replace('.', ','))) {
           if (role === 'admin') {
-            self.setState({
-              adminSignedIn: true,
-              submitBtnText: 'Add Event',
-              uid: user.uid,
-              email: user.email,
-              qrChecked: true,
-              qrDisabled: false,
-            });
-            self.readAllGroups();
-          } else if (role === 'leaders' && !self.state.adminSignedIn) {
-            self.setState({
-              leaderSignedIn: true,
-              submitBtnText: 'Request Event',
-              uid: user.uid,
-              email: user.email,
-            });
-            self.readLeaderGroups();
+            setAdminSignedIn(true);
+            setSubmitBtnText('Add Event');
+            setUid(user.uid);
+            setEmail(user.email);
+            setQrChecked(true);
+            setQrDisabled(false);
+
+            readAllGroups();
+          } else if (role === 'leaders' && !adminSignedIn) {
+            setLeaderSignedIn(true);
+            setSubmitBtnText('Request Event');
+            setUid(user.uid);
+            setEmail(user.email);
+
+            readLeaderGroups();
           }
         }
       });
-  }
+  };
 
   // Reads the tags from Firebase and sets the tags list
-  readTags() {
-    let self = this;
+  const readTags = () => {
     let ref = firebase.database.ref('/tags');
-    this.listeners.push(ref);
+    listeners.push(ref);
     ref.on('value', function(snapshot) {
       let tagsList = [];
       snapshot.forEach(function(child) {
         tagsList.push(child.val());
       });
-      self.setState({ databaseTags: tagsList });
-      console.log(tagsList);
+      setDatabaseTags(tagsList);
+      // console.log(tagsList);
     });
-  }
+  };
 
   // Reads the groups from Firebase and sets the groups list
-  readAllGroups() {
-    let self = this;
+  const readAllGroups = () => {
     let ref = firebase.database.ref('/groups');
-    this.listeners.push(ref);
+    listeners.push(ref);
     ref.on('value', function(snapshot) {
       let groupsList = [];
       snapshot.forEach(function(child) {
-        let decodedGroup = self.decodeGroup(child);
+        let decodedGroup = decodeGroup(child);
         groupsList.push(decodedGroup.val());
       });
-      self.setState({ groups: groupsList });
-      console.log('Groups List: ' + groupsList);
+      setGroups(groupsList);
+      // console.log('Groups List: ' + groupsList);
     });
-  }
+  };
 
-  readLeaderGroups() {
-    let self = this;
+  const readLeaderGroups = () => {
     let email = firebase.auth.currentUser.email;
     let ref = firebase.database
       .ref('/leaders')
@@ -324,27 +335,14 @@ class AddEvent extends Component {
     ref.on('value', function(snapshot) {
       let myGroups = [];
       snapshot.forEach(function(child) {
-        let decodedGroup = self.decodeGroup(child.key);
+        let decodedGroup = decodeGroup(child.key);
         myGroups.push(decodedGroup);
       });
-      self.setState({ groups: myGroups });
+      setGroups(myGroups);
     });
-  }
+  };
 
-  // Component will mount - read tags, groups, auth listener
-  componentWillMount() {
-    this.readTags();
-    firebase.auth.onAuthStateChanged((user) => {
-      if (user) {
-        this.checkRole(user, 'admin');
-        this.checkRole(user, 'leaders');
-      } else {
-        this.setState({ adminSignedIn: false });
-      }
-    });
-  }
-
-  decodeGroup = (codedGroup) => {
+  const decodeGroup = (codedGroup) => {
     let group = codedGroup;
     if (typeof group === 'string' || group instanceof String) {
       while (group.includes('*%&')) {
@@ -369,286 +367,251 @@ class AddEvent extends Component {
     return group;
   };
 
-  // Render the page
-  render() {
-    const child = [];
+  const child = [];
 
-    // Format Date - display preview
-    let date = new Date(this.state.date);
-    var month = (1 + date.getMonth()).toString();
-    month = month.length > 1 ? month : '0' + month;
-    var day = date.getDate().toString();
-    day = day.length > 1 ? day : '0' + day;
-    var hours = date.getHours().toString();
-    hours = hours.length > 1 ? hours : '0' + hours;
-    var minutes = date.getMinutes().toString();
-    minutes = minutes.length > 1 ? minutes : '0' + minutes;
-    let startDate =
-      month +
-      '-' +
-      day +
-      '-' +
-      date.getFullYear() +
-      ' ' +
-      hours +
-      ':' +
-      minutes;
-    date.setMilliseconds(date.getMilliseconds() + this.state.duration * 60000);
-    hours = date.getHours().toString();
-    hours = hours.length > 1 ? hours : '0' + hours;
-    minutes = date.getMinutes().toString();
-    minutes = minutes.length > 1 ? minutes : '0' + minutes;
-    let fullDate = startDate + '-' + hours + ':' + minutes;
-    child.push(
-      <ChildComponent
-        key={0}
-        name={this.state.name}
-        date={fullDate}
-        location={'Location: ' + this.state.location}
-        organization={'Group: ' + this.state.organization}
-        description={'Description: ' + this.state.description}
-        tags={'Tags: ' + this.state.tags}
-        image={this.state.image64}
-      />
-    );
+  // Format Date - display preview
+  var month = (1 + date.getMonth()).toString();
+  month = month.length > 1 ? month : '0' + month;
+  var day = date.getDate().toString();
+  day = day.length > 1 ? day : '0' + day;
+  var hours = date.getHours().toString();
+  hours = hours.length > 1 ? hours : '0' + hours;
+  var minutes = date.getMinutes().toString();
+  minutes = minutes.length > 1 ? minutes : '0' + minutes;
+  let startDate =
+    month + '-' + day + '-' + date.getFullYear() + ' ' + hours + ':' + minutes;
+  let endDate = new Date(date);
+  endDate.setMilliseconds(date.getMilliseconds() + duration * 60000);
 
-    return (
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ display: 'inline-block' }}>
-          <MuiPickersUtilsProvider utils={MomentUtils}>
-            <Grid container>
-              <Grid
-                item
-                container
-                direction='column'
-                spacing={8}
-                style={{ width: 200 }}
+  hours = endDate.getHours().toString();
+  hours = hours.length > 1 ? hours : '0' + hours;
+  minutes = endDate.getMinutes().toString();
+  minutes = minutes.length > 1 ? minutes : '0' + minutes;
+  let fullDate = startDate + '-' + hours + ':' + minutes;
+
+  child.push(
+    <ChildComponent
+      key={0}
+      title={title}
+      date={fullDate}
+      location={'Location: ' + location}
+      organization={'Group: ' + organization}
+      description={'Description: ' + description}
+      tags={'Tags: ' + tags}
+      image={image64}
+    />
+  );
+
+  return (
+    <Container maxWidth='md'>
+      {/* <MuiPickersUtilsProvider utils={MomentUtils}> */}
+      <Grid
+        container
+        spacing={4}
+        // alignItems='center'
+      >
+        <Grid
+          item
+          md={7}
+          // container
+          // spacing={1}
+          // style={{ width: 200 }}
+        >
+          <Grid item>
+            <label style={{ fontSize: 20 }}>Add Event</label>
+          </Grid>
+          <Grid item>
+            <TextField
+              fullWidth
+              label='Event Title'
+              id='event-title'
+              margin='normal'
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </Grid>
+          <Grid item>
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DateTimePicker
+                renderInput={(props) => <TextField {...props} />}
+                label='Start Date/Time'
+                value={date}
+                onChange={handleDateChange}
+              />
+            </LocalizationProvider>
+            {/* <DateTimePicker
+                label='Start Date/Time'
+                variant='outlined'
+                inputVariant='outlined'
+                value={date}
+                showTodayButton
+                disablePast
+                onChange={handleDateChange}
+              /> */}
+            {/* </Grid> */}
+            {/* <Grid item> */}
+            <TextField
+              style={{ marginLeft: 10 }}
+              // fullWidth
+              id='event-dur'
+              label='Duration (minutes)'
+              // margin='normal'
+              value={duration}
+              type='number'
+              onChange={(e) => setDuration(e.target.value)}
+            />
+          </Grid>
+          <Grid item>
+            <TextField
+              fullWidth
+              id='event-org'
+              label='Location'
+              margin='normal'
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
+          </Grid>
+          <Grid>
+            <FormControl>
+              <InputLabel>Group</InputLabel>
+              <Select
+                displayEmpty
+                value={organization}
+                style={{ minWidth: 200, maxWidth: 200 }}
+                onChange={(e) => setOrganization(e.target.value)}
+                // variant='outlined'
               >
-                <Grid item>
-                  <label style={{ fontSize: 20 }}>Add Event</label>
-                </Grid>
-                <Grid item>
-                  <TextField
-                    label='Event Title'
-                    id='event-name'
-                    margin='normal'
-                    value={this.state.name}
-                    onChange={(e) => this.setState({ name: e.target.value })}
-                  />
-                </Grid>
-                <Grid item>
-                  <DatePicker
-                    margin='normal'
-                    label='Start Date'
-                    value={this.state.date}
-                    onChange={this.handleDateChange}
-                  />
-                </Grid>
-                <Grid item>
-                  <TimePicker
-                    margin='normal'
-                    label='Start Time'
-                    value={this.state.date}
-                    onChange={this.handleDateChange}
-                  />
-                </Grid>
-                <Grid item>
-                  <TextField
-                    id='event-dur'
-                    label='Duration (minutes)'
-                    margin='normal'
-                    value={this.state.duration}
-                    type='number'
-                    onChange={(e) =>
-                      this.setState({ duration: e.target.value })
-                    }
-                  />
-                </Grid>
-                <Grid item>
-                  <TextField
-                    id='event-org'
-                    label='Location'
-                    margin='normal'
-                    value={this.state.location}
-                    onChange={(e) =>
-                      this.setState({ location: e.target.value })
-                    }
-                  />
-                </Grid>
-                <Grid item>
-                  <FormControl margin='normal'>
-                    <InputLabel>Group</InputLabel>
-                    <Select
-                      displayEmpty
-                      value={this.state.organization}
-                      style={{ minWidth: 200, maxWidth: 200 }}
-                      onChange={(e) =>
-                        this.setState({ organization: e.target.value })
-                      }
-                      variant='outlined'
-                    >
-                      {this.state.groups.map((group) => (
-                        <MenuItem key={group} value={group}>
-                          {group}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item>
-                  <FormControl margin='normal'>
-                    <InputLabel htmlFor='select-multiple'>Tags</InputLabel>
-                    <Select
-                      multiple
-                      displayEmpty
-                      input={<Input id='select-multiple' />}
-                      value={this.state.tags}
-                      style={{ minWidth: 200, maxWidth: 200 }}
-                      onChange={(e) => this.setState({ tags: e.target.value })}
-                      variant='outlined'
-                    >
-                      <MenuItem disabled value=''>
-                        <em>Select Tags</em>
-                      </MenuItem>
-                      {this.state.databaseTags.map((tag) => (
-                        <MenuItem key={tag} value={tag}>
-                          {tag}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item>
-                  <TextField
-                    id='event-link'
-                    label='Web Link (Optional)'
-                    margin='normal'
-                    value={this.state.webLink}
-                    onChange={(e) => this.setState({ webLink: e.target.value })}
-                  />
-                </Grid>
-                <Grid item>
-                  <TextField
-                    id='event-desc'
-                    label='Description'
-                    multiline
-                    rows='5'
-                    margin='normal'
-                    variant='outlined'
-                    value={this.state.description}
-                    onChange={(e) =>
-                      this.setState({ description: e.target.value })
-                    }
-                  />
-                </Grid>
-                <Grid item>
-                  <FilePicker
-                    extensions={['jpg', 'jpeg', 'png']}
-                    onChange={this.handleImageFileChanged}
-                    onError={(errMsg) => this.displayMessage(this, errMsg)}
-                  >
-                    <Button variant='contained' disabled={this.state.uploading}>
-                      Select Image
-                    </Button>
-                  </FilePicker>
-                </Grid>
-                <Grid item>
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    disabled={this.state.uploading}
-                    onClick={this.submitAction}
-                  >
-                    {this.state.submitBtnText}
-                  </Button>
-                </Grid>
-              </Grid>
-              <div style={{ marginTop: 50, marginLeft: 50 }}>
-                <label style={{ fontSize: 18 }}>Preview:</label>
-                <ParentComponent
-                  style={{ marginLeft: 50, width: 300, height: 400 }}
-                >
-                  {child}
-                </ParentComponent>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={this.state.qrChecked}
-                      onChange={this.toggleChecked}
-                      disabled={this.state.qrDisabled}
-                      value='qrChecked'
-                      color='primary'
-                    />
-                  }
-                  label='Download QR Code'
-                />
-              </div>
-            </Grid>
-          </MuiPickersUtilsProvider>
-          <Snackbar
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left',
-            }}
-            open={this.state.open}
-            autoHideDuration={6000}
-            onClose={this.handleClose}
-            ContentProps={{
-              'aria-describedby': 'message-id',
-            }}
-            message={this.state.message}
-            action={[
-              <Button
-                key='close'
-                aria-label='Close'
-                color='inherit'
-                onClick={this.handleClose}
+                {groups.map((group) => (
+                  <MenuItem key={group} value={group}>
+                    {group}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            {/* </Grid> */}
+            {/* <Grid item> */}
+            <FormControl style={{ marginLeft: 10 }}>
+              <InputLabel htmlFor='select-multiple'>Tags</InputLabel>
+              <Select
+                multiple
+                displayEmpty
+                input={<OutlinedInput id='select-multiple-chip' label='Chip' />}
+                value={tags}
+                style={{ minWidth: 200 }}
+                onChange={(e) => setTags(e.target.value)}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {selected.map((value) => (
+                      <Chip key={value} label={value} />
+                    ))}
+                  </Box>
+                )}
               >
-                {' '}
-                X
-              </Button>,
-            ]}
+                <MenuItem disabled value=''>
+                  <em>Select Tags</em>
+                </MenuItem>
+                {databaseTags.map((tag) => (
+                  <MenuItem key={tag} value={tag}>
+                    {tag}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item>
+            <TextField
+              fullWidth
+              id='event-link'
+              label='Web Link (Optional)'
+              margin='normal'
+              value={webLink}
+              onChange={(e) => setWebLink(e.target.value)}
+            />
+          </Grid>
+          <Grid item>
+            <TextField
+              fullWidth
+              id='event-desc'
+              label='Description'
+              multiline
+              rows='5'
+              margin='normal'
+              variant='outlined'
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </Grid>
+          <Grid item>
+            <FilePicker
+              extensions={['jpg', 'jpeg', 'png']}
+              onChange={handleImageFileChanged}
+              onError={(errMsg) => displayMessage(this, errMsg)}
+            >
+              <Button variant='contained' disabled={uploading}>
+                Select Image
+              </Button>
+            </FilePicker>
+          </Grid>
+          <Grid item style={{ marginTop: 10 }}>
+            <Button
+              variant='contained'
+              color='primary'
+              disabled={uploading}
+              onClick={submitAction}
+            >
+              {submitBtnText}
+            </Button>
+          </Grid>
+        </Grid>
+        <Grid
+          md={5}
+          item
+          // style={{ marginTop: 50, marginLeft: 150 }}
+        >
+          <label style={{ fontSize: 18 }}>Preview:</label>
+          <ParentComponent style={{ marginLeft: 50, width: 300, height: 400 }}>
+            {child}
+          </ParentComponent>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={qrChecked}
+                onChange={toggleChecked}
+                disabled={qrDisabled}
+                value='qrChecked'
+                color='primary'
+              />
+            }
+            label='Download QR Code'
           />
-        </div>
-      </div>
-    );
-  }
-}
+        </Grid>
+      </Grid>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        ContentProps={{
+          'aria-describedby': 'message-id',
+        }}
+        message={message}
+        action={[
+          <Button
+            key='close'
+            aria-label='Close'
+            color='inherit'
+            onClick={handleClose}
+          >
+            {' '}
+            X
+          </Button>,
+        ]}
+      />
+    </Container>
+  );
+};
 
 export default AddEvent;
-
-// Parent component for the preview
-const ParentComponent = (props) => (
-  <div>
-    <Grid container id='children-pane' direction='row' spacing={8}>
-      {props.children}
-    </Grid>
-  </div>
-);
-
-// Child component for the preview
-const ChildComponent = (props) => (
-  <Grid item>
-    <Card
-      style={{ minHeight: 400, maxHeight: 400, minWidth: 300, maxWidth: 300 }}
-    >
-      <CardHeader title={props.name} subheader={props.date}></CardHeader>
-      <CardMedia
-        style={{ height: 0, paddingTop: '56.25%' }}
-        image={props.image}
-        title={props.name}
-      />
-      <CardContent>
-        <Typography component='p'>
-          {props.location}
-          <br />
-          {props.organization}
-          <br />
-          {props.tags}
-          <br />
-          {props.description}
-        </Typography>
-      </CardContent>
-    </Card>
-  </Grid>
-);

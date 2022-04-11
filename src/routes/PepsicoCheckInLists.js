@@ -1,4 +1,5 @@
-import MomentUtils from '@date-io/moment';
+import CloseIcon from '@mui/icons-material/Close';
+import SearchIcon from '@mui/icons-material/Search';
 import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -7,16 +8,16 @@ import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import CloseIcon from '@mui/icons-material/Close';
-import SearchIcon from '@mui/icons-material/Search';
-import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import React, { Component } from 'react';
-
-import firebase from '../config';
 import PastEvent from '../components/PastEvent';
 import PastEventObj from '../components/PastEventObj';
+import firebase from '../config';
 
 //The main runner of the past event page, contains many past events
 class PepsicoCheckInLists extends Component {
@@ -293,7 +294,7 @@ class PepsicoCheckInLists extends Component {
         </div>
 
         <Grid container direction='row' justify='center'>
-          <MuiPickersUtilsProvider utils={MomentUtils}>
+          <LocalizationProvider dateAdapter={AdapterMoment}>
             <Grid
               container
               direction='row'
@@ -306,7 +307,8 @@ class PepsicoCheckInLists extends Component {
                   label='Start Date'
                   value={this.state.sortDate1}
                   onChange={this.handleDate1Change}
-                />{' '}
+                  renderInput={(params) => <TextField {...params} />}
+                />
               </Grid>
 
               <Grid item>
@@ -321,10 +323,11 @@ class PepsicoCheckInLists extends Component {
                   label='End Date'
                   value={this.state.sortDate2}
                   onChange={this.handleDate2Change}
+                  renderInput={(params) => <TextField {...params} />}
                 />
               </Grid>
             </Grid>
-          </MuiPickersUtilsProvider>
+          </LocalizationProvider>
 
           {children}
         </Grid>

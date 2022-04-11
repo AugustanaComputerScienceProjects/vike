@@ -1,4 +1,3 @@
-import MomentUtils from '@date-io/moment';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button';
@@ -7,9 +6,12 @@ import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { DataGrid } from '@mui/x-data-grid';
-import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import React, { useEffect, useState } from 'react';
 import XLSX from 'xlsx';
 import PastEventObj from '../components/PastEventObj';
@@ -238,7 +240,8 @@ const PastEvents = (props) => {
       </div>
 
       <Grid container direction='row' justify='center'>
-        <MuiPickersUtilsProvider utils={MomentUtils}>
+        <LocalizationProvider dateAdapter={AdapterMoment}>
+          {' '}
           <Grid
             container
             direction='row'
@@ -251,7 +254,8 @@ const PastEvents = (props) => {
                 label='Start Date'
                 value={sortDate1}
                 onChange={handleDate1Change}
-              />{' '}
+                renderInput={(params) => <TextField {...params} />}
+              />
             </Grid>
 
             <Grid item>
@@ -266,10 +270,11 @@ const PastEvents = (props) => {
                 label='End Date'
                 value={sortDate2}
                 onChange={handleDate2Change}
+                renderInput={(params) => <TextField {...params} />}
               />
             </Grid>
           </Grid>
-        </MuiPickersUtilsProvider>
+        </LocalizationProvider>
         <div style={{ display: 'flex', height: '80vh', width: '100vw' }}>
           <div style={{ flexGrow: 1 }}>
             <DataGrid

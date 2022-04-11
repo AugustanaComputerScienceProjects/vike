@@ -1,4 +1,6 @@
-import { Button, Grid } from '@material-ui/core';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+
 import Typography from '@mui/material/Typography';
 import React, { Component } from 'react';
 import XLSX from 'xlsx';

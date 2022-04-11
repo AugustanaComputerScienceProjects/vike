@@ -1,4 +1,5 @@
-import { Button, DialogContentText } from '@material-ui/core';
+import Button from '@mui/material/Button';
+import DialogContentText from '@mui/material/DialogContentText';
 import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
