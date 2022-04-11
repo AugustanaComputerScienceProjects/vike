@@ -26,11 +26,14 @@
     "react-file-picker": "0.0.6",
     "react-image-file-resizer": "^0.2.0",
     "react-router-dom": "^5.0.1",
-    "react-scripts": "^4.0.0",
+    "react-scripts": "4.0.3",
     "react-select": "^3.0.4",
     "react-select-material-ui": "^4.0.0",
     "uuid": "^3.3.2",
     "xlsx": "^0.14.3"
+  },
+  "resolutions": {
+    "react-error-overlay": "6.0.9"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -48,6 +51,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "eslint-plugin-promise": "^5.1.1"
+    "eslint-plugin-promise": "^5.1.1",
+    "react-error-overlay": "6.0.9"
   }
 }
