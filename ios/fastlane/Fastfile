@@ -20,12 +20,11 @@ platform :ios do
   lane :beta do
     changelog = prompt(text: "Changelog: ")
     # Ensure that your git status is not dirty
-    ensure_git_status_clean
     increment_build_number(
       build_number: latest_testflight_build_number + 1,  
       xcodeproj: "OSLEventApp.xcodeproj")
     # Commit the version bump
-    commit_version_bump(xcodeproj: "Example.xcodeproj")
+    commit_version_bump(xcodeproj: "OSLEventApp.xcodeproj")
 
     # Add a git tag for this build. This will automatically
     # use an appropriate git tag name
