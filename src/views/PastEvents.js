@@ -283,7 +283,6 @@ const PastEvents = (props) => {
               rows={filteredEvents}
               columns={[
                 { field: 'title', headerName: 'Title', minWidth: 150, flex: 1 },
-                { field: 'id', headerName: 'ID', minWidth: 200 },
                 {
                   field: 'date',
                   headerName: 'Date',
