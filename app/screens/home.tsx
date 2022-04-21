@@ -2,6 +2,7 @@
 /* eslint-disable react/self-closing-comp */
 
 import database from '@react-native-firebase/database';
+import moment from 'moment';
 import {Input, Text} from 'native-base';
 import React, {useEffect, useState} from 'react';
 import {FlatList, Keyboard, SafeAreaView, StyleSheet, View} from 'react-native';
@@ -167,8 +168,11 @@ const Home = ({navigation}: IProps) => {
                     style={styles.coverImage}
                   />
                   <View style={styles.metaInfo}>
-                    <Text color={COLORS.text}>{`${item.startDate} `}</Text>
+                    <Text color={COLORS.text}>{`${moment(item.startDate).format(
+                      'MMMM D (dddd)',
+                    )} `}</Text>
                     <Text style={styles.title}>{`${item.name}`}</Text>
+
                     <Text color={COLORS.text}>{`${item.location} `}</Text>
                   </View>
                 </View>

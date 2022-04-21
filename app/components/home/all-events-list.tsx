@@ -1,7 +1,9 @@
 import {useNavigation} from '@react-navigation/native';
-import {Text} from 'native-base';
+import moment from 'moment';
+import {Box, Text} from 'native-base';
 import React from 'react';
 import {
+  Dimensions,
   FlatList,
   Keyboard,
   StyleSheet,
@@ -12,12 +14,15 @@ import FastImage from 'react-native-fast-image';
 import styled from 'styled-components/native';
 import {COLORS, SIZES} from '../../constants';
 import {Event} from '../../screens/home';
+import {parseDate} from '../../utils/moment';
 
 interface Iprops {
   data: Event[];
   setIsSearching: (isSearching: boolean) => void;
   setQuery: (query: string) => void;
 }
+
+const windowWidth = Dimensions.get('window').width;
 
 const FeaturedList = ({data, setQuery, setIsSearching}: Iprops) => {
   const navigation = useNavigation();
@@ -49,17 +54,20 @@ const FeaturedList = ({data, setQuery, setIsSearching}: Iprops) => {
                 setIsSearching(false);
                 setQuery('');
               }}>
-              <View style={styles.listItem}>
+              <Box maxW={windowWidth - 100} style={styles.listItem}>
                 <FastImage
                   source={{uri: item.image}}
                   style={styles.coverImage}
                 />
                 <View style={styles.metaInfo}>
-                  <Text color={COLORS.text}>{`${item.startDate} `}</Text>
                   <Text style={styles.title}>{`${item.name}`}</Text>
-                  <Text color={COLORS.text}>{`${item.location} `}</Text>
+                  <Text color={COLORS.text}>{`${parseDate(
+                    item.startDate,
+                  )} `}</Text>
+
+                  <Text color={COLORS.text}>at {`${item.location} `}</Text>
                 </View>
-              </View>
+              </Box>
             </TouchableWithoutFeedback>
           )}
         />
