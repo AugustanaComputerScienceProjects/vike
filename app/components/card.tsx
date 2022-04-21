@@ -38,6 +38,7 @@ const Card = ({item, index, length}: Iprops) => {
         }}>
         <Box
           // maxW="80"
+          maxW="300"
           rounded="3xl"
           overflow="hidden"
           borderColor="coolGray.200"
@@ -70,7 +71,7 @@ const Card = ({item, index, length}: Iprops) => {
                   }}>
                   <DateBox>
                     <Text color={COLORS.text} opacity="0.5" letterSpacing={2}>
-                      {moment(item.startDate).format('MMM').toUpperCase()}
+                      {moment(item.startDate).format('MMMM').toUpperCase()}
                     </Text>
                     <Text fontSize="md" fontWeight="bold" color={COLORS.text}>
                       {moment(item.startDate).format('DD').toUpperCase()}
@@ -80,24 +81,22 @@ const Card = ({item, index, length}: Iprops) => {
               </FastImage>
             </AspectRatio>
           </Box>
-          <Stack p="4" space={2}>
-            <Stack space={2}>
-              <Text
-                fontSize="xs"
-                _light={{
-                  color: 'orange.500',
-                }}
-                _dark={{
-                  color: 'orange.400',
-                }}
-                fontWeight="600"
-                ml="-1">
-                {moment(item.startDate).format('ddd, MMM DD · h:mm')}
-              </Text>
-              <Heading size="md" ml="-1">
-                {item.name}
-              </Heading>
-            </Stack>
+          <Stack direction="column" p="4" space={2}>
+            <Text
+              fontSize="xs"
+              _light={{
+                color: 'orange.500',
+              }}
+              _dark={{
+                color: 'orange.400',
+              }}
+              fontWeight="600"
+              ml="-1">
+              {moment(item.startDate).format('ddd, MMM DD · h:mm A')}
+            </Text>
+            <Heading size="md" ml="-1">
+              {item.name}
+            </Heading>
             <Text fontWeight="400" ml="-1">
               {item.location}
             </Text>

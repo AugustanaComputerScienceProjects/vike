@@ -80,17 +80,18 @@ const EventShare = ({event}: IProps) => {
   const onSharePress = () =>
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['Share this event', 'Add to calendar', 'Cancel'],
+        options: ['Add to calendar', 'Cancel'],
         cancelButtonIndex: 2,
       },
       buttonIndex => {
         if (buttonIndex === 0) {
           // cancel action
-          onShare();
-        } else if (buttonIndex === 1) {
-          // add to calendar
           addToCalendar();
         }
+        // else if (buttonIndex === 1) {
+        //   // add to calendar
+        //   addToCalendar();
+        // }
       },
     );
 
@@ -119,7 +120,7 @@ const EventShare = ({event}: IProps) => {
         borderRadius: 100,
       }}
       onPress={onSharePress}>
-      <Icon name="share" size={18} color={COLORS.black} style={{}} />
+      <Icon name="share" size={18} color={COLORS.black} />
     </TouchableOpacity>
   );
 };

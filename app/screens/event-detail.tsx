@@ -2,13 +2,14 @@
 /* eslint-disable react/self-closing-comp */
 
 import moment from 'moment';
-import {Text} from 'native-base';
+import {Box, Text} from 'native-base';
 import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Animated,
   Linking,
   Platform,
+  PlatformOSType,
   StyleSheet,
   View,
 } from 'react-native';
@@ -86,11 +87,12 @@ const EventDetail = ({navigation, route}: IProps) => {
                 // fontWeight={'bold'}
                 fontSize={'sm'}
                 style={{opacity: 0.7, marginLeft: 4}}>
-                {`${moment(selectedEvent?.startDate).format(
-                  'hh:mm',
-                )} - ${moment(selectedEvent?.startDate)
+                {moment(selectedEvent.startDate).format('MMMM D (dddd)')}{' '}
+                {`${moment(selectedEvent?.startDate).format('LT')} - ${moment(
+                  selectedEvent?.startDate,
+                )
                   .add(selectedEvent.duration, 'minute')
-                  .format('hh:mm')}`}
+                  .format('LT')}`}
               </Text>
             </View>
             <View
@@ -107,8 +109,22 @@ const EventDetail = ({navigation, route}: IProps) => {
                 {selectedEvent?.location}
               </Text>
             </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 4,
+              }}>
+              <Icon name="user" size={18} color={COLORS.primary} />
+              <Text
+                color={COLORS.text}
+                fontSize={'sm'}
+                style={{opacity: 0.7, marginLeft: 4}}>
+                Hosted by {selectedEvent?.organization}
+              </Text>
+            </View>
           </View>
-          <View
+          {/* <View
             style={{
               width: 60,
               height: 60,
@@ -118,7 +134,7 @@ const EventDetail = ({navigation, route}: IProps) => {
               alignItems: 'center',
             }}>
             <Text color={COLORS.gray5} style={{letterSpacing: 1}}>
-              {moment(selectedEvent?.startDate).format('MMM').toUpperCase()}
+              {moment(selectedEvent?.startDate).format('MMMM').toUpperCase()}
             </Text>
             <Text
               color={COLORS.white}
@@ -127,7 +143,7 @@ const EventDetail = ({navigation, route}: IProps) => {
               style={{letterSpacing: 1}}>
               {moment(selectedEvent?.startDate).format('DD').toUpperCase()}
             </Text>
-          </View>
+          </View> */}
         </InfoContentView>
 
         <ButtonSection>
@@ -180,7 +196,23 @@ const EventDetail = ({navigation, route}: IProps) => {
                 marginTop: 20,
               }}
               minZoomLevel={15}
-              onPress={() => console.log('Map Pressed')}
+              onPress={e => {
+                let lat = 41.503;
+                let lng = -90.5504;
+                const scheme = Platform.select({
+                  ios: 'maps:0,0?q=',
+                  android: 'geo:0,0?q=',
+                });
+                const latLng: string = `${lat},${lng}`;
+                const label: string = selectedEvent.location;
+                const url: string = Platform.select({
+                  ios: `${scheme}${label}@${latLng}`,
+                  android: `${scheme}${latLng}(${label})`,
+                });
+
+                Linking.openURL(url);
+                console.log(e.nativeEvent);
+              }}
               initialRegion={dummyData.Region}
               customMapStyle={dummyData.MapStyle}
               zoomEnabled={false}
@@ -193,6 +225,9 @@ const EventDetail = ({navigation, route}: IProps) => {
           </View>
           <View style={{paddingBottom: 150}}></View>
         </LocationSection>
+        <View>
+          <Text color="black">{selectedEvent.tags}</Text>
+        </View>
       </Animated.ScrollView>
 
       <BottomBarSection
