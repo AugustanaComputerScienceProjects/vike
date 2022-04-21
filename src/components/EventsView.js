@@ -47,29 +47,6 @@ import DispatchGroup from './DispatchGroup';
 var QRCode = require('qrcode');
 
 const uuidv4 = require('uuid/v4');
-// const redTheme = createTheme({ palette: { primary: red } });
-
-// function getModalStyle() {
-//   const top = 50;
-//   const left = 50;
-
-//   return {
-//     top: `${top}%`,
-//     left: `${left}%`,
-//     transform: `translate(-${top}%, -${left}%)`,
-//   };
-// }
-
-// const styles = (theme) => ({
-//   paper: {
-//     position: 'absolute',
-//     width: theme.spacing.unit * 50,
-//     backgroundColor: theme.palette.background.paper,
-//     boxShadow: theme.shadows[5],
-//     padding: theme.spacing.unit * 4,
-//     outline: 'none',
-//   },
-// });
 
 export class EventsView extends Component {
   group = new DispatchGroup();

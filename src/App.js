@@ -55,7 +55,7 @@ const App = () => {
   // Render the page
   return (
     <div className='fullPage'>
-      <div style={{ width: '100%', position: 'absolute', overflow: 'hidden' }}>
+      <div style={{ width: '100%', position: 'absolute' }}>
         <div style={{ height: '10%' }}>
           <NavBar navChanged={onNavChanged}></NavBar>
         </div>
