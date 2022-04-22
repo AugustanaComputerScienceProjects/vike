@@ -225,9 +225,6 @@ const EventDetail = ({navigation, route}: IProps) => {
           </View>
           <View style={{paddingBottom: 150}}></View>
         </LocationSection>
-        <View>
-          <Text color="black">{selectedEvent.tags}</Text>
-        </View>
       </Animated.ScrollView>
 
       <BottomBarSection

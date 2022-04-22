@@ -36,7 +36,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>2</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>whatsapp</string>
@@ -52,11 +52,11 @@
 	<key>NSAppTransportSecurity</key>
 	<dict/>
 	<key>NSCalendarsUsageDescription</key>
-	<string>This app requires access to the calendar</string>
+	<string>$(PRODUCT_NAME) needs access to your Calendar to add events to your calendar</string>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs access to your Camera.</string>
+	<string>$(PRODUCT_NAME) needs access to your Camera to check in events by scanning QR code</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>$(PRODUCT_NAME) needs access to your Location used for directions</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Feather.ttf</string>
