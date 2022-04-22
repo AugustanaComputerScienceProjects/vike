@@ -10,7 +10,8 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "clean": "react-native-clean-project"
+    "clean": "react-native-clean-project",
+    "fastlane-build-ios": "bundle exec fastlane ios build"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^4",
