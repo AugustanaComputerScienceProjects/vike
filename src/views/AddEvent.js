@@ -32,7 +32,6 @@ import firebase from '../config';
 var QRCode = require('qrcode');
 
 const uuidv4 = require('uuid/v4');
-const listeners = [];
 
 // Parent component for the preview
 const ParentComponent = (props) => (
@@ -93,7 +92,6 @@ const AddEvent = () => {
   const [adminSignedIn, setAdminSignedIn] = useState();
 
   useEffect(() => {
-    // Component will mount - read tags, groups, auth listener
     readTags();
     firebase.auth.onAuthStateChanged((user) => {
       if (user) {
@@ -170,7 +168,7 @@ const AddEvent = () => {
       .ref(ref)
       .push({
         name: title,
-        startDate: moment(date).format('YYYY-MM-DD hh:mm'),
+        startDate: moment(date).format('YYYY-MM-DD HH:mm'),
         duration: parseInt(duration),
         location: location,
         organization: organization,
@@ -300,10 +298,9 @@ const AddEvent = () => {
   // Reads the tags from Firebase and sets the tags list
   const readTags = () => {
     let ref = firebase.database.ref('/tags');
-    listeners.push(ref);
-    ref.on('value', function(snapshot) {
+    ref.on('value', (snapshot) => {
       let tagsList = [];
-      snapshot.forEach(function(child) {
+      snapshot.forEach((child) => {
         tagsList.push(child.val());
       });
       setDatabaseTags(tagsList);
@@ -313,16 +310,12 @@ const AddEvent = () => {
 
   // Reads the groups from Firebase and sets the groups list
   const readAllGroups = () => {
-    let ref = firebase.database.ref('/groups');
-    listeners.push(ref);
-    ref.on('value', function(snapshot) {
+    firebase.database.ref('/groups').on('value', (snapshot) => {
       let groupsList = [];
-      snapshot.forEach(function(child) {
-        let decodedGroup = decodeGroup(child);
-        groupsList.push(decodedGroup.val());
+      snapshot.forEach((child) => {
+        groupsList.push(child.val());
       });
       setGroups(groupsList);
-      // console.log('Groups List: ' + groupsList);
     });
   };
 
@@ -332,40 +325,16 @@ const AddEvent = () => {
       .ref('/leaders')
       .child(email.replace('.', ','))
       .child('groups');
-    ref.on('value', function(snapshot) {
+    ref.on('value', (snapshot) => {
       let myGroups = [];
-      snapshot.forEach(function(child) {
-        let decodedGroup = decodeGroup(child.key);
-        myGroups.push(decodedGroup);
+      snapshot.forEach((child) => {
+        myGroups.push(child.key);
       });
       setGroups(myGroups);
     });
   };
 
-  const decodeGroup = (codedGroup) => {
-    let group = codedGroup;
-    if (typeof group === 'string' || group instanceof String) {
-      while (group.includes('*%&')) {
-        group = group.replace('*%&', '.');
-      }
-      while (group.includes('@%*')) {
-        group = group.replace('@%*', '$');
-      }
-      while (group.includes('*<=')) {
-        group = group.replace('*<=', '[');
-      }
-      while (group.includes('<@+')) {
-        group = group.replace('<@+', ']');
-      }
-      while (group.includes('!*>')) {
-        group = group.replace('!*>', '#');
-      }
-      while (group.includes('!<^')) {
-        group = group.replace('!<^', '/');
-      }
-    }
-    return group;
-  };
+
 
   const child = [];
 
@@ -404,19 +373,8 @@ const AddEvent = () => {
 
   return (
     <Container maxWidth='md'>
-      {/* <MuiPickersUtilsProvider utils={MomentUtils}> */}
-      <Grid
-        container
-        spacing={4}
-        // alignItems='center'
-      >
-        <Grid
-          item
-          md={7}
-          // container
-          // spacing={1}
-          // style={{ width: 200 }}
-        >
+      <Grid container spacing={4}>
+        <Grid item md={7}>
           <Grid item>
             <label style={{ fontSize: 20 }}>Add Event</label>
           </Grid>
@@ -439,17 +397,6 @@ const AddEvent = () => {
                 onChange={handleDateChange}
               />
             </LocalizationProvider>
-            {/* <DateTimePicker
-                label='Start Date/Time'
-                variant='outlined'
-                inputVariant='outlined'
-                value={date}
-                showTodayButton
-                disablePast
-                onChange={handleDateChange}
-              /> */}
-            {/* </Grid> */}
-            {/* <Grid item> */}
             <TextField
               style={{ marginLeft: 10 }}
               // fullWidth
@@ -488,8 +435,7 @@ const AddEvent = () => {
                 ))}
               </Select>
             </FormControl>
-            {/* </Grid> */}
-            {/* <Grid item> */}
+            
             <FormControl style={{ marginLeft: 10 }}>
               <InputLabel htmlFor='select-multiple'>Tags</InputLabel>
               <Select

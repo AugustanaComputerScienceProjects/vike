@@ -18,7 +18,6 @@ import PastEventObj from '../components/PastEventObj';
 import firebase from '../config';
 
 //The main runner of the past event page, contains many past events
-let listener = null;
 const PastEvents = (props) => {
   const [sortDate1, setSortDate1] = useState('2017-05-24');
   const [sortDate2, setSortDate2] = useState('2017-05-22');
@@ -40,45 +39,46 @@ const PastEvents = (props) => {
   }, []);
 
   const readPastEvents = () => {
-    listener = firebase.database.ref('/past-events').orderByChild('startDate');
+    firebase.database
+      .ref('/past-events')
+      .orderByChild('startDate')
+      .on('value', (snapshot) => {
+        let listEvents = [];
+        snapshot.forEach((childSnapshot) => {
+          let webEvent = childSnapshot.val();
+          // console.log(childSnapshot.key);
 
-    listener.on('value', function(snapshot) {
-      let listEvents = [];
-      snapshot.forEach(function(childSnapshot) {
-        let webEvent = childSnapshot.val();
-        // console.log(childSnapshot.key);
+          let len = 0;
 
-        let len = 0;
+          if (webEvent.hasOwnProperty('users')) {
+            //    webEvent["users"].forEach(function(user){
+            //      len++
+            // })
+            let users = webEvent['users'];
+            len = Object.keys(users).length;
+          }
 
-        if (webEvent.hasOwnProperty('users')) {
-          //    webEvent["users"].forEach(function(user){
-          //      len++
-          // })
-          let users = webEvent['users'];
-          len = Object.keys(users).length;
-        }
+          let arr = webEvent['startDate'].split(' ');
+          let arr2 = arr[0].split('-');
+          // let arr3 = arr[1].split(':');
+          let date = arr2[0] + '-' + arr2[1] + '-' + arr2[2];
 
-        let arr = webEvent['startDate'].split(' ');
-        let arr2 = arr[0].split('-');
-        // let arr3 = arr[1].split(':');
-        let date = arr2[0] + '-' + arr2[1] + '-' + arr2[2];
-
-        let event = new PastEventObj(
-          childSnapshot.key,
-          webEvent['name'],
-          date,
-          len,
-          webEvent['users']
-        );
-        listEvents.push(event);
+          let event = new PastEventObj(
+            childSnapshot.key,
+            webEvent['name'],
+            date,
+            len,
+            webEvent['users']
+          );
+          listEvents.push(event);
+        });
+        setEvents(listEvents);
+        setEventsInRange(listEvents);
+        setFilteredEvents(listEvents);
+        setSortDate1(listEvents[0].getDate());
+        setSortDate2(listEvents[listEvents.length - 1].getDate());
+        setHidden('hidden');
       });
-      setEvents(listEvents);
-      setEventsInRange(listEvents);
-      setFilteredEvents(listEvents);
-      setSortDate1(listEvents[0].getDate());
-      setSortDate2(listEvents[listEvents.length - 1].getDate());
-      setHidden('hidden');
-    });
   };
 
   const createDisplayEvents = async (d1, d2) => {
@@ -164,7 +164,7 @@ const PastEvents = (props) => {
   const filterEvents = async (text, originalEvents) => {
     var index = 0;
     let filtered = [];
-    originalEvents.forEach(function(event) {
+    originalEvents.forEach((event) => {
       if (event['title'].toLowerCase().includes(text.toLowerCase())) {
         filtered.push(event);
       }
@@ -239,13 +239,13 @@ const PastEvents = (props) => {
         </div>
       </div>
 
-      <Grid container direction='row' justify='center'>
+      <Grid container direction='row' justifyContent='center'>
         <LocalizationProvider dateAdapter={AdapterMoment}>
           {' '}
           <Grid
             container
             direction='row'
-            justify='center'
+            justifyContent='center'
             alignItems='flex-start'
           >
             <Grid item>
@@ -323,47 +323,6 @@ const PastEvents = (props) => {
             />
           </div>
         </div>
-
-        {/* <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Title</TableCell>
-                  <TableCell align='right'>Total Attendance</TableCell>
-                  <TableCell align='right'>Date</TableCell>
-                  <TableCell align='right'>Student List</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {this.state.filteredEvents.map((row) => {
-                  return (
-                    <TableRow
-                      key={row.getTitle()}
-                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                    >
-                      <TableCell component='th' scope='row'>
-                        {row.getTitle()}
-                      </TableCell>
-                      <TableCell align='right'>{row.getAttend()}</TableCell>
-                      <TableCell align='right'>{row.getDate()}</TableCell>
-                      <TableCell align='right'>
-                        <Button
-                          onClick={() =>
-                            this.downloadXLDoc(row.getTitle(), row.getStuList())
-                          }
-                          disabled={this.state.buttonDisabled}
-                        >
-                          Download XL Doc
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer> */}
-
-        {/* {children} */}
       </Grid>
     </div>
   );
