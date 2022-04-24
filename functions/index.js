@@ -79,9 +79,9 @@ exports.pepsicoEventAutoScheduling =
           let promises = [];
           snapshot.forEach((child) => {
             let event = child.val();
-            promises.push(
-              databaseRef.ref('/past-events/' + child.key).set(event)
-            );
+            // promises.push(
+            //   databaseRef.ref('/past-events/' + child.key).set(event)
+            // );
             promises.push(
               databaseRef.ref('/past-pepsico/' + child.key).set(event)
             );

@@ -1,10 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
 
-class UploadSuccess extends Component {
-  render() {
-    return (
+const UploadSuccess = () => (
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Grid direction='column'>
           <Grid>
@@ -22,7 +20,6 @@ class UploadSuccess extends Component {
         </Grid>
       </div>
     );
-  }
-}
+
 
 export default UploadSuccess;
