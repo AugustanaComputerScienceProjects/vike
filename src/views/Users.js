@@ -1,121 +1,117 @@
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
-import DialogContentText from '@mui/material/DialogContentText';
 import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
-import InputLabel from '@mui/material/InputLabel';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import CSVReader from 'react-csv-reader';
 import Select from 'react-select';
-
-import firebase from '../config';
 import DispatchGroup from '../components/DispatchGroup';
+import firebase from '../config';
 
 // File for the Users page
 
-class Users extends Component {
-  group = new DispatchGroup();
-
-  state = {
-    admins: [],
-    leaders: [],
-    email: '',
-    organization: '',
-    groups: [],
-    adding: false,
-    ref: '',
-    type: '',
-    deleting: false,
-    hidden: 'visible',
-    disabled: false,
-    uploading: false,
-    demographicsFile: null,
-    groupLeaders: new Map(),
-    groupsForLeaders: [],
-    leadersForGroups: [],
-    groupLeaderRemoved: '',
-  };
-
-  listeners = [];
+const Users = (props) => {
+  const group = new DispatchGroup();
+  const [admins, setAdmins] = useState([]);
+  // const [leaders, setLeaders] = useState([]);
+  const [email, setEmail] = useState('');
+  const [organization, setOrganization] = useState('');
+  const [groups, setGroups] = useState([]);
+  const [adding, setAdding] = useState(false);
+  const [ref, setRef] = useState('');
+  const [type, setType] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [hidden, setHidden] = useState('visible');
+  const [disabled, setDisabled] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [demographicsFile, setDemographicsFile] = useState(null);
+  const [groupLeaders, setGroupLeaders] = useState(new Map());
+  const [groupLeaderRemoved, setGroupLeaderRemoved] = useState('');
 
   // Handles the changing of the email in the add admin/leader screen
-  handleEmailChange = (event) => {
-    this.setState({ email: event.target.value });
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value);
   };
 
   // Action for removing a given user - opens the confirm option
-  removeAction = (ref, user, name) => {
-    this.setState({ email: user, ref: ref, groupLeaderRemoved: name });
-    this.handleDeleteOpen();
+  const removeAction = (ref, user, name) => {
+    setEmail(user);
+    setRef(ref);
+    setGroupLeaderRemoved(name);
+    handleDeleteOpen();
   };
 
   // Deletes the user from the database once they hit the confirm button
-  deleteUser = () => {
-    let user = this.state.email.replace('.', ',');
-    if (this.state.ref === '/leaders/') {
-      let org = this.codeGroup(this.state.groupLeaderRemoved);
-      console.log('Leader group: ' + org);
+  const deleteUser = () => {
+    let user = email.replace('.', ',');
+    if (ref === '/leaders/') {
+      console.log('Leader group: ' + groupLeaderRemoved);
       firebase.database
-        .ref('/groups-to-leaders/' + org + '/leaders/' + user)
+        .ref('/groups-to-leaders/' + groupLeaderRemoved + '/leaders/' + user)
         .remove();
-      firebase.database.ref('/leaders/' + user + '/groups/' + org).remove();
+      firebase.database
+        .ref('/leaders/' + user + '/groups/' + groupLeaderRemoved)
+        .remove();
     } else {
-      firebase.database.ref(this.state.ref + user).remove();
+      firebase.database.ref(ref + user).remove();
     }
-    this.handleDeleteClose();
+    handleDeleteClose();
   };
 
   // Handles closing of the add user pop up
-  handleClose = () => {
-    this.setState({ adding: false });
+  const handleClose = () => {
+    setAdding(false);
   };
 
   // Handles opening of the add user pop up
-  handleOpen = () => {
-    this.setState({ adding: true });
+  const handleOpen = () => {
+    setAdding(true);
   };
 
   // Handles closing of the confirm pop up for deleting a user
-  handleDeleteClose = () => {
-    this.setState({ deleting: false });
+  const handleDeleteClose = () => {
+    setDeleting(false);
   };
 
   // Handles opening of the confrim pop up for deleting a user
-  handleDeleteOpen = () => {
-    this.setState({ deleting: true });
+  const handleDeleteOpen = () => {
+    setDeleting(true);
   };
 
-  handleCloseUpload = () => {
-    this.setState({ uploading: false });
+  const handleCloseUpload = () => {
+    setUploading(false);
   };
 
   // Handles opening of the add user screen
-  addAction = (ref, type) => {
-    this.setState({ email: '', ref: ref, type: type });
+  const addAction = (ref, type) => {
+    setEmail('');
+    setRef(ref);
+    setType(type);
     if (type === 'Administrator') {
-      this.setState({ disabled: true });
+      setDisabled(true);
     } else {
-      this.setState({ disabled: false });
+      setDisabled(false);
     }
 
-    this.handleOpen();
+    handleOpen();
   };
 
-  uploadAction = () => {
-    this.setState({ uploading: true });
+  const uploadAction = () => {
+    setUploading(true);
   };
 
-  uploadLeaders = () => {
-    let leadersCSVData = this.state.demographicsFile;
+  const uploadLeaders = () => {
+    let leadersCSVData = demographicsFile;
     if (leadersCSVData === null) {
       alert('Please select a file to upload.');
     } else {
@@ -127,18 +123,17 @@ class Users extends Component {
         let group = leadersCSVData[row][0];
         console.log(group);
         firebase.database.ref('/groups').push(group);
-        let codedGroup = this.codeGroup(group);
-        console.log(codedGroup);
+        console.log(group);
         if (leadersCSVData[row][1] !== '') {
           for (let column = 1; column < columnNames.length; column++) {
             if (leadersCSVData[row][column] === '') {
               break;
             }
-            console.log(codedGroup + ': ' + leadersCSVData[row][column]);
+            console.log(group + ': ' + leadersCSVData[row][column]);
             console.log([row][1]);
             firebase.database
               .ref('/groups-to-leaders')
-              .child(codedGroup)
+              .child(group)
               .child('leaders')
               .child(leadersCSVData[row][column].replace('.', ','))
               .set(true);
@@ -146,217 +141,142 @@ class Users extends Component {
               .ref('/leaders')
               .child(leadersCSVData[row][column].replace('.', ','))
               .child('groups')
-              .child(codedGroup)
+              .child(group)
               .set(true);
           }
         } else {
-          if (codedGroup === '') {
+          if (group === '') {
             break;
           }
           firebase.database
             .ref('/groups-to-leaders')
-            .child(codedGroup)
+            .child(group)
             .child('leaders')
             .child('None')
             .set(true);
         }
       }
-      this.setState({ demographicsFile: null, uploading: false });
+      setDemographicsFile(null);
+      setUploading(false);
     }
   };
 
   // Handles adding of the user once the add user button is clicked
-  handleSave = () => {
-    if (
-      (this.state.organization === '' && this.state.ref === '/leaders/') ||
-      this.state.email === ''
-    ) {
+  const handleSave = () => {
+    if ((organization === '' && ref === '/leaders/') || email === '') {
       alert('Please fill out all fields.');
     } else {
-      if (this.state.ref === '/leaders/') {
-        let codedGroup = this.codeGroup(this.state.organization);
+      if (ref === '/leaders/') {
         firebase.database
           .ref('/groups-to-leaders')
-          .child(codedGroup)
+          .child(organization)
           .child('leaders')
           .child('None')
           .remove();
         firebase.database
-          .ref(this.state.ref + this.state.email.replace('.', ','))
+          .ref(ref + email.replace('.', ','))
           .child('groups')
-          .child(codedGroup)
+          .child(organization)
           .set(true);
         firebase.database
-          .ref('/groups-to-leaders/' + codedGroup)
+          .ref('/groups-to-leaders/' + organization)
           .child('leaders')
-          .child(this.state.email.replace('.', ','))
+          .child(email.replace('.', ','))
           .set(true);
-        this.setState({ organization: '' });
+        setOrganization('');
       } else {
-        firebase.database
-          .ref(this.state.ref + this.state.email.replace('.', ','))
-          .set(true);
+        firebase.database.ref(ref + email.replace('.', ',')).set(true);
       }
-      this.handleClose();
+      handleClose();
     }
   };
 
   // Reads the current administrators from the database
-  readAdministrators() {
-    let token = this.group.enter();
-    let self = this;
+  const readAdministrators = () => {
+    let token = group.enter();
     let ref = firebase.database.ref('/admin');
-    this.listeners.push(ref);
-    ref.on('value', function(snapshot) {
+    ref.on('value', (snapshot) => {
       console.log('reading admin');
       let admins = [];
-      snapshot.forEach(function(child) {
+      snapshot.forEach((child) => {
         admins.push(child.key.replace(',', '.'));
       });
-      self.setState({ admins: admins });
-      self.group.leave(token);
+
+      setAdmins(admins);
+      group.leave(token);
     });
-  }
+  };
 
   // Reads the current leaders from the database
-  readLeaders() {
-    let token = this.group.enter();
-    let self = this;
+  const readLeaders = () => {
+    let token = group.enter();
     let ref = firebase.database.ref('/leaders');
-    this.listeners.push(ref);
-    ref.on('value', function(snapshot) {
+    ref.on('value', (snapshot) => {
       let leaders = [];
-      snapshot.forEach(function(child) {
+      snapshot.forEach((child) => {
         leaders.push(child.key.replace(',', '.'));
       });
-      self.setState({ leaders: leaders });
-      self.group.leave(token);
+      group.leave(token);
     });
-  }
+  };
 
   // Reads the groups from Firebase and sets the groups list
-  readGroups() {
-    let self = this;
+  const readGroups = () => {
     let ref = firebase.database.ref('/groups').orderByValue();
-    this.listeners.push(ref);
-    ref.on('value', function(snapshot) {
+    ref.on('value', (snapshot) => {
       let groupsList = [];
-      snapshot.forEach(function(child) {
-        let decodedGroup = self.decodeGroup(child);
-        groupsList.push(decodedGroup.val());
+      snapshot.forEach((child) => {
+        groupsList.push(child.val());
       });
-      self.setState({ groups: groupsList });
+      setGroups(groupsList);
       console.log(groupsList);
     });
-  }
-
-  codeGroup = (uncodedGroup) => {
-    let group = uncodedGroup;
-    if (typeof group === 'string' || group instanceof String) {
-      console.log('AHHHHHHH: ' + group);
-      while (group.includes('.')) {
-        group = group.replace('.', '*%&');
-      }
-      while (group.includes('$')) {
-        group = group.replace('$', '@%*');
-      }
-      while (group.includes('[')) {
-        group = group.replace('[', '*&@');
-      }
-      while (group.includes(']')) {
-        group = group.replace(']', '<@+');
-      }
-      while (group.includes('#')) {
-        group = group.replace('#', '!*>');
-      }
-      while (group.includes('/')) {
-        group = group.replace('/', '!<^');
-      }
-    }
-    console.log('CODED GROUP: ' + group);
-    return group;
   };
 
-  decodeGroup = (codedGroup) => {
-    let group = codedGroup;
-    if (typeof group === 'string' || group instanceof String) {
-      while (group.includes('*%&')) {
-        group = group.replace('*%&', '.');
-      }
-      while (group.includes('@%*')) {
-        group = group.replace('@%*', '$');
-      }
-      while (group.includes('*<=')) {
-        group = group.replace('*<=', '[');
-      }
-      while (group.includes('<@+')) {
-        group = group.replace('<@+', ']');
-      }
-      while (group.includes('!*>')) {
-        group = group.replace('!*>', '#');
-      }
-      while (group.includes('!<^')) {
-        group = group.replace('!<^', '/');
-      }
-    }
-    return group;
-  };
-
-  readGroupsWithLeaders() {
-    let self = this;
+  const readGroupsWithLeaders = () => {
     let ref = firebase.database.ref('/groups-to-leaders');
-    this.listeners.push(ref);
-    ref.on('value', function(snapshot) {
+    ref.on('value', (snapshot) => {
       if (!snapshot.exists()) {
-        self.setState({ groupLeaders: new Map() });
+        setGroupLeaders(new Map());
       }
       let groups = new Map();
-      snapshot.forEach(function(child) {
+      snapshot.forEach((child) => {
         let leaders = [];
-        let decodedGroup = self.decodeGroup(child.key);
-        child.child('leaders').forEach(function(leader) {
+        child.child('leaders').forEach((leader) => {
           leaders.push(leader.key.replace(',', '.'));
         });
-        groups.set(decodedGroup, leaders);
-        self.setState({ groupLeaders: groups });
+        groups.set(child.key, leaders);
+        setGroupLeaders(groups);
       });
-      console.log('Map: ' + self.state.groupLeaders);
+      console.log('Map: ' + groupLeaders);
     });
-  }
+  };
 
-  // Component will mount - read the administrators and leaders, then hide the progress indicator
-  componentWillMount() {
-    this.readAdministrators();
-    this.readLeaders();
-    this.readGroups();
-    this.readGroupsWithLeaders();
-    let self = this;
-    this.group.notify(function() {
-      self.setState({ hidden: 'hidden' });
+  useEffect(() => {
+    readAdministrators();
+    readLeaders();
+    readGroups();
+    readGroupsWithLeaders();
+    group.notify(() => {
+      setHidden('hidden');
     });
-  }
-
-  // Compone will unmount - turn off the Firebase listeners
-  componentWillUnmount() {
-    this.listeners.forEach(function(listener) {
-      listener.off();
-    });
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   //Gives the group selector if the adding a leader
   //Otherwise, leaves it blank
-  addGroupSelect() {
-    if (this.state.type === 'Leader') {
-      const { selectedOption } = this.state.organization;
+  const addGroupSelect = () => {
+    if (type === 'Leader') {
+      const { selectedOption } = organization;
       return (
-        <Grid item>
-          <FormControl margin='normal' disabled={this.state.disabled}>
-            <InputLabel>Group</InputLabel>
+        <Grid item style={{ height: 425 }}>
+          <FormControl margin='normal' disabled={disabled}>
             <div style={{ width: 500 }}>
               <Select
+                label='Select Group'
                 value={selectedOption}
-                onChange={(e) => this.setState({ organization: e.value })}
-                options={this.state.groups.map((group) => {
+                onChange={(e) => setOrganization(e.value)}
+                options={groups.map((group) => {
                   return { value: group, label: group };
                 })}
               />
@@ -365,210 +285,199 @@ class Users extends Component {
         </Grid>
       );
     }
-  }
-
-  handleFileChanged = (data) => {
-    console.log(data);
-    console.log(data[0]);
-    this.setState({ demographicsFile: data });
-    console.log(this.state.demographicsFile.length);
   };
 
-  // Render the page
-  render() {
-    const adminChildren = [];
-    const leaderChildren = [];
+  const handleFileChanged = (data) => {
+    console.log(data);
+    console.log(demographicsFile.length);
+    setDemographicsFile(data);
+  };
 
-    // Build the administrator components to display
-    for (var i = 0; i < this.state.admins.length; i += 1) {
-      let index = i;
-      adminChildren.push(
-        <ChildComponent
-          key={index}
-          email={this.state.admins[index]}
-          removeAction={() =>
-            this.removeAction('/admin/', this.state.admins[index], '')
-          }
-        ></ChildComponent>
-      );
-    }
+  const adminChildren = [];
+  const leaderChildren = [];
 
-    // Build the leader components to display
-    let index = 0;
-    if (this.state.groupLeaders.size > 0) {
-      for (var [name, value] of this.state.groupLeaders.entries()) {
-        leaderChildren.push(
-          <GroupTitleComponent group={name}></GroupTitleComponent>
-        );
-        for (var j = 0; j < value.length; j += 1) {
-          let email = value[j];
-          let org = name;
-          leaderChildren.push(
-            <ChildComponent
-              key={index}
-              email={email}
-              removeAction={() => this.removeAction('/leaders/', email, org)}
-            ></ChildComponent>
-          );
-          index++;
-        }
-      }
-    }
-
-    return (
-      <div>
-        <div
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            margintop: '-50px',
-            marginleft: '-50px',
-            width: '100px',
-            height: '100px',
-          }}
-        >
-          <CircularProgress
-            disableShrink
-            style={{ visibility: this.state.hidden }}
-          ></CircularProgress>
-        </div>
-        <Grid container>
-          <Grid item container direction='row'>
-            <Grid item style={{ width: '50%' }}>
-              <Paper style={{ padding: 20, marginRight: 20 }}>
-                <AdminParentComponent
-                  title={'Administrators:'}
-                  addAction={() => this.addAction('/admin/', 'Administrator')}
-                >
-                  {adminChildren}
-                </AdminParentComponent>
-              </Paper>
-            </Grid>
-            <Grid item style={{ width: '50%' }}>
-              <Paper style={{ padding: 20 }}>
-                <LeaderParentComponent
-                  title={'Leaders:'}
-                  addAction={() => this.addAction('/leaders/', 'Leader')}
-                  upload={() => this.uploadAction()}
-                >
-                  {leaderChildren}
-                </LeaderParentComponent>
-              </Paper>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Dialog
-          onClose={this.handleClose}
-          aria-labelledby='customized-dialog-title'
-          open={this.state.adding}
-        >
-          <DialogTitle
-            id='customized-dialog-title'
-            onClose={this.handleCloseEdit}
-          >
-            Add {this.state.type}
-          </DialogTitle>
-          <DialogContent style={{ height: 425 }}>
-            <Grid container>
-              <Grid item container direction='column' spacing={0}>
-                <Grid item>
-                  <TextField
-                    autoFocus={true}
-                    style={{ width: 300 }}
-                    label='Email'
-                    id='email'
-                    margin='normal'
-                    value={this.state.email}
-                    onChange={this.handleEmailChange}
-                  />
-                </Grid>
-                {this.addGroupSelect()}
-              </Grid>
-            </Grid>
-          </DialogContent>
-          <DialogActions style={{ justifyContent: 'center' }}>
-            <Button
-              variant='contained'
-              onClick={this.handleSave}
-              color='primary'
-            >
-              Add User
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        <Dialog
-          onClose={this.handleCloseUpload}
-          aria-labelledby='customized-dialog-title'
-          open={this.state.uploading}
-        >
-          <DialogTitle id='customized-dialog-title'>Upload Leaders</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              <h3>Make sure you are uploading a .csv file.</h3>
-              <p>
-                <strong>How to make a .csv file from Excel</strong>
-              </p>
-              <ol>
-                <li>
-                  Start Excel and open the spreadsheet you would like to upload.
-                </li>
-                <li>
-                  At the top of your screen, click on "File", then "Save As".
-                </li>
-                <li>
-                  Click on the dropdown box for "File Format:" (should say
-                  "Excel Workbook .xlsx).
-                </li>
-                <li>Select "CSV UTF-8 (Comma delimited) (.csv)</li>
-                <li>Save the file to a location you can later find it.</li>
-              </ol>
-            </DialogContentText>
-            <DialogActions>
-              <CSVReader
-                onFileLoaded={this.handleFileChanged}
-                inputId='something'
-                inputStyle={{ color: 'purple' }}
-                style={{ margin: 'auto' }}
-              />
-              <Button
-                variant='contained'
-                onClick={this.uploadLeaders}
-                style={{ backgroundColor: 'blue' }}
-                color='primary'
-              >
-                Submit
-              </Button>
-            </DialogActions>
-          </DialogContent>
-        </Dialog>
-
-        <Dialog
-          open={this.state.deleting}
-          onClose={this.handleDeleteClose}
-          aria-labelledby='alert-dialog-title'
-          aria-describedby='alert-dialog-description'
-        >
-          <DialogTitle id='alert-dialog-title'>
-            {'Are you sure you want to remove this user?'}
-          </DialogTitle>
-          <DialogContent>
-            <label>{this.state.email}</label>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleDeleteClose} color='primary'>
-              Cancel
-            </Button>
-            <Button onClick={this.deleteUser} color='primary' autoFocus>
-              Confirm
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+  // Build the administrator components to display
+  for (var i = 0; i < admins.length; i += 1) {
+    let index = i;
+    adminChildren.push(
+      <ChildComponent
+        key={index}
+        email={admins[index]}
+        removeAction={() => removeAction('/admin/', admins[index], '')}
+      ></ChildComponent>
     );
   }
-}
+
+  // Build the leader components to display
+  let index = 0;
+  if (groupLeaders.size > 0) {
+    for (var [name, value] of groupLeaders.entries()) {
+      leaderChildren.push(
+        <GroupTitleComponent group={name}></GroupTitleComponent>
+      );
+      for (var j = 0; j < value.length; j += 1) {
+        let email = value[j];
+        let org = name;
+        leaderChildren.push(
+          <ChildComponent
+            key={index}
+            email={email}
+            removeAction={() => removeAction('/leaders/', email, org)}
+          ></ChildComponent>
+        );
+        index++;
+      }
+    }
+  }
+  return (
+    <div>
+      <div
+        style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          margintop: '-50px',
+          marginleft: '-50px',
+          width: '100px',
+          height: '100px',
+        }}
+      >
+        <CircularProgress
+          disableShrink
+          style={{ visibility: hidden }}
+        ></CircularProgress>
+      </div>
+      <Grid container>
+        <Grid item container direction='row'>
+          <Grid item style={{ width: '50%' }}>
+            <Paper style={{ padding: 20, marginRight: 20 }}>
+              <AdminParentComponent
+                title={'Administrators:'}
+                addAction={() => addAction('/admin/', 'Administrator')}
+              >
+                {adminChildren}
+              </AdminParentComponent>
+            </Paper>
+          </Grid>
+          <Grid item style={{ width: '50%' }}>
+            <Paper style={{ padding: 20 }}>
+              <LeaderParentComponent
+                title={'Leaders:'}
+                addAction={() => addAction('/leaders/', 'Leader')}
+                upload={() => uploadAction()}
+              >
+                {leaderChildren}
+              </LeaderParentComponent>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Dialog
+        onClose={handleClose}
+        aria-labelledby='customized-dialog-title'
+        open={adding}
+      >
+        <DialogTitle
+          id='customized-dialog-title'
+          // onClose={handleCloseEdit}
+        >
+          Add {type}
+        </DialogTitle>
+        <DialogContent>
+          <Grid container>
+            <Grid item container direction='column' spacing={0}>
+              <Grid item>
+                <TextField
+                  autoFocus={true}
+                  style={{ width: 300 }}
+                  label='Email'
+                  id='email'
+                  margin='normal'
+                  value={email}
+                  onChange={handleEmailChange}
+                />
+              </Grid>
+              {addGroupSelect()}
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions style={{ justifyContent: 'center' }}>
+          <Button variant='contained' onClick={handleSave} color='primary'>
+            Add User
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        onClose={handleCloseUpload}
+        aria-labelledby='customized-dialog-title'
+        open={uploading}
+      >
+        <DialogTitle id='customized-dialog-title'>Upload Leaders</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <h3>Make sure you are uploading a .csv file.</h3>
+            <p>
+              <strong>How to make a .csv file from Excel</strong>
+            </p>
+            <ol>
+              <li>
+                Start Excel and open the spreadsheet you would like to upload.
+              </li>
+              <li>
+                At the top of your screen, click on "File", then "Save As".
+              </li>
+              <li>
+                Click on the dropdown box for "File Format:" (should say "Excel
+                Workbook .xlsx).
+              </li>
+              <li>Select "CSV UTF-8 (Comma delimited) (.csv)</li>
+              <li>Save the file to a location you can later find it.</li>
+            </ol>
+          </DialogContentText>
+          <DialogActions>
+            <CSVReader
+              onFileLoaded={handleFileChanged}
+              inputId='something'
+              inputStyle={{ color: 'purple' }}
+              style={{ margin: 'auto' }}
+            />
+            <Button
+              variant='contained'
+              onClick={uploadLeaders}
+              style={{ backgroundColor: 'blue' }}
+              color='primary'
+            >
+              Submit
+            </Button>
+          </DialogActions>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={deleting}
+        onClose={handleDeleteClose}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+      >
+        <DialogTitle id='alert-dialog-title'>
+          {'Are you sure you want to remove this user?'}
+        </DialogTitle>
+        <DialogContent>
+          <label>{email}</label>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteClose} color='primary'>
+            Cancel
+          </Button>
+          <Button onClick={deleteUser} color='primary' autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+};
 
 // Parent component for a user to be displayed
 const AdminParentComponent = (props) => (

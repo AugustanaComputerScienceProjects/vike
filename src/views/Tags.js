@@ -10,165 +10,152 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import DispatchGroup from '../components/DispatchGroup';
 import firebase from '../config.js';
 
 // File for manging the Groups/Tags screen
 
-class Tags extends Component {
-  group = new DispatchGroup();
+const Tags = () => {
+  const group = new DispatchGroup();
+  const [tags, setTags] = React.useState([]);
+  const [groups, setGroups] = React.useState([]);
+  const [key, setKey] = React.useState('');
+  const [data, setData] = React.useState('');
+  const [adding, setAdding] = React.useState(false);
+  const [ref, setRef] = React.useState(null);
+  const [type, setType] = React.useState('');
+  const [deleting, setDeleting] = React.useState(false);
+  const [adminSignedIn, setAdminSignedIn] = React.useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [leaderSignedIn, setLeaderSignedIn] = React.useState(false);
+  const [hidden, setHidden] = React.useState(false);
 
-  state = {
-    tags: [],
-    groups: [],
-    key: '',
-    data: '',
-    adding: false,
-    ref: '',
-    type: '',
-    deleting: false,
-    adminSignedIn: false,
-    leaderSignedIn: false,
-    hidden: 'visible',
-  };
-
-  listeners = [];
-
-  // Component will mount - read the tags and groups and then hide the progress indicator
-  componentWillMount() {
-    this.readTags();
-    this.readGroups();
-    let self = this;
-    this.group.notify(function() {
-      self.setState({ hidden: 'hidden' });
+  useEffect(() => {
+    readTags();
+    readGroups();
+    group.notify(() => {
+      setHidden('hidden');
     });
-    this.off = firebase.auth.onAuthStateChanged((user) => {
+    firebase.auth.onAuthStateChanged((user) => {
       if (user) {
-        this.checkRole(user, 'leader');
-        this.checkRole(user, 'admin');
+        checkRole(user, 'leader');
+        checkRole(user, 'admin');
       }
     });
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Component will unmount - turn off the Firebase listeners
-  componentWillUnmount() {
-    this.listeners.forEach(function(listener) {
-      listener.off();
-    });
-  }
-
-  // Read the tags from Firebase
-  readTags() {
-    let token = this.group.enter();
-    let self = this;
+  const readTags = () => {
+    let token = group.enter();
     let ref = firebase.database.ref('/tags');
-    this.listeners.push(ref);
-    ref.on('value', function(snapshot) {
+    ref.on('value', (snapshot) => {
       let tagsList = [];
-      snapshot.forEach(function(child) {
+      snapshot.forEach((child) => {
         tagsList.push([child.key, child.val()]);
       });
-      self.setState({ tags: tagsList });
-      self.group.leave(token);
+      setTags(tagsList);
+      group.leave(token);
       console.log(tagsList);
     });
-  }
+  };
 
   // Read the groups from Firebase
-  readGroups() {
-    let token = this.group.enter();
-    let self = this;
+  const readGroups = () => {
+    let token = group.enter();
     let ref = firebase.database.ref('/groups');
-    this.listeners.push(ref);
-    ref.on('value', function(snapshot) {
+    ref.on('value', (snapshot) => {
       let groupsList = [];
-      snapshot.forEach(function(child) {
+      snapshot.forEach((child) => {
         groupsList.push([child.key, child.val()]);
       });
-      self.setState({ groups: groupsList });
-      self.group.leave(token);
+      setGroups(groupsList);
+      group.leave(token);
       console.log(groupsList);
     });
-  }
+  };
 
   // Action for opening the confirm pop up when deleting a tag/group
-  removeAction = (ref, data, key, type) => {
-    this.setState({ key: key, data: data, ref: ref, type: type });
-    this.handleDeleteOpen();
+  const removeAction = (ref, data, key, type) => {
+    setKey(key);
+    setData(data);
+    setRef(ref);
+    setType(type);
+    handleDeleteOpen();
   };
 
   // Handles closing of the confirm delete pop up
-  handleDeleteClose = () => {
-    this.setState({ deleting: false });
+  const handleDeleteClose = () => {
+    setDeleting(false);
   };
 
   // Handles opening of the confirm delete pop up
-  handleDeleteOpen = () => {
-    this.setState({ deleting: true });
+  const handleDeleteOpen = () => {
+    setDeleting(true);
   };
 
   // Action for opening the add group/tag pop up
-  addAction = (ref, type) => {
-    this.setState({ data: '', ref: ref, type: type });
-    this.handleOpen();
+  const addAction = (ref, type) => {
+    setData('');
+    setRef(ref);
+    setType(type);
+    handleOpen();
   };
 
   // Handles closing of the add group/tag pop up
-  handleClose = () => {
-    this.setState({ adding: false });
+  const handleClose = () => {
+    setAdding(false);
   };
 
   // Handles opening of the add group/tag pop up
-  handleOpen = () => {
-    this.setState({ adding: true });
+  const handleOpen = () => {
+    setAdding(true);
   };
 
   // Action for adding the group/tag to Firebase once the Add button is clicked
-  handleSave = () => {
+  const handleSave = () => {
     firebase.database
-      .ref(this.state.ref)
+      .ref(ref)
       .push()
-      .set(this.state.data);
-    this.handleClose();
+      .set(data);
+    handleClose();
   };
 
   // Handles changing of the group/tag field in the add pop up
-  handleChange = (event) => {
-    this.setState({ data: event.target.value });
+  const handleChange = (event) => {
+    setData(event.target.value);
   };
 
   // Deletes the tag/group from Firebase once the confirm button is clicked
-  deleteData = () => {
-    firebase.database.ref(this.state.ref + '/' + this.state.key).remove();
-    this.handleDeleteClose();
+  const deleteData = () => {
+    firebase.database.ref(ref + '/' + key).remove();
+    handleDeleteClose();
   };
 
-  checkRole(user, role) {
-    let self = this;
+  const checkRole = (user, role) => {
     firebase.database
       .ref(role)
       .once('value')
-      .then(function(snapshot) {
+      .then((snapshot) => {
         if (snapshot.hasChild(user.email.replace('.', ','))) {
           console.log('Snapshot: ' + snapshot);
           if (role === 'admin') {
-            self.setState({ adminSignedIn: true });
-          } else if (role === 'leaders' && !self.state.adminSignedIn) {
-            self.setState({ leaderSignedIn: true });
+            setAdminSignedIn(true);
+          } else if (role === 'leaders' && !adminSignedIn) {
+            setLeaderSignedIn(true);
           }
         }
       });
-  }
+  };
 
-  insertGroupsWidget(groupsChildren) {
-    if (this.state.adminSignedIn) {
+  const insertGroupsWidget = (groupsChildren) => {
+    if (adminSignedIn) {
       return (
         <Grid item style={{ width: '50%' }}>
           <Paper style={{ padding: 20, marginRight: 20 }}>
             <ParentComponent
               title={'Groups:'}
-              addAction={() => this.addAction('/groups/', 'Group')}
+              addAction={() => addAction('/groups/', 'Group')}
             >
               {groupsChildren}
             </ParentComponent>
@@ -176,140 +163,125 @@ class Tags extends Component {
         </Grid>
       );
     }
-  }
+  };
 
-  // Render the Groups/Tags page
-  render() {
-    const tagsChildren = [];
-    const groupsChildren = [];
+  const tagsChildren = [];
+  const groupsChildren = [];
 
-    // Build the components for tags
-    for (var i = 0; i < this.state.tags.length; i += 1) {
-      let index = i;
-      let tag = this.state.tags[index];
-      tagsChildren.push(
-        <ChildComponent
-          key={index}
-          data={tag[1]}
-          removeAction={() =>
-            this.removeAction('/tags/', tag[1], tag[0], 'tag')
-          }
-        ></ChildComponent>
-      );
-    }
-
-    // Build the components for groups
-    for (var j = 0; j < this.state.groups.length; j += 1) {
-      let index = j;
-      let group = this.state.groups[index];
-      groupsChildren.push(
-        <ChildComponent
-          key={index}
-          data={group[1]}
-          removeAction={() =>
-            this.removeAction('/groups/', group[1], group[0], 'group')
-          }
-        ></ChildComponent>
-      );
-    }
-
-    return (
-      <div>
-        <div
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            margintop: '-50px',
-            marginleft: '-50px',
-            width: '100px',
-            height: '100px',
-          }}
-        >
-          <CircularProgress
-            disableShrink
-            style={{ visibility: this.state.hidden }}
-          ></CircularProgress>
-        </div>
-        <Grid container>
-          <Grid item container direction='row'>
-            {this.insertGroupsWidget(groupsChildren)}
-            <Grid item style={{ width: '50%' }}>
-              <Paper style={{ padding: 20 }}>
-                <ParentComponent
-                  title={'Tags:'}
-                  addAction={() => this.addAction('/tags/', 'Tag')}
-                >
-                  {tagsChildren}
-                </ParentComponent>
-              </Paper>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Dialog
-          onClose={this.handleClose}
-          aria-labelledby='customized-dialog-title'
-          open={this.state.adding}
-        >
-          <DialogTitle
-            id='customized-dialog-title'
-            onClose={this.handleCloseEdit}
-          >
-            Add {this.state.type}
-          </DialogTitle>
-          <DialogContent>
-            <Grid container>
-              <Grid item container direction='column' spacing={0}>
-                <Grid item>
-                  <TextField
-                    autoFocus={true}
-                    style={{ width: 300 }}
-                    label={this.state.type}
-                    id='data'
-                    margin='normal'
-                    value={this.state.data}
-                    onChange={this.handleChange}
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
-          </DialogContent>
-          <DialogActions style={{ justifyContent: 'center' }}>
-            <Button
-              variant='contained'
-              onClick={this.handleSave}
-              color='primary'
-            >
-              Add
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog
-          open={this.state.deleting}
-          onClose={this.handleDeleteClose}
-          aria-labelledby='alert-dialog-title'
-          aria-describedby='alert-dialog-description'
-        >
-          <DialogTitle id='alert-dialog-title'>
-            {'Are you sure you want to remove this ' + this.state.type + '?'}
-          </DialogTitle>
-          <DialogContent>
-            <label>{this.state.data}</label>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleDeleteClose} color='primary'>
-              Cancel
-            </Button>
-            <Button onClick={this.deleteData} color='primary' autoFocus>
-              Confirm
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+  // Build the components for tags
+  for (var i = 0; i < tags.length; i += 1) {
+    let index = i;
+    let tag = tags[index];
+    tagsChildren.push(
+      <ChildComponent
+        key={index}
+        data={tag[1]}
+        removeAction={() => removeAction('/tags/', tag[1], tag[0], 'tag')}
+      ></ChildComponent>
     );
   }
-}
 
+  // Build the components for groups
+  for (var j = 0; j < groups.length; j += 1) {
+    let index = j;
+    let group = groups[index];
+    groupsChildren.push(
+      <ChildComponent
+        key={index}
+        data={group[1]}
+        removeAction={() =>
+          removeAction('/groups/', group[1], group[0], 'group')
+        }
+      ></ChildComponent>
+    );
+  }
+
+  return (
+    <div>
+      <div
+        style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          margintop: '-50px',
+          marginleft: '-50px',
+          width: '100px',
+          height: '100px',
+        }}
+      >
+        <CircularProgress
+          disableShrink
+          style={{ visibility: hidden }}
+        ></CircularProgress>
+      </div>
+      <Grid container>
+        <Grid item container direction='row'>
+          {insertGroupsWidget(groupsChildren)}
+          <Grid item style={{ width: '50%' }}>
+            <Paper style={{ padding: 20 }}>
+              <ParentComponent
+                title={'Tags:'}
+                addAction={() => addAction('/tags/', 'Tag')}
+              >
+                {tagsChildren}
+              </ParentComponent>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Dialog
+        onClose={handleClose}
+        aria-labelledby='customized-dialog-title'
+        open={adding}
+      >
+        <DialogTitle id='customized-dialog-title'>Add {type}</DialogTitle>
+        <DialogContent>
+          <Grid container>
+            <Grid item container direction='column' spacing={0}>
+              <Grid item>
+                <TextField
+                  autoFocus={true}
+                  style={{ width: 300 }}
+                  label={type}
+                  id='data'
+                  margin='normal'
+                  value={data}
+                  onChange={handleChange}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions style={{ justifyContent: 'center' }}>
+          <Button variant='contained' onClick={handleSave} color='primary'>
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={deleting}
+        onClose={handleDeleteClose}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+      >
+        <DialogTitle id='alert-dialog-title'>
+          {'Are you sure you want to remove ' + type + '?'}
+        </DialogTitle>
+        <DialogContent>
+          <label>{data}</label>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteClose} color='primary'>
+            Cancel
+          </Button>
+          <Button onClick={deleteData} color='primary' autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+};
 // Parent component for displaying a single group/tag
 const ParentComponent = (props) => (
   <div style={{ width: 1000 }}>
