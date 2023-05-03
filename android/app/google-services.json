@@ -8,12 +8,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:559059413195:android:62e6f5cd4d95a819b8934e",
+        "mobilesdk_app_id": "1:559059413195:android:007adf0c4f4ebb35b8934e",
         "android_client_info": {
           "package_name": "edu.augustana.osleventapp"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "559059413195-va5s8h0c6019v90hbuh7g9o0v4sd1fnd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.augustana.osleventapp",
+            "certificate_hash": "1f36efc8ce045add1d07c2a7e400f40242b56e48"
+          }
+        },
         {
           "client_id": "559059413195-kc0din44sr01g9opm9nnnb3ve06mvrcq.apps.googleusercontent.com",
           "client_type": 3
@@ -32,10 +40,11 @@
               "client_type": 3
             },
             {
-              "client_id": "559059413195-bm452n249mhutpo2ddtmf8ptjrubbqqq.apps.googleusercontent.com",
+              "client_id": "559059413195-ar460uuho85d6pmua37pj10fuv7i2mrh.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "edu.augustana.OSL-Calendar-IOS-App"
+                "bundle_id": "edu.augustana.osl-events-ios-app",
+                "app_store_id": "1473326895"
               }
             }
           ]
@@ -132,10 +141,11 @@
               "client_type": 3
             },
             {
-              "client_id": "559059413195-bm452n249mhutpo2ddtmf8ptjrubbqqq.apps.googleusercontent.com",
+              "client_id": "559059413195-ar460uuho85d6pmua37pj10fuv7i2mrh.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "edu.augustana.OSL-Calendar-IOS-App"
+                "bundle_id": "edu.augustana.osl-events-ios-app",
+                "app_store_id": "1473326895"
               }
             }
           ]
