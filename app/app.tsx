@@ -1,10 +1,7 @@
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {NavigationContainer} from '@react-navigation/native';
-import {
-  CardStyleInterpolators,
-  createStackNavigator,
-} from '@react-navigation/stack';
+import {createStackNavigator} from '@react-navigation/stack';
 import {NativeBaseProvider} from 'native-base';
 import React, {useEffect, useState} from 'react';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -17,7 +14,7 @@ import theme from './theme';
 
 GoogleSignin.configure({
   webClientId:
-    '559059413195-p4j61vpcbdgreua073t4st0vbb3vg343.apps.googleusercontent.com',
+    '559059413195-kc0din44sr01g9opm9nnnb3ve06mvrcq.apps.googleusercontent.com',
   hostedDomain: 'augustana.edu',
 });
 

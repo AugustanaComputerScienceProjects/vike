@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>559059413195-p4j61vpcbdgreua073t4st0vbb3vg343.apps.googleusercontent.com</string>
+	<string>559059413195-cgcrremu6c4tm8tveaj84c91b6pppn60.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.559059413195-p4j61vpcbdgreua073t4st0vbb3vg343</string>
+	<string>com.googleusercontent.apps.559059413195-cgcrremu6c4tm8tveaj84c91b6pppn60</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>559059413195-4hcr4desjjc0sepgasfov0g43knpbvci.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -31,7 +31,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:559059413195:ios:7519c92484179bf9b8934e</string>
+	<string>1:559059413195:ios:448239f319547fadb8934e</string>
 	<key>DATABASE_URL</key>
 	<string>https://osl-events-app.firebaseio.com</string>
 </dict>

@@ -26,6 +26,7 @@ const Auth = ({params}: IProps) => {
       // Sign-in the user with the credential
       return auth().signInWithCredential(googleCredential);
     } catch (error: any) {
+      console.log('error', error.code, error.message);
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
       } else if (error.code === statusCodes.IN_PROGRESS) {
