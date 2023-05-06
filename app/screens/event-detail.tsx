@@ -2,14 +2,13 @@
 /* eslint-disable react/self-closing-comp */
 
 import moment from 'moment';
-import {Box, Text} from 'native-base';
+import {Text} from 'native-base';
 import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Animated,
   Linking,
   Platform,
-  PlatformOSType,
   StyleSheet,
   View,
 } from 'react-native';
@@ -19,12 +18,14 @@ import MapView, {Marker} from 'react-native-maps';
 import styled from 'styled-components/native';
 import EventShare from '../components/event-detail/event-share';
 import {Icon} from '../components/icons';
-import {COLORS, dummyData, SIZES} from '../constants';
+import {COLORS, SIZES, dummyData} from '../constants';
 import {Event} from './home';
+import * as Location from 'expo-location';
 
 interface IProps {
   params: any;
   route: any;
+  navigation: any;
 }
 
 const AnimatedFastImage = Animated.createAnimatedComponent(FastImage);
@@ -38,7 +39,14 @@ const EventDetail = ({navigation, route}: IProps) => {
   useEffect(() => {
     let {event} = route.params;
     setSelectedEvent(event);
+    geocode(event);
   }, [route.params]);
+
+  const geocode = async (event: Event) => {
+    const geocodedLocation = await Location.geocodeAsync(event.location);
+    console.log('Geocoded Address:');
+    console.log(geocodedLocation);
+  };
 
   return selectedEvent ? (
     <View style={styles.container}>
@@ -171,7 +179,10 @@ const EventDetail = ({navigation, route}: IProps) => {
               <Text
                 color={COLORS.blue}
                 fontSize={'sm'}
-                onPress={() => Linking.openURL(selectedEvent?.webLink)}>
+                onPress={() =>
+                  selectedEvent?.webLink &&
+                  Linking.openURL(selectedEvent?.webLink)
+                }>
                 {selectedEvent?.webLink}
               </Text>
             </DescriptionSection>
@@ -205,12 +216,14 @@ const EventDetail = ({navigation, route}: IProps) => {
                 });
                 const latLng: string = `${lat},${lng}`;
                 const label: string = selectedEvent.location;
-                const url: string = Platform.select({
+                const url = Platform.select({
                   ios: `${scheme}${label}@${latLng}`,
                   android: `${scheme}${latLng}(${label})`,
                 });
+                if (url) {
+                  Linking.openURL(url);
+                }
 
-                Linking.openURL(url);
                 console.log(e.nativeEvent);
               }}
               initialRegion={dummyData.Region}
@@ -363,11 +376,6 @@ const SectionImageHeader = styled.View`
   margin-top: ${Platform.OS === 'ios' ? '40px' : '20px'};
   padding-left: 20px;
   padding-right: 20px;
-`;
-
-const SectionImageFooter = styled.View`
-  flex: 1;
-  justify-content: flex-end;
 `;
 
 const InfoContentView = styled.View`

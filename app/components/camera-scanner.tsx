@@ -1,13 +1,7 @@
 import {useToast} from 'native-base';
 import * as React from 'react';
 import {useRef, useState, useEffect, useCallback} from 'react';
-import {
-  AppState,
-  AppStateStatus,
-  StyleSheet,
-  View,
-  LoadingIndicator,
-} from 'react-native';
+import {AppState, AppStateStatus, StyleSheet, View} from 'react-native';
 import {
   Camera,
   CameraRuntimeError,
@@ -41,94 +35,94 @@ const CameraScanner = () => {
   const toast = useToast();
   const didLoad = useRef<boolean>(false);
 
-  const [frameProcessor, barcodes] = useScanBarcodes([
-    BarcodeFormat.ALL_FORMATS,
-  ]);
+  const [frameProcessor, barcodes] = useScanBarcodes([BarcodeFormat.QR_CODE], {
+    checkInverted: true,
+  });
 
-  React.useEffect(() => {
+  useEffect(() => {
     (async () => {
       const status = await Camera.requestCameraPermission();
       setHasPermission(status === 'authorized');
     })();
   }, []);
+  const checkIn = useCallback(
+    (decodedURL: String) => {
+      if (
+        decodedURL.includes('?') &&
+        decodedURL.includes('osl-events-app.firebaseapp.com')
+      ) {
+        let startIndex = decodedURL.indexOf('?');
+        let endIndex = decodedURL.indexOf('&');
+        let eventID = decodedURL.substring(startIndex + 4, endIndex);
 
-  React.useEffect(() => {
-    if (barcodes.length !== 0 && !didLoad.current) {
+        const userID = currentUser?.email?.substring(
+          0,
+          currentUser.email.indexOf('@'),
+        );
+
+        const eventRef = currentEventsRef.child(eventID);
+        eventRef.on('value', (snapshot: DataSnapshot) => {
+          if (snapshot.val().name !== '' && userID) {
+            eventRef
+              .child('users')
+              .child(userID)
+              .set(true)
+              .then(() => {
+                toast.show({
+                  title: 'Success',
+                  status: 'success',
+                  description:
+                    'You have successfully checked into ' +
+                    snapshot.val().name +
+                    ' as ' +
+                    userID +
+                    '.',
+                });
+              })
+              .catch(error => console.error(error));
+          } else {
+            toast.show({
+              title: 'Something went wrong',
+              status: 'error',
+              description:
+                'Sorry, this event is in the past or no longer exists!',
+            });
+          }
+        });
+      } else {
+        toast.show({
+          title: 'Something went wrong',
+          status: 'error',
+          description: 'This is not a QR code for an Augustana Event.',
+        });
+      }
+    },
+    [toast],
+  );
+
+  useEffect(() => {
+    if (!barcodes.length && barcodes[0].displayValue && !didLoad.current) {
       checkIn(barcodes[0].displayValue);
       didLoad.current = true;
     }
-  }, [barcodes]);
+  }, [barcodes, checkIn]);
 
-  const checkIn = (decodedURL: String) => {
-    if (
-      decodedURL.includes('?') &&
-      decodedURL.includes('osl-events-app.firebaseapp.com')
-    ) {
-      let startIndex = decodedURL.indexOf('?');
-      let endIndex = decodedURL.indexOf('&');
-      let eventID = decodedURL.substring(startIndex + 4, endIndex);
-
-      const userID = currentUser?.email?.substring(
-        0,
-        currentUser.email.indexOf('@'),
-      );
-
-      const eventRef = currentEventsRef.child(eventID);
-      eventRef.on('value', (snapshot: DataSnapshot) => {
-        if (snapshot.val().name !== '') {
-          eventRef
-            .child('users')
-            .child(userID)
-            .set(true)
-            .then(() => {
-              toast.show({
-                title: 'Success',
-                status: 'success',
-                description:
-                  'You have successfully checked into ' +
-                  snapshot.val().name +
-                  ' as ' +
-                  userID +
-                  '.',
-              });
-            })
-            .catch(error => console.error(error));
-        } else {
-          toast.show({
-            title: 'Something went wrong',
-            status: 'error',
-            description:
-              'Sorry, this event is in the past or no longer exists!',
-          });
-        }
-      });
-    } else {
-      toast.show({
-        title: 'Something went wrong',
-        status: 'error',
-        description: 'This is not a QR code for an Augustana Event.',
-      });
-    }
-  };
   const onError = useCallback((error: CameraRuntimeError) => {
     console.error(error);
   }, []);
 
-  return (
-    device != null &&
-    hasPermission && (
-      <View style={styles.container}>
-        <Camera
-          style={StyleSheet.absoluteFill}
-          device={device}
-          isActive={isFocused && isAppForeground}
-          frameProcessor={frameProcessor}
-          frameProcessorFps={5}
-          onError={onError}
-        />
-      </View>
-    )
-  );
+  return device != null && hasPermission ? (
+    <View style={styles.container}>
+      <Camera
+        style={StyleSheet.absoluteFill}
+        device={device}
+        isActive={isFocused && isAppForeground}
+        frameProcessor={frameProcessor}
+        frameProcessorFps={5}
+        onError={onError}
+      />
+    </View>
+  ) : null;
 };
 
 const styles = StyleSheet.create({

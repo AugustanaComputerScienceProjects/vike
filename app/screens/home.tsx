@@ -17,7 +17,7 @@ import AllEventsList from '../components/home/all-events-list';
 import FeaturedList from '../components/home/featured-list';
 import {Icon} from '../components/icons';
 import ScrollView from '../components/scroll-view';
-import {COLORS, metrics, SIZES} from '../constants';
+import {COLORS, SIZES} from '../constants';
 import {DataSnapshot, getStorageImgURL} from '../firebase';
 
 export interface Event {
