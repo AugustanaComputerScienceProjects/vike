@@ -11,6 +11,7 @@ import Root from './navigation/tabs';
 import Auth from './screens/auth';
 import EventDetail from './screens/event-detail';
 import theme from './theme';
+import {ActionSheetProvider} from '@expo/react-native-action-sheet';
 
 GoogleSignin.configure({
   webClientId:
@@ -37,36 +38,38 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <NativeBaseProvider theme={theme}>
-          {/* <StatusBar barStyle="light-content"></StatusBar> */}
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-            }}
-            initialRouteName="Featured">
-            {user ? (
-              <>
-                <Stack.Group>
-                  <Stack.Screen name="Root" component={Root} />
-                  <Stack.Screen name="EventDetail" component={EventDetail} />
-                </Stack.Group>
-                <Stack.Group
-                  screenOptions={{
-                    presentation: 'modal',
-                  }}>
-                  <Stack.Screen
-                    name="CameraScanner"
-                    component={CameraScanner}
-                  />
-                </Stack.Group>
-              </>
-            ) : (
-              <>
-                <Stack.Screen name="Auth" component={Auth} />
-              </>
-            )}
-          </Stack.Navigator>
-        </NativeBaseProvider>
+        <ActionSheetProvider>
+          <NativeBaseProvider theme={theme}>
+            {/* <StatusBar barStyle="light-content"></StatusBar> */}
+            <Stack.Navigator
+              screenOptions={{
+                headerShown: false,
+              }}
+              initialRouteName="Featured">
+              {user ? (
+                <>
+                  <Stack.Group>
+                    <Stack.Screen name="Root" component={Root} />
+                    <Stack.Screen name="EventDetail" component={EventDetail} />
+                  </Stack.Group>
+                  <Stack.Group
+                    screenOptions={{
+                      presentation: 'modal',
+                    }}>
+                    <Stack.Screen
+                      name="CameraScanner"
+                      component={CameraScanner}
+                    />
+                  </Stack.Group>
+                </>
+              ) : (
+                <>
+                  <Stack.Screen name="Auth" component={Auth} />
+                </>
+              )}
+            </Stack.Navigator>
+          </NativeBaseProvider>
+        </ActionSheetProvider>
         <SplashScreen />
       </NavigationContainer>
     </SafeAreaProvider>

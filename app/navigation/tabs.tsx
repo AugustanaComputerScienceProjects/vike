@@ -5,7 +5,6 @@ import React from 'react';
 import {View} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import Feather from 'react-native-vector-icons/Feather';
-import CameraScanner from '../components/camera-scanner';
 import {Icon as IconComponent} from '../components/icons';
 import {COLORS} from '../constants';
 import {Home, Profile} from '../screens';
