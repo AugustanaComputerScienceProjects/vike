@@ -3,15 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
-	<key>CFBundleDisplayName</key>
-	<string>Vike</string>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIcons</key>
-	<dict/>
-	<key>CFBundleIcons~ipad</key>
-	<dict/>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -19,69 +13,30 @@
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(MARKETING_VERSION)</string>
+	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>com.googleusercontent.apps.559059413195-p4j61vpcbdgreua073t4st0vbb3vg343</string>
-			</array>
-		</dict>
-	</array>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
 	<key>CFBundleVersion</key>
-	<string>2</string>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>whatsapp</string>
-		<string>mailto</string>
-		<string>instagram</string>
-		<string>instagram-stories</string>
-		<string>fb</string>
-		<string>facebook-stories</string>
-		<string>snapchat</string>
-	</array>
+	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
-	<dict/>
-	<key>NSCalendarsUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs access to your Calendar to add events to your calendar</string>
-	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs access to your Camera to check in events by scanning QR code</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs access to your Location used for directions</string>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Feather.ttf</string>
-		<string>MaterialCommunityIcons.ttf</string>
-		<string>BeVietnamPro-Black.ttf</string>
-		<string>BeVietnamPro-BlackItalic.ttf</string>
-		<string>BeVietnamPro-Bold.ttf</string>
-		<string>BeVietnamPro-BoldItalic.ttf</string>
-		<string>BeVietnamPro-ExtraBold.ttf</string>
-		<string>BeVietnamPro-ExtraBoldItalic.ttf</string>
-		<string>BeVietnamPro-ExtraLight.ttf</string>
-		<string>BeVietnamPro-ExtraLightItalic.ttf</string>
-		<string>BeVietnamPro-Italic.ttf</string>
-		<string>BeVietnamPro-Light.ttf</string>
-		<string>BeVietnamPro-LightItalic.ttf</string>
-		<string>BeVietnamPro-Medium.ttf</string>
-		<string>BeVietnamPro-MediumItalic.ttf</string>
-		<string>BeVietnamPro-Regular.ttf</string>
-		<string>BeVietnamPro-SemiBold.ttf</string>
-		<string>BeVietnamPro-SemiBoldItalic.ttf</string>
-		<string>BeVietnamPro-Thin.ttf</string>
-		<string>BeVietnamPro-ThinItalic.ttf</string>
-	</array>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>localhost</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
 	<key>UILaunchStoryboardName</key>
-	<string>BootSplash</string>
+	<string>SplashScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
@@ -94,5 +49,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+  <key>UIStatusBarStyle</key>
+  <string>UIStatusBarStyleDefault</string>
+  <key>CADisableMinimumFrameDurationOnPhone</key>
+  <true/>
 </dict>
 </plist>

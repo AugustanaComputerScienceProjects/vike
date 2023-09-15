@@ -1,4 +1,10 @@
 {
-  "name": "OSLEventApp",
-  "displayName": "OSLEventApp"
+  "expo": {
+    "name": "OSLEventApp",
+    "slug": "OSLEventApp",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
 }
