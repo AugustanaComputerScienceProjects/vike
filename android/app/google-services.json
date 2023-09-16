@@ -1,0 +1,157 @@
+{
+  "project_info": {
+    "project_number": "559059413195",
+    "firebase_url": "https://osl-events-app.firebaseio.com",
+    "project_id": "osl-events-app",
+    "storage_bucket": "osl-events-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:559059413195:android:007adf0c4f4ebb35b8934e",
+        "android_client_info": {
+          "package_name": "edu.augustana.osleventapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "559059413195-va5s8h0c6019v90hbuh7g9o0v4sd1fnd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.augustana.osleventapp",
+            "certificate_hash": "1f36efc8ce045add1d07c2a7e400f40242b56e48"
+          }
+        },
+        {
+          "client_id": "559059413195-kc0din44sr01g9opm9nnnb3ve06mvrcq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCd_sydusdVLPZAXKDbWf-dDUhISt5QNBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "559059413195-kc0din44sr01g9opm9nnnb3ve06mvrcq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "559059413195-ar460uuho85d6pmua37pj10fuv7i2mrh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "edu.augustana.osl-events-ios-app",
+                "app_store_id": "1473326895"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:559059413195:android:27f2d61187a00f38",
+        "android_client_info": {
+          "package_name": "edu.augustana.osleventsandroid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "559059413195-4hcr4desjjc0sepgasfov0g43knpbvci.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.augustana.osleventsandroid",
+            "certificate_hash": "596f294aa87454284362354dd1a51b89fb5bebc1"
+          }
+        },
+        {
+          "client_id": "559059413195-f9h11qesuih5000dob02775o3mid6dqd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.augustana.osleventsandroid",
+            "certificate_hash": "ef8dac4a4a351519e8f1db6d0a9fea09e28c711f"
+          }
+        },
+        {
+          "client_id": "559059413195-k128qohjjkqi8a5j15hbln305kq8h7c9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.augustana.osleventsandroid",
+            "certificate_hash": "7c92f500c8e3ddaacad5bc02d46bd7329a88b4cf"
+          }
+        },
+        {
+          "client_id": "559059413195-lsc3fnr6705aleccuq7dii6459dihgal.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.augustana.osleventsandroid",
+            "certificate_hash": "6e0e7825697aa6c8a10b1b727ea0ec581ba0f57c"
+          }
+        },
+        {
+          "client_id": "559059413195-p2soij8kpnpcs2j4olrbr6gujkbq73up.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.augustana.osleventsandroid",
+            "certificate_hash": "a28166ab257f1eddf636196fb78e7380e51470e3"
+          }
+        },
+        {
+          "client_id": "559059413195-pjcesd84lnoidbhagrnf4drfij4ngkmd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.augustana.osleventsandroid",
+            "certificate_hash": "e3b7f57bd540203ef3e78ad189bfbb32f0534b12"
+          }
+        },
+        {
+          "client_id": "559059413195-ssaufol5hujgeb3rc1puo919hnrdlbij.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.augustana.osleventsandroid",
+            "certificate_hash": "e07263efec887a510836cc618b7ee9c92c399a7c"
+          }
+        },
+        {
+          "client_id": "559059413195-un94jvctd5f2g7jtvchdl554bieq0gem.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.augustana.osleventsandroid",
+            "certificate_hash": "c57d8c7b44d7b139b034c42ba65c3fadef05a25f"
+          }
+        },
+        {
+          "client_id": "559059413195-kc0din44sr01g9opm9nnnb3ve06mvrcq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCd_sydusdVLPZAXKDbWf-dDUhISt5QNBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "559059413195-kc0din44sr01g9opm9nnnb3ve06mvrcq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "559059413195-ar460uuho85d6pmua37pj10fuv7i2mrh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "edu.augustana.osl-events-ios-app",
+                "app_store_id": "1473326895"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

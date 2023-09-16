@@ -3,8 +3,25 @@
     "name": "OSLEventApp",
     "slug": "OSLEventApp",
     "version": "1.0.0",
-    "assetBundlePatterns": [
-      "**/*"
-    ]
+    "assetBundlePatterns": ["**/*"],
+    "plugins": [
+      "@react-native-firebase/app",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ],
+    "android": {
+      "googleServicesFile": "./google-services.json",
+      "package": "edu.augustana.osleventapp"
+    },
+    "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "bundleIdentifier": "edu.augustana.osleventapp"
+    }
   }
 }

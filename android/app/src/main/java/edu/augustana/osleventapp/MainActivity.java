@@ -1,4 +1,4 @@
-package com.osleventapp;
+package edu.augustana.osleventapp;
 
 import android.os.Build;
 import android.os.Bundle;
