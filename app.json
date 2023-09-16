@@ -4,6 +4,7 @@
     "slug": "OSLEventApp",
     "version": "1.0.0",
     "assetBundlePatterns": ["**/*"],
+    "scheme": "vike",
     "plugins": [
       "@react-native-firebase/app",
       "@react-native-google-signin/google-signin",
@@ -14,7 +15,8 @@
             "useFrameworks": "static"
           }
         }
-      ]
+      ],
+      "expo-router"
     ],
     "android": {
       "googleServicesFile": "./google-services.json",
