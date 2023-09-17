@@ -25,6 +25,7 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
+        <data android:scheme="vike"/>
         <data android:scheme="edu.augustana.osleventapp"/>
         <data android:scheme="exp+osleventapp"/>
       </intent-filter>

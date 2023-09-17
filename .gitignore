@@ -63,3 +63,7 @@ buck-out/
 .expo/
 .git/
 .vscode/
+
+credentials.json
+*.keystore
+*.keystore.old

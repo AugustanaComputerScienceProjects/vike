@@ -4,18 +4,12 @@ import {
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
-import {StatusBar} from 'expo-status-bar';
-import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {Stack, useRouter} from 'expo-router';
+import {Text, View} from 'react-native';
 
-GoogleSignin.configure({
-  webClientId:
-    '559059413195-kc0din44sr01g9opm9nnnb3ve06mvrcq.apps.googleusercontent.com',
-  hostedDomain: 'augustana.edu',
-});
+export default function Auth() {
+  const router = useRouter();
 
-export default function App() {
-  console.log(auth().currentUser);
   const signIn = async () => {
     try {
       // Get the users ID token
@@ -29,6 +23,7 @@ export default function App() {
         .signInWithCredential(googleCredential)
         .then(user => {
           console.log('user', user);
+          router.replace('/(tabs)/home');
         });
     } catch (error) {
       console.log('error', error.code, error.message);
@@ -43,9 +38,10 @@ export default function App() {
       }
     }
   };
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on Vike!</Text>
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <Stack.Screen options={{title: 'Login'}} />
       <GoogleSigninButton
         style={{width: 192, height: 48}}
         size={GoogleSigninButton.Size.Wide}
@@ -53,16 +49,12 @@ export default function App() {
         onPress={signIn}
         // disabled={this.state.isSigninInProgress}
       />
-      <StatusBar style="auto" />
+      <Text
+        onPress={() => {
+          router.replace('/(tabs)/');
+        }}>
+        Login
+      </Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

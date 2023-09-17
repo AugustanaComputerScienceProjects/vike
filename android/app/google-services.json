@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "559059413195-fhk1jl584tti885ikmtd3sp2643cg9g8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.augustana.osleventapp",
+            "certificate_hash": "bf8c0568ee4748b7cda15e05f06cdcfe4c12d8c2"
+          }
+        },
+        {
           "client_id": "559059413195-va5s8h0c6019v90hbuh7g9o0v4sd1fnd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

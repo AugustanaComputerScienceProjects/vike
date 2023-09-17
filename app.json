@@ -3,7 +3,9 @@
     "name": "OSLEventApp",
     "slug": "OSLEventApp",
     "version": "1.0.0",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "scheme": "vike",
     "plugins": [
       "@react-native-firebase/app",
@@ -25,6 +27,14 @@
     "ios": {
       "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "edu.augustana.osleventapp"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "aad3b70c-0cc7-42bd-bf30-2cf5b319608f"
+      }
     }
   }
 }
