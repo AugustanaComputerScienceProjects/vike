@@ -1,5 +1,5 @@
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {Stack} from 'expo-router';
+import {Slot} from 'expo-router';
 
 // For Android
 GoogleSignin.configure({
@@ -9,5 +9,5 @@ GoogleSignin.configure({
 });
 
 export default function Layout() {
-  return <Stack screenOptions={{headerShown: false}} />;
+  return <Slot />;
 }
