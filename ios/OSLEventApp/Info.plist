@@ -7,7 +7,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
-    <string>OSLEventApp</string>
+    <string>Vike</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -40,7 +40,7 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>exp+osleventapp</string>
+          <string>exp+vike</string>
         </array>
       </dict>
     </array>
@@ -75,6 +75,7 @@
     <string>Allow $(PRODUCT_NAME) to access your reminders</string>
     <key>NSUserActivityTypes</key>
     <array>
+      <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>

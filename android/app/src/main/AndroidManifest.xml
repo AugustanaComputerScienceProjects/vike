@@ -31,6 +31,7 @@
         <data android:scheme="vike"/>
         <data android:scheme="edu.augustana.osleventapp"/>
         <data android:scheme="exp+osleventapp"/>
+        <data android:scheme="exp+vike"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>
