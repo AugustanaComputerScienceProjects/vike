@@ -1,11 +1,9 @@
 {
   "expo": {
-    "name": "OSLEventApp",
-    "slug": "OSLEventApp",
+    "name": "Vike",
+    "slug": "vike",
     "version": "1.0.0",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "scheme": "vike",
     "plugins": [
       "@react-native-firebase/app",
@@ -18,9 +16,25 @@
           }
         }
       ],
-      "expo-router"
+      "expo-router",
+      [
+        "expo-barcode-scanner",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access camera."
+        }
+      ]
     ],
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#fff"
+    },
     "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#fff"
+      },
       "googleServicesFile": "./google-services.json",
       "package": "edu.augustana.osleventapp"
     },

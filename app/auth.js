@@ -4,8 +4,10 @@ import {
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
-import {Stack, useRouter} from 'expo-router';
+import {Image} from 'expo-image';
+import {useRouter} from 'expo-router';
 import {Text, View} from 'react-native';
+import {COLORS} from '../constants/theme';
 
 export default function Auth() {
   const router = useRouter();
@@ -40,8 +42,20 @@ export default function Auth() {
   };
 
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Stack.Screen options={{title: 'Login'}} />
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: COLORS.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+      <Image
+        style={{marginTop: 20, marginBottom: 20, width: 100, height: 100}}
+        source={require('../assets/vike.png')}
+      />
+      <Text style={{color: COLORS.white, fontSize: 32}}>
+        Augustana Vike Life
+      </Text>
       <GoogleSigninButton
         style={{width: 192, height: 48}}
         size={GoogleSigninButton.Size.Wide}
@@ -49,12 +63,6 @@ export default function Auth() {
         onPress={signIn}
         // disabled={this.state.isSigninInProgress}
       />
-      <Text
-        onPress={() => {
-          router.replace('/(tabs)/');
-        }}>
-        Login
-      </Text>
     </View>
   );
 }

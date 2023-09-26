@@ -1,5 +1,13 @@
+import {ActionSheetProvider} from '@expo/react-native-action-sheet';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {Slot} from 'expo-router';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+
+import {Inter_900Black, useFonts} from '@expo-google-fonts/inter';
+import * as SplashScreen from 'expo-splash-screen';
+import {useCallback} from 'react';
+
+SplashScreen.preventAutoHideAsync();
 
 // For Android
 GoogleSignin.configure({
@@ -9,5 +17,24 @@ GoogleSignin.configure({
 });
 
 export default function Layout() {
-  return <Slot />;
+  const [fontsLoaded, fontError] = useFonts({
+    Inter_900Black,
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded || fontError) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+  return (
+    <SafeAreaProvider onLayout={onLayoutRootView}>
+      <ActionSheetProvider>
+        <Slot />
+      </ActionSheetProvider>
+    </SafeAreaProvider>
+  );
 }

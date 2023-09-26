@@ -1,3 +1,4 @@
+import {ActionSheetProvider} from '@expo/react-native-action-sheet';
 import auth from '@react-native-firebase/auth';
 import {
   Stack,
@@ -34,10 +35,12 @@ export default function Index() {
   }, [segments, navigationState?.key]);
 
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{headerShown: false}} />
-      <Stack.Screen name="modal" options={{presentation: 'modal'}} />
-    </Stack>
+    <ActionSheetProvider>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{headerShown: false}} />
+        <Stack.Screen name="modal" options={{presentation: 'modal'}} />
+      </Stack>
+    </ActionSheetProvider>
   );
 }
 

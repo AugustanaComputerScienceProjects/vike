@@ -6,12 +6,13 @@ import {useEffect, useState} from 'react';
 import {
   FlatList,
   Keyboard,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+
 import {
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -19,6 +20,7 @@ import {
 
 import AllEventsList from '../../components/home/AllEventsList';
 import {COLORS} from '../../constants/theme';
+import {useEventStore} from '../../store';
 
 export const getStorageImgURL = async imageName => {
   const imgURL = await storage()
@@ -41,7 +43,8 @@ const ScrollViewComponent = props => {
 };
 
 export default function Home() {
-  const [events, setEvents] = useState();
+  const events = useEventStore(state => state.events);
+  const updateEvents = useEventStore(state => state.updateEvents);
 
   const [query, setQuery] = useState('');
   const [searchData, setSearchData] = useState([]);
@@ -77,7 +80,7 @@ export default function Home() {
           );
           const resolved = await Promise.all(unresolved);
 
-          setEvents(resolved);
+          updateEvents(resolved);
         });
     };
     fetchEvents();
@@ -89,7 +92,6 @@ export default function Home() {
         {!isSearching && query === '' && (
           <View
             style={{
-              padding: '16px 30px',
               justifyContent: 'space-between',
               alignItems: 'center',
               flexDirection: 'row',
@@ -99,7 +101,8 @@ export default function Home() {
                 style={{
                   fontSize: 24,
                   fontWeight: 'bold',
-                  color: '#000',
+                  color: COLORS.text,
+                  marginBottom: 16,
                 }}>
                 Explore events
               </Text>
@@ -194,7 +197,6 @@ export default function Home() {
 
         {/* FEATURED */}
         {!isSearching && query === '' && (
-          // <Animated.View entering={FadeIn.duration(300)}>
           <>
             {/* {events && events.length > 0 && <FeaturedList data={events} />} */}
             {events && events.length > 0 && (
@@ -205,7 +207,6 @@ export default function Home() {
               />
             )}
           </>
-          // </Animated.View>
         )}
         <View style={{flex: 1, height: 100}} />
       </ScrollViewComponent>
@@ -218,16 +219,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.gray5,
-    borderRadius: 10,
-    paddingVertical: 4,
-    width: '100%', // you can adjust this dynamically using a style prop
-    // paddingHorizontal: SIZES.padding,  // Uncomment if needed
+    borderRadius: 20, // Adjusted borderRadius
+    paddingVertical: 8, // Adjusted padding
+    width: '100%',
+    paddingHorizontal: 12, // Adjusted padding
   },
   inputStyle: {
     flex: 1,
     color: COLORS.input,
     fontSize: 14,
-    paddingLeft: 4, // This gives some space after the icon
+    marginLeft: 8,
+    padding: 8, // Adjusted padding
   },
   iconStyle: {
     marginLeft: 4,
@@ -237,8 +239,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    width: '100%',
-    height: '100%',
+    padding: 16,
   },
   coverImage: {
     width: 100,

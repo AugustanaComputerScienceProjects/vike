@@ -1,15 +1,8 @@
 import {useNavigation} from '@react-navigation/native';
 import {Image} from 'expo-image';
+import {Link} from 'expo-router';
 import React from 'react';
-import {
-  Dimensions,
-  FlatList,
-  Keyboard,
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import {Dimensions, FlatList, StyleSheet, Text, View} from 'react-native';
 import {COLORS} from '../../constants/theme';
 // import {parseDate} from '../../utils/moment';
 
@@ -26,7 +19,8 @@ const AllEventsList = ({data, setQuery, setIsSearching}) => {
       }}>
       <View
         style={{
-          margin: '20px 30px 0',
+          marginTop: 20,
+          marginHorizontal: 30,
         }}>
         <Text
           style={{
@@ -42,32 +36,34 @@ const AllEventsList = ({data, setQuery, setIsSearching}) => {
           scrollEnabled={false}
           data={data}
           keyExtractor={item => item.id}
-          renderItem={({item}) => (
-            <TouchableWithoutFeedback
-              onPress={() => {
-                Keyboard.dismiss();
-                setIsSearching(false);
-                setQuery('');
-              }}>
-              <View style={styles.listItem}>
-                <Image source={{uri: item.image}} style={styles.coverImage} />
-                <View style={styles.metaInfo}>
-                  <Text style={styles.title}>{`${item.name}`}</Text>
-                  {/* <Text
+          renderItem={({item}) => {
+            console.log('item', item);
+            return (
+              <Link
+                href={{
+                  pathname: '/event/[id]',
+                  params: {id: item.id, event: item},
+                }}>
+                <View style={styles.listItem}>
+                  <Image source={{uri: item.image}} style={styles.coverImage} />
+                  <View style={styles.metaInfo}>
+                    <Text style={styles.title}>{`${item.name}`}</Text>
+                    {/* <Text
                     style={{
                       color: COLORS.text,
                     }}>{`${parseDate(item.startDate)} `}</Text> */}
 
-                  <Text
-                    style={{
-                      color: COLORS.text,
-                    }}>
-                    at {`${item.location} `}
-                  </Text>
+                    <Text
+                      style={{
+                        color: COLORS.text,
+                      }}>
+                      at {`${item.location} `}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            </TouchableWithoutFeedback>
-          )}
+              </Link>
+            );
+          }}
         />
       </View>
     </View>
