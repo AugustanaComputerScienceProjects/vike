@@ -53,7 +53,12 @@ export default function Auth() {
         style={{marginTop: 20, marginBottom: 20, width: 100, height: 100}}
         source={require('../assets/vike.png')}
       />
-      <Text style={{color: COLORS.white, fontSize: 32}}>
+      <Text
+        style={{
+          fontFamily: 'Inter_700Bold',
+          color: COLORS.white,
+          fontSize: 32,
+        }}>
         Augustana Vike App
       </Text>
       <GoogleSigninButton

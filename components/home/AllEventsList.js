@@ -20,7 +20,6 @@ const AllEventsList = ({data, setQuery, setIsSearching}) => {
       <View
         style={{
           marginTop: 20,
-          marginHorizontal: 30,
         }}>
         <Text
           style={{
@@ -84,7 +83,6 @@ const styles = StyleSheet.create({
     maxWidth: windowWidth - 100,
     // marginTop: 10,
     paddingVertical: 15,
-    paddingHorizontal: 20,
     // backgroundColor: '#fff',
     flexDirection: 'row',
   },
