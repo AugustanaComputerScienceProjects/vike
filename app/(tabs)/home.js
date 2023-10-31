@@ -6,11 +6,11 @@ import {useEffect, useState} from 'react';
 import {
   FlatList,
   Keyboard,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
-  ScrollView,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -51,13 +51,12 @@ export default function Home() {
   const [searchData, setSearchData] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  const state = { search: '',};
+  const state = {search: ''};
 
   const handleSearch = text => {
     const formattedQuery = text.toLowerCase();
     const filteredData = events?.filter(event => {
       return event.name.toLowerCase().includes(formattedQuery);
-      // return event.name.toLowerCase().startsWith(formattedQuery);
     });
     setSearchData(filteredData);
     setQuery(text);
@@ -68,7 +67,6 @@ export default function Home() {
       return database()
         .ref('/current-events')
         .on('value', async snapshot => {
-          console.log('snapshot.val()', snapshot.val());
           const unresolved = Object.entries(snapshot.val()).map(
             async childSnapShot => {
               const [key, value] = childSnapShot;
@@ -91,8 +89,7 @@ export default function Home() {
   }, []);
   return (
     <SafeAreaView style={styles.container}>
-      {/* <ScrollViewComponent showsVerticalScrollIndicator={false} > */}
-      <ScrollView keyboardShouldPersistTaps='always'>
+      <ScrollView keyboardShouldPersistTaps="always">
         {/* Header Section */}
         {!isSearching && query === '' && (
           <View
@@ -127,8 +124,6 @@ export default function Home() {
               justifyContent: 'center',
               flexDirection: 'row',
               alignItems: 'center',
-              // marginLeft: 15,
-              // marginRight: 18,
               marginHorizontal: 15,
               height: '100%',
             }}>
@@ -215,8 +210,7 @@ export default function Home() {
           </>
         )}
         <View style={{flex: 1, height: 100}} />
-      </ScrollView>  
-      {/* </ScrollViewComponent> */}
+      </ScrollView>
     </SafeAreaView>
   );
 }
