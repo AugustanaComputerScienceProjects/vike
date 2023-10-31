@@ -10,6 +10,7 @@ import {
   Text,
   TextInput,
   View,
+  ScrollView,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -50,10 +51,13 @@ export default function Home() {
   const [searchData, setSearchData] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
+  const state = { search: '',};
+
   const handleSearch = text => {
     const formattedQuery = text.toLowerCase();
     const filteredData = events?.filter(event => {
       return event.name.toLowerCase().includes(formattedQuery);
+      // return event.name.toLowerCase().startsWith(formattedQuery);
     });
     setSearchData(filteredData);
     setQuery(text);
@@ -87,7 +91,8 @@ export default function Home() {
   }, []);
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollViewComponent showsVerticalScrollIndicator={false}>
+      {/* <ScrollViewComponent showsVerticalScrollIndicator={false} > */}
+      <ScrollView keyboardShouldPersistTaps='always'>
         {/* Header Section */}
         {!isSearching && query === '' && (
           <View
@@ -122,8 +127,9 @@ export default function Home() {
               justifyContent: 'center',
               flexDirection: 'row',
               alignItems: 'center',
-              marginLeft: 15,
-              marginRight: 18,
+              // marginLeft: 15,
+              // marginRight: 18,
+              marginHorizontal: 15,
               height: '100%',
             }}>
             {/* <Icon color={COLORS.text} size={18} name="search" /> */}
@@ -209,7 +215,8 @@ export default function Home() {
           </>
         )}
         <View style={{flex: 1, height: 100}} />
-      </ScrollViewComponent>
+      </ScrollView>  
+      {/* </ScrollViewComponent> */}
     </SafeAreaView>
   );
 }

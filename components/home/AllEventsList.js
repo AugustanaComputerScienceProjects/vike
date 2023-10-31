@@ -20,7 +20,7 @@ const AllEventsList = ({data, setQuery, setIsSearching}) => {
       <View
         style={{
           marginTop: 20,
-          marginHorizontal: 30,
+          marginHorizontal: 20,
         }}>
         <Text
           style={{
@@ -38,6 +38,7 @@ const AllEventsList = ({data, setQuery, setIsSearching}) => {
           keyExtractor={item => item.id}
           renderItem={({item}) => {
             console.log('item', item);
+            const {formattedDate, formattedTime} = parseDate(item.startDate);
             return (
               <Link
                 href={{
@@ -48,16 +49,21 @@ const AllEventsList = ({data, setQuery, setIsSearching}) => {
                   <Image source={{uri: item.image}} style={styles.coverImage} />
                   <View style={styles.metaInfo}>
                     <Text style={styles.title}>{`${item.name}`}</Text>
-                    {/* <Text
-                    style={{
-                      color: COLORS.text,
-                    }}>{`${parseDate(item.startDate)} `}</Text> */}
 
-                    <Text
-                      style={{
-                        color: COLORS.text,
-                      }}>
-                      at {`${item.location} `}
+                    {/* <Text style={{ color: 'chocolate'}}>
+                      {`${parseDate(item.startDate)} `}
+                    </Text> */}
+
+                    <Text style={{ color: 'chocolate' }}>
+                      {formattedDate}
+                    </Text>
+
+                    <Text style={{ color: COLORS.black }}>
+                      {formattedTime}
+                    </Text>
+
+                    <Text style={{ color: COLORS.text, }}>
+                      {`${item.location} `}
                     </Text>
                   </View>
                 </View>
@@ -69,6 +75,19 @@ const AllEventsList = ({data, setQuery, setIsSearching}) => {
     </View>
   );
 };
+
+// function parseDate(dateString) {
+//   const date = new Date(dateString);
+//   return date.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+// }
+
+function parseDate(dateString) {
+  const date = new Date(dateString);
+  const formattedDate = date.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  const formattedTime = date.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit' });
+  
+  return { formattedDate, formattedTime };
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -89,7 +108,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   metaInfo: {
-    paddingLeft: 10,
+    paddingLeft: 20,
   },
   title: {
     fontSize: 18,
