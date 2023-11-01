@@ -1,6 +1,6 @@
 {
   "functions": {
-    "runtime": "nodejs18",
+    "runtime": "nodejs10",
     "predeploy": [
       "npm --prefix \"$RESOURCE_DIR\" run lint"
     ]
