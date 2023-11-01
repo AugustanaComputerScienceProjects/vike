@@ -25,3 +25,5 @@ yarn-error.log*
 #firebase
 /.firebase
 firebase-debug.log
+osl-event-app-service-account.json
+functions/.runtimeconfig.json
