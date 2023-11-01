@@ -21,8 +21,5 @@
     "eslint-plugin-promise": "^4.0.1",
     "firebase-functions-test": "^0.1.6"
   },
-  "engines": {
-    "node": "10"
-  },
   "private": true
 }
