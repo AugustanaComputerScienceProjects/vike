@@ -89,15 +89,10 @@ export default function Home() {
   }, []);
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView keyboardShouldPersistTaps="always">
+      <ScrollView>
         {/* Header Section */}
         {!isSearching && query === '' && (
-          <View
-            style={{
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexDirection: 'row',
-            }}>
+          <View>
             <View>
               <Text
                 style={{
@@ -127,7 +122,6 @@ export default function Home() {
               marginHorizontal: 15,
               height: '100%',
             }}>
-            {/* <Icon color={COLORS.text} size={18} name="search" /> */}
             <View style={styles.inputContainer}>
               <Icon style={styles.iconStyle} name="search" />
               <TextInput
@@ -169,7 +163,6 @@ export default function Home() {
             renderItem={({item}) => (
               <TouchableWithoutFeedback
                 onPress={() => {
-                  // navigation.navigate('EventDetail', {event: item});
                   Keyboard.dismiss();
                   setIsSearching(false);
                   setQuery('');
@@ -177,12 +170,6 @@ export default function Home() {
                 <View style={styles.listItem}>
                   <Image source={{uri: item.image}} style={styles.coverImage} />
                   <View style={styles.metaInfo}>
-                    {/* <Text
-                      styles={{
-                        color: COLORS.text,
-                      }}>{`${moment(item.startDate).format(
-                      'MMMM D (dddd)',
-                    )} `}</Text> */}
                     <Text style={styles.title}>{`${item.name}`}</Text>
 
                     <Text
@@ -248,10 +235,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   listItem: {
-    // marginTop: 10,
     paddingVertical: 15,
     paddingHorizontal: 20,
-    // backgroundColor: '#fff',
     flexDirection: 'row',
   },
   metaInfo: {
