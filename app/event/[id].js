@@ -3,12 +3,13 @@ import {addMinutes, format} from 'date-fns';
 import {Image} from 'expo-image';
 import {Link, router, useLocalSearchParams} from 'expo-router';
 import {useRef} from 'react';
-import {Animated, StyleSheet, Text, View} from 'react-native';
+import {Animated, Linking, StyleSheet, Text, View} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import EventShare from '../../components/EventShare';
 import {COLORS, SIZES} from '../../constants/theme';
 import {useEventStore} from '../../store';
+
 const HEADER_HEIGHT =
   SIZES.height < 700 ? SIZES.height * 0.3 : SIZES.height * 0.4;
 
@@ -23,7 +24,7 @@ export default function Event() {
     <SafeAreaView style={styles.container}>
       <View>
         <Image
-          resizeMode="cover"
+          contentFit="cover"
           source={{uri: event?.image}}
           style={{
             width: '100%',
@@ -32,7 +33,8 @@ export default function Event() {
         />
         <View style={styles.infoContent}>
           <View style={{flex: 1}}>
-            <Text color={COLORS.black} fontWeight={'bold'} fontSize={'2xl'}>
+            <Text
+              style={{color: COLORS.black, fontWeight: 'bold', fontSize: 25}}>
               {event?.name}
             </Text>
             <View
@@ -41,13 +43,21 @@ export default function Event() {
                 alignItems: 'center',
                 marginTop: 8,
               }}>
-              <Icon name="clock" size={18} color={COLORS.primary} />
+              <Icon
+                name="clock"
+                size={20}
+                color={COLORS.primary}
+                marginRight={5}
+              />
               <Text
-                color={COLORS.black}
-                // fontWeight={'bold'}
-                fontSize={'sm'}
-                style={{opacity: 0.7, marginLeft: 4}}>
-                {format(new Date(event.startDate), 'MMMM d (eeee)')}{' '}
+                style={{
+                  color: COLORS.orange,
+                  fontSize: 17, // replace 'sm' with the actual size in points
+                  opacity: 0.7,
+                  marginLeft: 4,
+                }}>
+                {format(new Date(event.startDate), 'EEE MMM d')}
+                {', '}
                 {format(new Date(event.startDate), 'h:mm a')} {' - '}
                 {format(
                   addMinutes(new Date(event.startDate), event.duration),
@@ -59,13 +69,21 @@ export default function Event() {
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                marginTop: 4,
+                marginTop: 8,
               }}>
-              <Icon name="map" size={18} color={COLORS.primary} />
+              <Icon
+                name="map"
+                size={20}
+                color={COLORS.primary}
+                marginRight={5}
+              />
               <Text
-                color={COLORS.text}
-                fontSize={'sm'}
-                style={{opacity: 0.7, marginLeft: 4}}>
+                style={{
+                  color: COLORS.black,
+                  fontSize: 17,
+                  opacity: 0.7,
+                  marginLeft: 4,
+                }}>
                 {event?.location}
               </Text>
             </View>
@@ -73,13 +91,21 @@ export default function Event() {
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                marginTop: 4,
+                marginTop: 8,
               }}>
-              <Icon name="user" size={18} color={COLORS.primary} />
+              <Icon
+                name="user"
+                size={20}
+                color={COLORS.primary}
+                marginRight={5}
+              />
               <Text
-                color={COLORS.text}
-                fontSize={'sm'}
-                style={{opacity: 0.7, marginLeft: 4}}>
+                style={{
+                  color: COLORS.black,
+                  fontSize: 17,
+                  opacity: 0.7,
+                  marginLeft: 4,
+                }}>
                 Hosted by {event?.organization}
               </Text>
             </View>
@@ -133,6 +159,26 @@ export default function Event() {
           </>
         ) : null}
 
+        {/* <MapView
+          style={{ flex: 1, height: 200 }}
+          provider={PROVIDER_GOOGLE} // or PROVIDER_DEFAULT
+          initialRegion={{
+            latitude: 41.503, // Replace with your desired latitude
+            longitude: -90.5504, // Replace with your desired longitude
+            latitudeDelta: 0.01, // Adjust the zoom level as needed
+            longitudeDelta: 0.01,
+          }}
+        >
+          <Marker
+            coordinate={{
+              latitude: 41.503, // Replace with the same latitude as above
+              longitude: -90.5504, // Replace with the same longitude as above
+            }}
+            title={event?.location}
+            description={event?.location}
+          />
+        </MapView> */}
+
         {/* Location Section */}
         {/* <View
           style={{
@@ -157,7 +203,7 @@ export default function Event() {
           </Text>
           <View style={{height: 250}}>
             <MapView
-            // provider={PROVIDER_GOOGLE}
+            provider={PROVIDER_GOOGLE}
             style={{
               height: 250,
               borderRadius: 30,
@@ -298,7 +344,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
     flexGrow: 1,
-    // alignItems: 'center',
   },
   infoContent: {
     justifyContent: 'space-between',
@@ -309,7 +354,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 30,
   },
   buttonSection: {
-    marginVertical: 15,
+    marginTop: 20,
+    marginBottom: 10,
     marginHorizontal: 30,
     flexDirection: 'row',
   },
@@ -321,8 +367,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerContainer: {
-    // alignItems: 'center',
-    // backgroundColor: '#FFF',
     marginBottom: 10,
     marginTop: 45,
   },
@@ -331,8 +375,6 @@ const styles = StyleSheet.create({
   },
   scroll: {
     flexGrow: 1,
-    // justifyContent: 'space-between',
-    // flexDirection: 'column',
     paddingHorizontal: 24,
     marginBottom: 100,
   },
@@ -378,7 +420,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   userImage: {
-    // borderRadius: 60,
     height: 120,
     marginBottom: 20,
     width: 120,
@@ -391,12 +432,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     lineHeight: 30,
-    // textAlign: 'center',
   },
   userRow: {
-    // alignItems: 'center',
-    // flexDirection: 'column',
-    // justifyContent: 'center',
     marginBottom: 12,
   },
 });

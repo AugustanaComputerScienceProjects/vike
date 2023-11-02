@@ -6,6 +6,7 @@ import {useEffect, useState} from 'react';
 import {
   FlatList,
   Keyboard,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -50,6 +51,8 @@ export default function Home() {
   const [searchData, setSearchData] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
+  const state = {search: ''};
+
   const handleSearch = text => {
     const formattedQuery = text.toLowerCase();
     const filteredData = events?.filter(event => {
@@ -64,7 +67,6 @@ export default function Home() {
       return database()
         .ref('/current-events')
         .on('value', async snapshot => {
-          console.log('snapshot.val()', snapshot.val());
           const unresolved = Object.entries(snapshot.val()).map(
             async childSnapShot => {
               const [key, value] = childSnapShot;
@@ -87,7 +89,7 @@ export default function Home() {
   }, []);
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollViewComponent showsVerticalScrollIndicator={false}>
+      <ScrollView keyboardShouldPersistTaps="always">
         {/* Header Section */}
         {!isSearching && query === '' && (
           <View
@@ -122,8 +124,7 @@ export default function Home() {
               justifyContent: 'center',
               flexDirection: 'row',
               alignItems: 'center',
-              marginLeft: 15,
-              marginRight: 18,
+              marginHorizontal: 15,
               height: '100%',
             }}>
             {/* <Icon color={COLORS.text} size={18} name="search" /> */}
@@ -209,7 +210,7 @@ export default function Home() {
           </>
         )}
         <View style={{flex: 1, height: 100}} />
-      </ScrollViewComponent>
+      </ScrollView>
     </SafeAreaView>
   );
 }

@@ -1,15 +1,12 @@
-import {useNavigation} from '@react-navigation/native';
 import {Image} from 'expo-image';
 import {Link} from 'expo-router';
 import React from 'react';
 import {Dimensions, FlatList, StyleSheet, Text, View} from 'react-native';
 import {COLORS} from '../../constants/theme';
-// import {parseDate} from '../../utils/moment';
 
 const windowWidth = Dimensions.get('window').width;
 
-const AllEventsList = ({data, setQuery, setIsSearching}) => {
-  const navigation = useNavigation();
+const AllEventsList = ({data}) => {
   return (
     <View
       style={{
@@ -20,6 +17,7 @@ const AllEventsList = ({data, setQuery, setIsSearching}) => {
       <View
         style={{
           marginTop: 20,
+          marginHorizontal: 20,
         }}>
         <Text
           style={{
@@ -36,7 +34,7 @@ const AllEventsList = ({data, setQuery, setIsSearching}) => {
           data={data}
           keyExtractor={item => item.id}
           renderItem={({item}) => {
-            console.log('item', item);
+            const {formattedDate, formattedTime} = parseDate(item.startDate);
             return (
               <Link
                 href={{
@@ -47,16 +45,12 @@ const AllEventsList = ({data, setQuery, setIsSearching}) => {
                   <Image source={{uri: item.image}} style={styles.coverImage} />
                   <View style={styles.metaInfo}>
                     <Text style={styles.title}>{`${item.name}`}</Text>
-                    {/* <Text
-                    style={{
-                      color: COLORS.text,
-                    }}>{`${parseDate(item.startDate)} `}</Text> */}
+                    <Text style={{color: 'chocolate'}}>{formattedDate}</Text>
 
-                    <Text
-                      style={{
-                        color: COLORS.text,
-                      }}>
-                      at {`${item.location} `}
+                    <Text style={{color: COLORS.black}}>{formattedTime}</Text>
+
+                    <Text style={{color: COLORS.text}}>
+                      {`${item.location} `}
                     </Text>
                   </View>
                 </View>
@@ -68,6 +62,21 @@ const AllEventsList = ({data, setQuery, setIsSearching}) => {
     </View>
   );
 };
+
+function parseDate(dateString) {
+  const date = new Date(dateString);
+  const formattedDate = date.toLocaleString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+  });
+  const formattedTime = date.toLocaleString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  return {formattedDate, formattedTime};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -81,13 +90,12 @@ const styles = StyleSheet.create({
   },
   listItem: {
     maxWidth: windowWidth - 100,
-    // marginTop: 10,
     paddingVertical: 15,
-    // backgroundColor: '#fff',
+    paddingHorizontal: 20,
     flexDirection: 'row',
   },
   metaInfo: {
-    paddingLeft: 10,
+    paddingLeft: 20,
   },
   title: {
     fontSize: 18,
