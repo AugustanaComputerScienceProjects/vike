@@ -3,12 +3,13 @@ import {addMinutes, format} from 'date-fns';
 import {Image} from 'expo-image';
 import {Link, router, useLocalSearchParams} from 'expo-router';
 import {useRef} from 'react';
-import {Animated, Linking, StyleSheet, Text, View} from 'react-native';
+import {Animated, Linking, StyleSheet, Text, View, ScrollView} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import EventShare from '../../components/EventShare';
 import {COLORS, SIZES} from '../../constants/theme';
 import {useEventStore} from '../../store';
+import {LinearGradient} from 'expo-linear-gradient';
 
 const HEADER_HEIGHT =
   SIZES.height < 700 ? SIZES.height * 0.3 : SIZES.height * 0.4;
@@ -31,85 +32,91 @@ export default function Event() {
             height: HEADER_HEIGHT,
           }}
         />
-        <View style={styles.infoContent}>
-          <View style={{flex: 1}}>
-            <Text
-              style={{color: COLORS.black, fontWeight: 'bold', fontSize: 25}}>
-              {event?.name}
-            </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: 8,
-              }}>
-              <Icon
-                name="clock"
-                size={20}
-                color={COLORS.primary}
-                marginRight={5}
-              />
+        <ScrollView style={styles.scrollableSection}>
+          <View style={styles.infoContent}>
+            <View style={{flex: 1}}>
               <Text
-                style={{
-                  color: COLORS.orange,
-                  fontSize: 17, // replace 'sm' with the actual size in points
-                  opacity: 0.7,
-                  marginLeft: 4,
-                }}>
-                {format(new Date(event.startDate), 'EEE MMM d')}
-                {', '}
-                {format(new Date(event.startDate), 'h:mm a')} {' - '}
-                {format(
-                  addMinutes(new Date(event.startDate), event.duration),
-                  'h:mm a',
-                )}
+                style={{color: COLORS.black, fontWeight: 'bold', fontSize: 25}}>
+                {event?.name}
               </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: 8,
-              }}>
-              <Icon
-                name="map"
-                size={20}
-                color={COLORS.primary}
-                marginRight={5}
-              />
-              <Text
+              
+              <View
                 style={{
-                  color: COLORS.black,
-                  fontSize: 17,
-                  opacity: 0.7,
-                  marginLeft: 4,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: 8,
                 }}>
-                {event?.location}
-              </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: 8,
-              }}>
-              <Icon
-                name="user"
-                size={20}
-                color={COLORS.primary}
-                marginRight={5}
-              />
-              <Text
+                <Icon
+                  name="clock"
+                  size={20}
+                  color={COLORS.primary}
+                  marginRight={5}
+                />
+                <Text
+                  style={{
+                    color: COLORS.orange,
+                    fontSize: 16, // replace 'sm' with the actual size in points
+                    opacity: 0.7,
+                    marginLeft: 4,
+                  }}>
+                  {format(new Date(event.startDate), 'EEE MMM d')}
+                  {', '}
+                  {format(new Date(event.startDate), 'h:mm a')} {' - '}
+                  {format(
+                    addMinutes(new Date(event.startDate), event.duration),
+                    'h:mm a',
+                  )}
+                </Text>
+              </View>
+              
+              <View
                 style={{
-                  color: COLORS.black,
-                  fontSize: 17,
-                  opacity: 0.7,
-                  marginLeft: 4,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: 8,
                 }}>
-                Hosted by {event?.organization}
-              </Text>
+                <Icon
+                  name="map"
+                  size={20}
+                  color={COLORS.primary}
+                  marginRight={5}
+                />
+                <Text
+                  style={{
+                    color: COLORS.black,
+                    fontSize: 16,
+                    opacity: 0.7,
+                    marginLeft: 4,
+                    flex: 1,
+                  }}>
+                  {event?.location}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: 8,
+                }}>
+                <Icon
+                  name="user"
+                  size={20}
+                  color={COLORS.primary}
+                  marginRight={5}
+                />
+                <Text
+                  style={{
+                    color: COLORS.black,
+                    fontSize: 16,
+                    opacity: 0.7,
+                    marginLeft: 4,
+                  }}>
+                  Hosted by {event?.organization}
+                </Text>
+              </View>
             </View>
           </View>
+<<<<<<< Updated upstream
         </View>
         <View style={styles.buttonSection}>
           <Text
@@ -179,6 +186,57 @@ export default function Event() {
           />
         </MapView> */}
 
+=======
+          <View style={styles.buttonSection}>
+            <Text
+              color={COLORS.text}
+              style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                color: COLORS.text,
+              }}>
+              About
+            </Text>
+          </View>
+          <View style={styles.descriptionSection}>
+            <Text
+              color={COLORS.text}
+              style={{
+                fontSize: 16,
+              }}>
+              {event?.description}
+            </Text>
+          </View>
+          {event?.webLink ? (
+            <>
+              <View style={styles.buttonSection}>
+                <Text
+                  color={COLORS.text}
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 'bold',
+                    color: COLORS.text,
+                  }}>
+                  Web Link
+                </Text>
+              </View>
+              <View style={styles.descriptionSection}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: COLORS.primary,
+                    paddingBottom: 18,
+                  }}
+                  onPress={() =>
+                    event?.webLink && Linking.openURL(event?.webLink)
+                  }>
+                  {event?.webLink}
+                </Text>
+              </View>
+            </>
+          ) : null}
+        
+>>>>>>> Stashed changes
         {/* Location Section */}
         {/* <View
           style={{
@@ -237,8 +295,72 @@ export default function Event() {
             />
           </MapView>
           </View>
+<<<<<<< Updated upstream
           <View style={{paddingBottom: 150}}></View>
         </View> */}
+=======
+          <View style={{paddingBottom: 100}}></View>
+        </View> */}
+        
+        {/* <LinearGradient
+          colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 50,
+          }}
+        /> */}
+
+        </ScrollView>
+        
+      </Animated.ScrollView>
+      <View
+        style={{
+          position: 'absolute',
+          top: 10,
+          left: 0,
+          right: 0,
+          height: 50,
+          justifyContent: 'space-between',
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginTop: 20,
+          paddingLeft: 20,
+          paddingRight: 20,
+        }}>
+        <Animated.View
+          style={{
+            position: 'absolute',
+            top: -100,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: COLORS.white,
+            borderBottomColor: COLORS.gray3,
+            borderBottomWidth: 1,
+            opacity: scrollY.interpolate({
+              inputRange: [HEADER_HEIGHT - 100, HEADER_HEIGHT - 70],
+              outputRange: [0, 1],
+            }),
+          }}
+        />
+        <TouchableOpacity
+          onPress={() => {
+            router.back();
+          }}
+          style={{
+            width: 40,
+            height: 40,
+            backgroundColor: COLORS.white,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 100,
+          }}>
+          <Icon name="arrow-left" size={18} color={COLORS.black}></Icon>
+        </TouchableOpacity>
+>>>>>>> Stashed changes
 
         <View
           style={{
@@ -296,11 +418,31 @@ export default function Event() {
           </View>
         </View>
       </View>
+      {/* <LinearGradient
+          colors={['rgba(255,255,255,0)', 'rgba(255,134,255,1)']}
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 200,
+          }}
+        /> */}
+        <LinearGradient
+          colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 90,
+            height: 30,
+          }}
+        />
       <View
         style={{
-          height: 111,
+          height: 90,
           width: SIZES.width,
-          borderRadius: SIZES.radius,
+          // borderRadius: SIZES.radius,
           backgroundColor: 'transparent',
           position: 'absolute',
           bottom: 0,
@@ -312,6 +454,9 @@ export default function Event() {
           },
           shadowOpacity: 0.2,
         }}>
+          
+          
+
         <Link href="/camera" asChild>
           <TouchableOpacity
             style={{
@@ -339,10 +484,11 @@ export default function Event() {
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.white,
     flexGrow: 1,
   },
   infoContent: {
@@ -435,5 +581,9 @@ const styles = StyleSheet.create({
   },
   userRow: {
     marginBottom: 12,
+  },
+  scrollableSection: {
+    maxHeight: 420, // Adjust the height as needed
+    marginBottom: 10,
   },
 });
