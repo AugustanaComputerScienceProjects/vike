@@ -23,7 +23,7 @@ export default function Event() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View>
+      <Animated.ScrollView>
         <Image
           contentFit="cover"
           source={{uri: event?.image}}
@@ -116,77 +116,6 @@ export default function Event() {
               </View>
             </View>
           </View>
-<<<<<<< Updated upstream
-        </View>
-        <View style={styles.buttonSection}>
-          <Text
-            color={COLORS.text}
-            style={{
-              fontSize: 20,
-              fontWeight: 'bold',
-              color: COLORS.text,
-            }}>
-            About
-          </Text>
-        </View>
-        <View style={styles.descriptionSection}>
-          <Text
-            color={COLORS.text}
-            style={{
-              fontSize: 16,
-            }}>
-            {event?.description}
-          </Text>
-        </View>
-        {event?.webLink ? (
-          <>
-            <View style={styles.buttonSection}>
-              <Text
-                color={COLORS.text}
-                style={{
-                  fontSize: 20,
-                  fontWeight: 'bold',
-                  color: COLORS.text,
-                }}>
-                Web Link
-              </Text>
-            </View>
-            <View style={styles.descriptionSection}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  color: COLORS.primary,
-                }}
-                onPress={() =>
-                  event?.webLink && Linking.openURL(event?.webLink)
-                }>
-                {event?.webLink}
-              </Text>
-            </View>
-          </>
-        ) : null}
-
-        {/* <MapView
-          style={{ flex: 1, height: 200 }}
-          provider={PROVIDER_GOOGLE} // or PROVIDER_DEFAULT
-          initialRegion={{
-            latitude: 41.503, // Replace with your desired latitude
-            longitude: -90.5504, // Replace with your desired longitude
-            latitudeDelta: 0.01, // Adjust the zoom level as needed
-            longitudeDelta: 0.01,
-          }}
-        >
-          <Marker
-            coordinate={{
-              latitude: 41.503, // Replace with the same latitude as above
-              longitude: -90.5504, // Replace with the same longitude as above
-            }}
-            title={event?.location}
-            description={event?.location}
-          />
-        </MapView> */}
-
-=======
           <View style={styles.buttonSection}>
             <Text
               color={COLORS.text}
@@ -236,7 +165,6 @@ export default function Event() {
             </>
           ) : null}
         
->>>>>>> Stashed changes
         {/* Location Section */}
         {/* <View
           style={{
@@ -295,10 +223,6 @@ export default function Event() {
             />
           </MapView>
           </View>
-<<<<<<< Updated upstream
-          <View style={{paddingBottom: 150}}></View>
-        </View> */}
-=======
           <View style={{paddingBottom: 100}}></View>
         </View> */}
         
@@ -360,7 +284,6 @@ export default function Event() {
           }}>
           <Icon name="arrow-left" size={18} color={COLORS.black}></Icon>
         </TouchableOpacity>
->>>>>>> Stashed changes
 
         <View
           style={{
