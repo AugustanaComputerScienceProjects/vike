@@ -225,18 +225,6 @@ export default function Event() {
           </View>
           <View style={{paddingBottom: 100}}></View>
         </View> */}
-        
-        {/* <LinearGradient
-          colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: 50,
-          }}
-        /> */}
-
         </ScrollView>
         
       </Animated.ScrollView>
@@ -284,73 +272,15 @@ export default function Event() {
           }}>
           <Icon name="arrow-left" size={18} color={COLORS.black}></Icon>
         </TouchableOpacity>
-
         <View
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 30,
             justifyContent: 'space-between',
-            flexDirection: 'row',
             alignItems: 'center',
-            marginTop: 20,
-            paddingLeft: 20,
-            paddingRight: 20,
+            flexDirection: 'row',
           }}>
-          <Animated.View
-            style={{
-              position: 'absolute',
-              top: -100,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: COLORS.white,
-              borderBottomColor: COLORS.gray3,
-              borderBottomWidth: 1,
-
-              opacity: scrollY.interpolate({
-                inputRange: [HEADER_HEIGHT - 100, HEADER_HEIGHT - 70],
-                outputRange: [0, 1],
-              }),
-            }}
-          />
-          <TouchableOpacity
-            onPress={() => {
-              router.back();
-            }}
-            style={{
-              width: 40,
-              height: 40,
-              backgroundColor: COLORS.white,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 100,
-            }}>
-            <Icon name="arrow-left" size={18} color={COLORS.black}></Icon>
-          </TouchableOpacity>
-
-          <View
-            style={{
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexDirection: 'row',
-            }}>
-            <EventShare event={event} />
-          </View>
+          <EventShare event={event} />
         </View>
       </View>
-      {/* <LinearGradient
-          colors={['rgba(255,255,255,0)', 'rgba(255,134,255,1)']}
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: 200,
-          }}
-        /> */}
         <LinearGradient
           colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
           style={{
