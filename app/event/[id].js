@@ -23,7 +23,7 @@ export default function Event() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Animated.ScrollView>
+      <Animated.ScrollView style={{maxHeight: SIZES.height - 100}}>
         <Image
           contentFit="cover"
           source={{uri: event?.image}}
@@ -32,138 +32,137 @@ export default function Event() {
             height: HEADER_HEIGHT,
           }}
         />
-        <ScrollView style={styles.scrollableSection}>
-          <View style={styles.infoContent}>
-            <View style={{flex: 1}}>
+        <View style={styles.infoContent}>
+          <View style={{flex: 1}}>
+            <Text
+              style={{color: COLORS.black, fontWeight: 'bold', fontSize: 25}}>
+              {event?.name}
+            </Text>
+            
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 8,
+              }}>
+              <Icon
+                name="clock"
+                size={20}
+                color={COLORS.primary}
+                marginRight={5}
+              />
               <Text
-                style={{color: COLORS.black, fontWeight: 'bold', fontSize: 25}}>
-                {event?.name}
+                style={{
+                  color: COLORS.orange,
+                  fontSize: 16, // replace 'sm' with the actual size in points
+                  opacity: 0.7,
+                  marginLeft: 4,
+                }}>
+                {format(new Date(event.startDate), 'EEE MMM d')}
+                {', '}
+                {format(new Date(event.startDate), 'h:mm a')} {' - '}
+                {format(
+                  addMinutes(new Date(event.startDate), event.duration),
+                  'h:mm a',
+                )}
               </Text>
-              
-              <View
+            </View>
+            
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 8,
+              }}>
+              <Icon
+                name="map"
+                size={20}
+                color={COLORS.primary}
+                marginRight={5}
+              />
+              <Text
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginTop: 8,
+                  color: COLORS.black,
+                  fontSize: 16,
+                  opacity: 0.7,
+                  marginLeft: 4,
+                  flex: 1,
                 }}>
-                <Icon
-                  name="clock"
-                  size={20}
-                  color={COLORS.primary}
-                  marginRight={5}
-                />
-                <Text
-                  style={{
-                    color: COLORS.orange,
-                    fontSize: 16, // replace 'sm' with the actual size in points
-                    opacity: 0.7,
-                    marginLeft: 4,
-                  }}>
-                  {format(new Date(event.startDate), 'EEE MMM d')}
-                  {', '}
-                  {format(new Date(event.startDate), 'h:mm a')} {' - '}
-                  {format(
-                    addMinutes(new Date(event.startDate), event.duration),
-                    'h:mm a',
-                  )}
-                </Text>
-              </View>
-              
-              <View
+                {event?.location}
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 8,
+              }}>
+              <Icon
+                name="user"
+                size={20}
+                color={COLORS.primary}
+                marginRight={5}
+              />
+              <Text
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginTop: 8,
+                  color: COLORS.black,
+                  fontSize: 16,
+                  opacity: 0.7,
+                  marginLeft: 4,
                 }}>
-                <Icon
-                  name="map"
-                  size={20}
-                  color={COLORS.primary}
-                  marginRight={5}
-                />
-                <Text
-                  style={{
-                    color: COLORS.black,
-                    fontSize: 16,
-                    opacity: 0.7,
-                    marginLeft: 4,
-                    flex: 1,
-                  }}>
-                  {event?.location}
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginTop: 8,
-                }}>
-                <Icon
-                  name="user"
-                  size={20}
-                  color={COLORS.primary}
-                  marginRight={5}
-                />
-                <Text
-                  style={{
-                    color: COLORS.black,
-                    fontSize: 16,
-                    opacity: 0.7,
-                    marginLeft: 4,
-                  }}>
-                  Hosted by {event?.organization}
-                </Text>
-              </View>
+                Hosted by {event?.organization}
+              </Text>
             </View>
           </View>
-          <View style={styles.buttonSection}>
-            <Text
-              color={COLORS.text}
-              style={{
-                fontSize: 20,
-                fontWeight: 'bold',
-                color: COLORS.text,
-              }}>
-              About
-            </Text>
-          </View>
-          <View style={styles.descriptionSection}>
-            <Text
-              color={COLORS.text}
-              style={{
-                fontSize: 16,
-              }}>
-              {event?.description}
-            </Text>
-          </View>
-          {event?.webLink ? (
-            <>
-              <View style={styles.buttonSection}>
-                <Text
-                  color={COLORS.text}
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 'bold',
-                    color: COLORS.text,
-                  }}>
-                  Web Link
-                </Text>
-              </View>
-              <View style={styles.descriptionSection}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: COLORS.primary,
-                    paddingBottom: 18,
-                  }}
-                  onPress={() =>
-                    event?.webLink && Linking.openURL(event?.webLink)
-                  }>
-                  {event?.webLink}
-                </Text>
-              </View>
-            </>
-          ) : null}
+        </View>
+        <View style={styles.buttonSection}>
+          <Text
+            color={COLORS.text}
+            style={{
+              fontSize: 20,
+              fontWeight: 'bold',
+              color: COLORS.text,
+            }}>
+            About
+          </Text>
+        </View>
+        <View style={styles.descriptionSection}>
+          <Text
+            color={COLORS.text}
+            style={{
+              fontSize: 16,
+            }}>
+            {event?.description}
+          </Text>
+        </View>
+        {event?.webLink ? (
+          <>
+            <View style={styles.buttonSection}>
+              <Text
+                color={COLORS.text}
+                style={{
+                  fontSize: 20,
+                  fontWeight: 'bold',
+                  color: COLORS.text,
+                }}>
+                Web Link
+              </Text>
+            </View>
+            <View style={styles.descriptionSection}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: COLORS.primary,
+                  paddingBottom: 18,
+                }}
+                onPress={() =>
+                  event?.webLink && Linking.openURL(event?.webLink)
+                }>
+                {event?.webLink}
+              </Text>
+            </View>
+          </>
+        ) : null}
         
         {/* Location Section */}
         {/* <View
@@ -225,9 +224,18 @@ export default function Event() {
           </View>
           <View style={{paddingBottom: 100}}></View>
         </View> */}
-        </ScrollView>
         
       </Animated.ScrollView>
+      <LinearGradient
+          colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 75,
+            height: 30,
+          }}
+        />
       <View
         style={{
           position: 'absolute',
@@ -281,21 +289,10 @@ export default function Event() {
           <EventShare event={event} />
         </View>
       </View>
-        <LinearGradient
-          colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 90,
-            height: 30,
-          }}
-        />
       <View
         style={{
           height: 90,
           width: SIZES.width,
-          // borderRadius: SIZES.radius,
           backgroundColor: 'transparent',
           position: 'absolute',
           bottom: 0,
@@ -307,9 +304,6 @@ export default function Event() {
           },
           shadowOpacity: 0.2,
         }}>
-          
-          
-
         <Link href="/camera" asChild>
           <TouchableOpacity
             style={{
@@ -434,9 +428,5 @@ const styles = StyleSheet.create({
   },
   userRow: {
     marginBottom: 12,
-  },
-  scrollableSection: {
-    maxHeight: 420, // Adjust the height as needed
-    marginBottom: 10,
   },
 });

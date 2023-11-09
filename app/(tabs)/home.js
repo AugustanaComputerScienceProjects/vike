@@ -116,11 +116,10 @@ export default function Home() {
           style={{
             height: 50,
             borderRadius: 15,
-            backgroundColor: '#fff',
           }}>
           <View
             style={{
-              backgroundColor: '#fff',
+              backgroundColor: COLORS.background,
               justifyContent: 'center',
               flexDirection: 'row',
               alignItems: 'center',
