@@ -2,11 +2,17 @@ import Icon from '@expo/vector-icons/Feather';
 import {addMinutes, format} from 'date-fns';
 import {Image} from 'expo-image';
 import {Link, router, useLocalSearchParams} from 'expo-router';
-import {useRef} from 'react';
-import {Animated, Linking, StyleSheet, Text, View} from 'react-native';
+import React, {useRef} from 'react';
+import {
+  Animated,
+  Linking,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import EventShare from '../../components/EventShare';
 import {COLORS, SIZES} from '../../constants/theme';
 import {useEventStore} from '../../store';
@@ -22,7 +28,7 @@ export default function Event() {
   const event = getCurrentEvent(id);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -131,7 +137,6 @@ export default function Event() {
         </View>
         <View style={styles.buttonSection}>
           <Text
-            color={COLORS.text}
             style={{
               fontSize: 20,
               fontWeight: 'bold',
@@ -142,8 +147,8 @@ export default function Event() {
         </View>
         <View style={styles.descriptionSection}>
           <Text
-            color={COLORS.text}
             style={{
+              color: COLORS.text,
               fontSize: 16,
             }}>
             {event?.description}
@@ -153,7 +158,6 @@ export default function Event() {
           <>
             <View style={styles.buttonSection}>
               <Text
-                color={COLORS.text}
                 style={{
                   fontSize: 20,
                   fontWeight: 'bold',
@@ -184,7 +188,6 @@ export default function Event() {
             marginHorizontal: 30,
           }}>
           <Text
-            color={COLORS.text}
             style={{
               fontSize: 20,
               fontWeight: 'bold',
@@ -339,14 +342,16 @@ export default function Event() {
           </TouchableOpacity>
         </Link>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.white,
+    justifyContent: 'center',
+    alignItems: 'center',
     flexGrow: 1,
   },
   infoContent: {
