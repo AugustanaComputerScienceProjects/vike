@@ -3,7 +3,12 @@ import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {Slot} from 'expo-router';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
-import {Inter_900Black, useFonts} from '@expo-google-fonts/inter';
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_700Bold,
+  useFonts,
+} from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import {useCallback} from 'react';
 
@@ -18,7 +23,9 @@ GoogleSignin.configure({
 
 export default function Layout() {
   const [fontsLoaded, fontError] = useFonts({
-    Inter_900Black,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_700Bold,
   });
 
   const onLayoutRootView = useCallback(async () => {
@@ -31,7 +38,11 @@ export default function Layout() {
     return null;
   }
   return (
-    <SafeAreaProvider onLayout={onLayoutRootView}>
+    <SafeAreaProvider
+      onLayout={onLayoutRootView}
+      style={{
+        fontFamily: 'Inter_400Regular',
+      }}>
       <ActionSheetProvider>
         <Slot />
       </ActionSheetProvider>
