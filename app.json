@@ -31,6 +31,12 @@
       "backgroundColor": "#fff"
     },
     "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyB9PvtuwDFWCzUFFVf9kijCSS8on9y3t48"
+        }
+      },
+      "permissions": ["ACCESS_COARSE_LOCATION", "CAMERA"],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#fff"
@@ -39,6 +45,9 @@
       "package": "edu.augustana.osleventapp"
     },
     "ios": {
+      "config": {
+        "googleMapsApiKey": "AIzaSyBr8_x3nXHBPJMJ4EBg5w2clq5t_S1s05o"
+      },
       "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "edu.augustana.osleventapp"
     },
