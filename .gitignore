@@ -67,3 +67,5 @@ buck-out/
 credentials.json
 *.keystore
 *.keystore.old
+
+.env*

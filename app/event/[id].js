@@ -12,7 +12,11 @@ import {
   View,
 } from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps';
+import MapView, {
+  Marker,
+  PROVIDER_DEFAULT,
+  PROVIDER_GOOGLE,
+} from 'react-native-maps';
 import EventShare from '../../components/EventShare';
 import {COLORS, SIZES} from '../../constants/theme';
 import {useEventStore} from '../../store';
@@ -204,7 +208,9 @@ export default function Event() {
           </Text>
           <View style={{height: 250}}>
             <MapView
-              provider={PROVIDER_DEFAULT}
+              provider={
+                Platform.OS == 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
+              }
               style={{
                 height: 250,
                 borderRadius: 30,
