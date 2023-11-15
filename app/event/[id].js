@@ -5,6 +5,7 @@ import {Link, router, useLocalSearchParams} from 'expo-router';
 import {useRef} from 'react';
 import {Animated, Linking, StyleSheet, Text, View, ScrollView} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import EventShare from '../../components/EventShare';
 import {COLORS, SIZES} from '../../constants/theme';
@@ -23,7 +24,24 @@ export default function Event() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Animated.ScrollView style={{maxHeight: SIZES.height - 100}}>
+      <Animated.ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}
+        onScroll={Animated.event(
+          [
+            {
+              nativeEvent: {
+                contentOffset: {
+                  y: scrollY,
+                },
+              },
+            },
+          ],
+          {useNativeDriver: true},
+        )}
+        style={{width: '100%', maxHeight: SIZES.height - 100}}>
         <Image
           contentFit="cover"
           source={{uri: event?.image}}
@@ -163,9 +181,8 @@ export default function Event() {
             </View>
           </>
         ) : null}
-        
         {/* Location Section */}
-        {/* <View
+        <View
           style={{
             marginVertical: 25,
             marginHorizontal: 30,
@@ -188,43 +205,49 @@ export default function Event() {
           </Text>
           <View style={{height: 250}}>
             <MapView
-            provider={PROVIDER_GOOGLE}
-            style={{
-              height: 250,
-              borderRadius: 30,
-              marginTop: 20,
-            }}
-            minZoomLevel={15}
-            onPress={e => {
-              let lat = 41.503;
-              let lng = -90.5504;
-              const scheme = Platform.select({
-                ios: 'maps:0,0?q=',
-                android: 'geo:0,0?q=',
-              });
-              const latLng = `${lat},${lng}`;
-              const label = event.location;
-              const url = Platform.select({
-                ios: `${scheme}${label}@${latLng}`,
-                android: `${scheme}${latLng}(${label})`,
-              });
-              if (url) {
-                Linking.openURL(url);
-              }
-            }}
-            initialRegion={dummyData.Region}
-            customMapStyle={dummyData.MapStyle}
-            zoomEnabled={false}
-            scrollEnabled={false}>
-            <Marker
-              coordinate={{latitude: 41.503, longitude: -90.5504}}
-              title={event.location}
-            />
-          </MapView>
+              provider={PROVIDER_DEFAULT}
+              style={{
+                height: 250,
+                borderRadius: 30,
+                marginTop: 20,
+              }}
+              minZoomLevel={15}
+              onPress={e => {
+                let lat = event.latitude || 41.503;
+                let lng = event.longitude || -90.5504;
+                const scheme = Platform.select({
+                  ios: 'maps:0,0?q=',
+                  android: 'geo:0,0?q=',
+                });
+                const latLng = `${lat},${lng}`;
+                const label = event.location;
+                const url = Platform.select({
+                  ios: `${scheme}${label}@${latLng}`,
+                  android: `${scheme}${latLng}(${label})`,
+                });
+                if (url) {
+                  Linking.openURL(url);
+                }
+              }}
+              initialRegion={{
+                latitude: event.latitude || 41.503,
+                longitude: event.longitude || -90.5504,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+              zoomEnabled={false}
+              scrollEnabled={false}>
+              <Marker
+                coordinate={{
+                  latitude: event.latitude || 41.503,
+                  longitude: event.longitude || -90.5504,
+                }}
+                title={event.location}
+              />
+            </MapView>
           </View>
           <View style={{paddingBottom: 100}}></View>
-        </View> */}
-        
+        </View>
       </Animated.ScrollView>
       <LinearGradient
           colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
@@ -260,6 +283,7 @@ export default function Event() {
             backgroundColor: COLORS.white,
             borderBottomColor: COLORS.gray3,
             borderBottomWidth: 1,
+
             opacity: scrollY.interpolate({
               inputRange: [HEADER_HEIGHT - 100, HEADER_HEIGHT - 70],
               outputRange: [0, 1],
@@ -280,6 +304,7 @@ export default function Event() {
           }}>
           <Icon name="arrow-left" size={18} color={COLORS.black}></Icon>
         </TouchableOpacity>
+
         <View
           style={{
             justifyContent: 'space-between',
@@ -344,7 +369,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginTop: 20,
     marginBottom: 10,
-    marginHorizontal: 30,
+    marginHorizontal: 25,
   },
   buttonSection: {
     marginTop: 20,
