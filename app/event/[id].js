@@ -3,14 +3,17 @@ import {addMinutes, format} from 'date-fns';
 import {Image} from 'expo-image';
 import {Link, router, useLocalSearchParams} from 'expo-router';
 import {useRef} from 'react';
-import {Animated, Linking, StyleSheet, Text, View, ScrollView} from 'react-native';
+import {Animated, Linking, StyleSheet, Text, View} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import MapView, {Marker, PROVIDER_DEFAULT} from 'react-native-maps';
+import MapView, {
+  Marker,
+  PROVIDER_DEFAULT,
+  PROVIDER_GOOGLE,
+} from 'react-native-maps';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import EventShare from '../../components/EventShare';
 import {COLORS, SIZES} from '../../constants/theme';
 import {useEventStore} from '../../store';
-import {LinearGradient} from 'expo-linear-gradient';
 
 const HEADER_HEIGHT =
   SIZES.height < 700 ? SIZES.height * 0.3 : SIZES.height * 0.4;
@@ -41,7 +44,8 @@ export default function Event() {
           ],
           {useNativeDriver: true},
         )}
-        style={{width: '100%', maxHeight: SIZES.height - 100}}>
+
+        style={{width: '100%'}}>
         <Image
           contentFit="cover"
           source={{uri: event?.image}}
@@ -56,7 +60,7 @@ export default function Event() {
               style={{color: COLORS.black, fontWeight: 'bold', fontSize: 25}}>
               {event?.name}
             </Text>
-            
+
             <View
               style={{
                 flexDirection: 'row',
@@ -85,7 +89,7 @@ export default function Event() {
                 )}
               </Text>
             </View>
-            
+
             <View
               style={{
                 flexDirection: 'row',
@@ -205,7 +209,9 @@ export default function Event() {
           </Text>
           <View style={{height: 250}}>
             <MapView
-              provider={PROVIDER_DEFAULT}
+              provider={
+                Platform.OS == 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
+              }
               style={{
                 height: 250,
                 borderRadius: 30,
@@ -355,7 +361,6 @@ export default function Event() {
     </SafeAreaView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
