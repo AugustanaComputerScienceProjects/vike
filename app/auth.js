@@ -6,6 +6,7 @@ import {
 } from '@react-native-google-signin/google-signin';
 import {Image} from 'expo-image';
 import {useRouter} from 'expo-router';
+import React from 'react';
 import {Text, View} from 'react-native';
 import {COLORS} from '../constants/theme';
 

@@ -19,7 +19,7 @@ import MapView, {
 } from 'react-native-maps';
 import EventShare from '../../components/EventShare';
 import {COLORS, SIZES} from '../../constants/theme';
-import {useEventStore} from '../../store';
+import {useEventStore} from '../../context/store';
 
 const HEADER_HEIGHT =
   SIZES.height < 700 ? SIZES.height * 0.3 : SIZES.height * 0.4;

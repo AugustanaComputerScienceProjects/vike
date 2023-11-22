@@ -1,6 +1,6 @@
 import {ActionSheetProvider} from '@expo/react-native-action-sheet';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {Slot} from 'expo-router';
+import {Stack} from 'expo-router';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 import {
@@ -10,7 +10,8 @@ import {
   useFonts,
 } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
-import {useCallback} from 'react';
+import React, {useCallback} from 'react';
+import {AuthProvider} from '../context/useAuth';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -43,9 +44,13 @@ export default function Layout() {
       style={{
         fontFamily: 'Inter_400Regular',
       }}>
-      <ActionSheetProvider>
-        <Slot />
-      </ActionSheetProvider>
+      <AuthProvider>
+        <ActionSheetProvider>
+          <Stack screenOptions={{headerShown: false}}>
+            <Stack.Screen name="camera" options={{presentation: 'modal'}} />
+          </Stack>
+        </ActionSheetProvider>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }

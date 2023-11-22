@@ -3,7 +3,9 @@
     "name": "Vike",
     "slug": "vike",
     "version": "1.0.0",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "scheme": "vike",
     "plugins": [
       "@react-native-firebase/app",
@@ -22,7 +24,8 @@
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access camera."
         }
-      ]
+      ],
+      "./plugins/react-native-maps-plugin"
     ],
     "icon": "./assets/icon.png",
     "splash": {
@@ -36,7 +39,10 @@
           "apiKey": "AIzaSyB9PvtuwDFWCzUFFVf9kijCSS8on9y3t48"
         }
       },
-      "permissions": ["ACCESS_COARSE_LOCATION", "CAMERA"],
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#fff"

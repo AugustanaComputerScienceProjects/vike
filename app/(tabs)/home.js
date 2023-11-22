@@ -10,8 +10,9 @@ import {Link} from 'expo-router';
 import React from 'react';
 import {SearchBar} from 'react-native-elements';
 import AllEventsList from '../../components/home/AllEventsList';
+import FeaturedList from '../../components/home/FeaturedList';
 import {COLORS} from '../../constants/theme';
-import {useEventStore} from '../../store';
+import {useEventStore} from '../../context/store';
 
 export const getStorageImgURL = async imageName => {
   const imgURL = await storage()
@@ -56,7 +57,6 @@ export default function Home() {
             },
           );
           const resolved = await Promise.all(unresolved);
-
           updateEvents(resolved);
         });
     };
@@ -64,7 +64,11 @@ export default function Home() {
   }, []);
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{
+          padding: 16,
+        }}>
         {/* Header Section */}
         {!isSearching && query === '' && (
           <View>
@@ -142,7 +146,9 @@ export default function Home() {
         {/* FEATURED */}
         {!isSearching && query === '' && (
           <Animated.View entering={FadeIn.duration(300)}>
-            {/* {events && events.length > 0 && <FeaturedList data={events} />} */}
+            {events && events.length > 0 && (
+              <FeaturedList data={events.slice(0, 5)} />
+            )}
             {events && events.length > 0 && <AllEventsList data={events} />}
           </Animated.View>
         )}
@@ -161,7 +167,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    padding: 16,
   },
   coverImage: {
     width: 100,

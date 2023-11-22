@@ -1,20 +1,13 @@
-import {Image} from 'expo-image';
 import React from 'react';
-import {
-  Dimensions,
-  FlatList,
-  Keyboard,
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import {Dimensions, StyleSheet, Text, View} from 'react-native';
+import Carousel from 'react-native-reanimated-carousel';
 
 import {COLORS} from '../../constants/theme';
+import Card from '../Card';
 
 const windowWidth = Dimensions.get('window').width;
 
-const FeaturedList = ({data, setQuery, setIsSearching}) => {
+const FeaturedList = ({data}) => {
   return (
     <View
       style={{
@@ -24,7 +17,8 @@ const FeaturedList = ({data, setQuery, setIsSearching}) => {
       }}>
       <View
         style={{
-          margin: '20px 30px 0',
+          marginVertical: 15,
+          marginLeft: 20,
         }}>
         <Text
           style={{
@@ -32,41 +26,21 @@ const FeaturedList = ({data, setQuery, setIsSearching}) => {
             fontWeight: 'bold',
             color: COLORS.text,
           }}>
-          All Events
+          Feature Events
         </Text>
       </View>
       <View>
-        <FlatList
-          scrollEnabled={false}
+        <Carousel
+          loop={false}
+          style={{width: '100%'}}
+          width={windowWidth}
+          height={420}
           data={data}
-          keyExtractor={item => item.id}
-          renderItem={({item}) => (
-            <TouchableWithoutFeedback
-              onPress={() => {
-                // navigation.navigate('EventDetail', {event: item});
-                Keyboard.dismiss();
-                setIsSearching(false);
-                setQuery('');
-              }}>
-              <View style={styles.listItem}>
-                <Image source={{uri: item.image}} style={styles.coverImage} />
-                <View style={styles.metaInfo}>
-                  <Text style={styles.title}>{`${item.name}`}</Text>
-                  {/* <Text
-                    style={{
-                      color: COLORS.text,
-                    }}>{`${parseDate(item.startDate)} `}</Text> */}
-
-                  <Text
-                    style={{
-                      color: COLORS.text,
-                    }}>
-                    at {`${item.location} `}
-                  </Text>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          )}
+          scrollAnimationDuration={500}
+          onSnapToItem={index => console.log('current index:', index)}
+          renderItem={({item}, index) => {
+            return <Card item={item} index={index} length={data?.length} />;
+          }}
         />
       </View>
     </View>
@@ -77,27 +51,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-  },
-  coverImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
-  },
-  listItem: {
-    maxWidth: windowWidth - 100,
-    // marginTop: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    // backgroundColor: '#fff',
-    flexDirection: 'row',
-  },
-  metaInfo: {
-    paddingLeft: 10,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: COLORS.text,
   },
 });
 
