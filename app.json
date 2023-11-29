@@ -48,21 +48,21 @@
         "backgroundColor": "#fff"
       },
       "googleServicesFile": "./google-services.json",
-      "package": "edu.augustana.osleventapp"
+      "package": "edu.augustana.osleventsandroid"
     },
     "ios": {
       "config": {
         "googleMapsApiKey": "AIzaSyBr8_x3nXHBPJMJ4EBg5w2clq5t_S1s05o"
       },
       "googleServicesFile": "./GoogleService-Info.plist",
-      "bundleIdentifier": "edu.augustana.osleventapp"
+      "bundleIdentifier": "edu.augustana.OSL-Calendar-IOS-App"
     },
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "aad3b70c-0cc7-42bd-bf30-2cf5b319608f"
+        "projectId": "ae327b5e-168a-4d01-b35c-b07442ac04d9"
       }
     }
   }

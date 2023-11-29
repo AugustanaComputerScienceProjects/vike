@@ -21,7 +21,7 @@
     "@react-native-google-signin/google-signin": "^10.0.1",
     "@types/react": "~18.2.14",
     "date-fns": "^2.30.0",
-    "expo": "~49.0.10",
+    "expo": "~49.0.13",
     "expo-barcode-scanner": "~12.5.3",
     "expo-build-properties": "~0.8.3",
     "expo-calendar": "~11.3.1",

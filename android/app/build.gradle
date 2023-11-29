@@ -81,9 +81,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace 'edu.augustana.osleventapp'
+    namespace 'edu.augustana.osleventsandroid'
     defaultConfig {
-        applicationId 'edu.augustana.osleventapp'
+        applicationId 'edu.augustana.osleventsandroid'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

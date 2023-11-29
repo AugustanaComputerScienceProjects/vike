@@ -653,7 +653,7 @@ PODS:
     - ExpoModulesCore
   - EXConstants (14.4.2):
     - ExpoModulesCore
-  - EXFileSystem (15.4.4):
+  - EXFileSystem (15.4.5):
     - ExpoModulesCore
   - EXFont (11.4.0):
     - ExpoModulesCore
@@ -663,7 +663,7 @@ PODS:
   - EXJSONUtils (0.7.1)
   - EXManifests (0.7.2):
     - ExpoModulesCore
-  - Expo (49.0.10):
+  - Expo (49.0.20):
     - ExpoModulesCore
   - expo-dev-client (2.4.10):
     - EXManifests
@@ -734,7 +734,7 @@ PODS:
     - SDWebImageWebPCoder (~> 0.11.0)
   - ExpoKeepAwake (12.3.0):
     - ExpoModulesCore
-  - ExpoModulesCore (1.5.11):
+  - ExpoModulesCore (1.5.12):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
     - React-NativeModulesApple
@@ -1733,12 +1733,12 @@ SPEC CHECKSUMS:
   EXBarCodeScanner: 44783bf0be375ab18a838dcfef29dd648397000a
   EXCalendar: ec74fc35b442ea6b67bf338c7478eb525e04c13c
   EXConstants: ce5bbea779da8031ac818c36bea41b10e14d04e1
-  EXFileSystem: 2b826a3bf1071a4b80a8457e97124783d1ac860e
+  EXFileSystem: f8b838a880254de42a5a7da20ed5ce12e2697c1b
   EXFont: 738c44c390953ebcbab075a4848bfbef025fd9ee
   EXImageLoader: 34b214f9387e98f3c73989f15d8d5b399c9ab3f7
   EXJSONUtils: 6802be4282d42b97c51682468ddc1026a06f8276
   EXManifests: cf66451b11b2c2f6464917528d792759f7fd6ce0
-  Expo: 0ff83f0415a0e7a9368ce38bf25cad539b18a08c
+  Expo: 25b41ba5d4a3af57234dca132f6b9e1f5b0bd4b5
   expo-dev-client: e4b51d8c2d9cfabbd02275f355e5792fc934eb03
   expo-dev-launcher: 330b6fb506b7a8be2c68e14274d6090d98b66c52
   expo-dev-menu: 44e6f381c8eb0c7ea0694b9bffa015b9194a6837
@@ -1747,7 +1747,7 @@ SPEC CHECKSUMS:
   ExpoHead: d580a84b8198298253f907d49d6dd5c871dbe857
   ExpoImage: e0182814c62f40dd4e2e74324ebbbbbc2a4464c9
   ExpoKeepAwake: be4cbd52d9b177cde0fd66daa1913afa3161fc1d
-  ExpoModulesCore: 81037d28453615c4206a6a2ca7556a0f364a0a0a
+  ExpoModulesCore: e5b041c20cee64b4f2d8c49b0bcdd757d152109f
   EXSplashScreen: 2c80621e4bc952f5bea328304c2436f5fe21c2a0
   EXUpdatesInterface: 82ed48d417cdcd376c12ca1c2ce390d35500bed6
   FBLazyVector: 5d4a3b7f411219a45a6d952f77d2c0a6c9989da5

@@ -28,13 +28,13 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>vike</string>
-          <string>edu.augustana.osleventapp</string>
+          <string>edu.augustana.OSL-Calendar-IOS-App</string>
         </array>
       </dict>
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>com.googleusercontent.apps.559059413195-cgcrremu6c4tm8tveaj84c91b6pppn60</string>
+          <string>com.googleusercontent.apps.559059413195-bm452n249mhutpo2ddtmf8ptjrubbqqq</string>
         </array>
       </dict>
       <dict>
