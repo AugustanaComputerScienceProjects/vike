@@ -1,9 +1,10 @@
 import {format} from 'date-fns';
-import {Image} from 'expo-image';
 import {Link} from 'expo-router';
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, View} from 'react-native';
 import {COLORS, SIZES} from '../constants/theme';
+const blurhash =
+  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 const Card = ({item, index, length}) => {
   return (
@@ -18,10 +19,8 @@ const Card = ({item, index, length}) => {
       }}>
       <View style={styles.card}>
         <View style={styles.imageContainer}>
-          <Image
-            contentFit="cover"
-            source={{uri: item.image}}
-            style={styles.image}>
+          <Image source={{uri: item.image}} style={styles.image} />
+          <View style={styles.overlayTextContainer}>
             <View style={styles.dateContainer}>
               <View style={styles.dateBox}>
                 <Text style={styles.monthText}>
@@ -32,7 +31,7 @@ const Card = ({item, index, length}) => {
                 </Text>
               </View>
             </View>
-          </Image>
+          </View>
         </View>
         <View style={styles.details}>
           <Text style={styles.dateText}>
@@ -52,22 +51,21 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     overflow: 'hidden',
     backgroundColor: '#F5F5F5',
-    borderColor: '#CCCCCC', //
+    borderColor: '#CCCCCC',
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   imageContainer: {
     height: SIZES.width / 2 + 100,
   },
+  overlayTextContainer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    justifyContent: 'flex-end',
+  },
   image: {
     flex: 1,
+    width: '100%',
     justifyContent: 'flex-end',
   },
   dateContainer: {
