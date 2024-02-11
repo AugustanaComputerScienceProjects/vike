@@ -1,11 +1,23 @@
 import Icon from '@expo/vector-icons/Feather';
 import auth from '@react-native-firebase/auth';
 import {Link} from 'expo-router';
+import React from 'react';
 import {ActionSheetIOS, StyleSheet, Text, View} from 'react-native';
+import {Avatar} from 'react-native-elements';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {COLORS} from '../../constants/theme';
+import {COLORS} from '../../../constants/theme';
 
+const getInitials = fullName => {
+  const allNames = fullName.trim().split(' ');
+  const initials = allNames.reduce((acc, curr, index) => {
+    if (index === 0 || index === allNames.length - 1) {
+      acc = `${acc}${curr.charAt(0).toUpperCase()}`;
+    }
+    return acc;
+  }, '');
+  return initials;
+};
 export default function Profile() {
   const settingsOptions = [
     {
@@ -44,9 +56,14 @@ export default function Profile() {
       <ScrollView style={styles.scroll}>
         <View style={styles.headerContainer}>
           <View style={styles.userRow}>
-            {/* <Avatar size="md" mb="4" style={styles.userImage}>
-              {getInitials(auth().currentUser?.displayName)}
-            </Avatar> */}
+            <Avatar
+              // style={styles.userImage}
+              overlayContainerStyle={{backgroundColor: 'grey'}}
+              size="small"
+              activeOpacity={0.7}
+              rounded
+              title={getInitials(auth().currentUser?.displayName)}
+            />
             <View style={styles.userNameRow}>
               <Text style={styles.userNameText}>
                 {auth().currentUser?.displayName}
@@ -56,7 +73,12 @@ export default function Profile() {
         </View>
 
         <View>
-          <Text color={COLORS.text} mb={4} fontSize={'xl'} fontWeight="bold">
+          <Text
+            style={{
+              marginBottom: 4,
+              fontSize: 17,
+              fontWeight: 'bold',
+            }}>
             Settings
           </Text>
           <View>
@@ -88,7 +110,6 @@ export default function Profile() {
         </View>
 
         <TouchableOpacity
-          color={COLORS.text}
           onPress={() => {
             ActionSheetIOS.showActionSheetWithOptions(
               {
@@ -106,7 +127,11 @@ export default function Profile() {
             );
           }}>
           <View style={{marginTop: 48, paddingBottom: 10}}>
-            <Text color={COLORS.text} fontSize={14} underline>
+            <Text
+              style={{
+                fontSize: 14,
+                textDecorationLine: 'underline',
+              }}>
               Log out
             </Text>
           </View>

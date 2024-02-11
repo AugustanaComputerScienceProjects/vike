@@ -1,7 +1,9 @@
 import Icon from '@expo/vector-icons/Feather';
-import {Link, Tabs} from 'expo-router';
-import {Pressable, Text, View} from 'react-native';
+import {Tabs} from 'expo-router';
+import React from 'react';
+import {View} from 'react-native';
 import {COLORS} from '../../constants/theme';
+import {useAuth} from '../../context/useAuth';
 
 const TabIcon = ({focused, icon}) => {
   return (
@@ -10,21 +12,8 @@ const TabIcon = ({focused, icon}) => {
     </View>
   );
 };
-const TabLabel = ({focused, text}) => {
-  return focused ? (
-    <Text
-      color={COLORS.text}
-      style={{
-        fontSize: 12,
-        paddingBottom: 10,
-      }}>
-      {text}
-    </Text>
-  ) : (
-    <View />
-  );
-};
 export default function TabLayout() {
+  const {user, initialized} = useAuth();
   return (
     <Tabs
       screenOptions={{
@@ -37,35 +26,20 @@ export default function TabLayout() {
           right: 0,
           elevation: 0,
           backgroundColor: COLORS.background,
-          // opacity: 0.9,
-          // borderTopColor: 'transparent',
-          // height: 60,
-          // borderRadius: 20,
         },
       }}>
       <Tabs.Screen
+        redirect={!user}
         name="home"
         options={{
           tabBarIcon: ({focused}) => (
             <TabIcon focused={focused} icon={'compass'} />
           ),
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({pressed}) => (
-                  <Icon
-                    name="info-circle"
-                    size={25}
-                    style={{marginRight: 15, opacity: pressed ? 0.5 : 1}}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
         }}
       />
       <Tabs.Screen
-        name="profile"
+        redirect={!user}
+        name="(profile)"
         options={{
           title: 'Profile',
           tabBarIcon: ({focused}) => (

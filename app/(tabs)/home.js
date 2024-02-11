@@ -1,46 +1,24 @@
-import Icon from '@expo/vector-icons/Feather';
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 import {Image} from 'expo-image';
 import {useEffect, useState} from 'react';
-import {
-  FlatList,
-  Keyboard,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import {FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
+import Animated, {FadeIn} from 'react-native-reanimated';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-} from 'react-native-gesture-handler';
-
+import {Link} from 'expo-router';
+import React from 'react';
+import {SearchBar} from 'react-native-elements';
 import AllEventsList from '../../components/home/AllEventsList';
+import FeaturedList from '../../components/home/FeaturedList';
 import {COLORS} from '../../constants/theme';
-import {useEventStore} from '../../store';
+import {useEventStore} from '../../context/store';
 
 export const getStorageImgURL = async imageName => {
   const imgURL = await storage()
     .ref('Images/' + imageName + '.jpg')
     .getDownloadURL();
   return imgURL;
-};
-
-const ScrollViewComponent = props => {
-  return (
-    <FlatList
-      {...props}
-      data={[]}
-      keyExtractor={(e, i) => 'dom' + i.toString()}
-      ListEmptyComponent={null}
-      renderItem={null}
-      ListHeaderComponent={() => <>{props.children}</>}
-    />
-  );
 };
 
 export default function Home() {
@@ -50,8 +28,6 @@ export default function Home() {
   const [query, setQuery] = useState('');
   const [searchData, setSearchData] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-
-  const state = {search: ''};
 
   const handleSearch = text => {
     const formattedQuery = text.toLowerCase();
@@ -81,7 +57,6 @@ export default function Home() {
             },
           );
           const resolved = await Promise.all(unresolved);
-
           updateEvents(resolved);
         });
     };
@@ -89,7 +64,11 @@ export default function Home() {
   }, []);
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{
+          padding: 16,
+        }}>
         {/* Header Section */}
         {!isSearching && query === '' && (
           <View>
@@ -107,51 +86,34 @@ export default function Home() {
           </View>
         )}
         {/* Search Section */}
-        <View
-          style={{
-            height: 50,
-            borderRadius: 15,
-          }}>
-          <View
-            style={{
+        <View>
+          <SearchBar
+            placeholder="Search"
+            onChangeText={handleSearch}
+            value={query}
+            onFocus={() => setIsSearching(true)}
+            onBlur={() => setIsSearching(false)}
+            showCancel={false}
+            onClear={() => setSearchData([])}
+            containerStyle={{
+              borderRadius: 15,
               backgroundColor: COLORS.background,
-              justifyContent: 'center',
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginHorizontal: 15,
-              height: '100%',
-            }}>
-            <View style={styles.inputContainer}>
-              <Icon style={styles.iconStyle} name="search" />
-              <TextInput
-                style={styles.inputStyle}
-                clearButtonMode="while-editing"
-                value={query}
-                onChangeText={queryText => handleSearch(queryText)}
-                placeholder="Search"
-                placeholderTextColor={COLORS.gray1}
-                onFocus={() => setIsSearching(true)}
-                onBlur={() => setIsSearching(false)}
-                returnKeyType="search"
-                enablesReturnKeyAutomatically
-              />
-            </View>
-            {isSearching && (
-              <TouchableOpacity
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setIsSearching(false);
-                  setQuery('');
-                }}>
-                <Text
-                  style={{
-                    color: COLORS.text,
-                  }}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
+              borderWidth: 0,
+              shadowColor: 'white',
+              borderBottomColor: 'transparent',
+              borderTopColor: 'transparent',
+            }}
+            lightTheme={true}
+            inputContainerStyle={{
+              backgroundColor: COLORS.gray5,
+              borderRadius: 10,
+              paddingVertical: 4,
+              paddingHorizontal: 12,
+            }}
+            inputStyle={{
+              color: COLORS.input,
+            }}
+          />
         </View>
 
         {query !== '' && (
@@ -160,11 +122,10 @@ export default function Home() {
             data={searchData}
             keyExtractor={item => item.id}
             renderItem={({item}) => (
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setIsSearching(false);
-                  setQuery('');
+              <Link
+                href={{
+                  pathname: '/event/[id]',
+                  params: {id: item.id, event: item},
                 }}>
                 <View style={styles.listItem}>
                   <Image source={{uri: item.image}} style={styles.coverImage} />
@@ -172,28 +133,24 @@ export default function Home() {
                     <Text style={styles.title}>{`${item.name}`}</Text>
 
                     <Text
-                      styles={{
+                      style={{
                         color: COLORS.text,
                       }}>{`${item.location} `}</Text>
                   </View>
                 </View>
-              </TouchableWithoutFeedback>
+              </Link>
             )}
           />
         )}
 
         {/* FEATURED */}
         {!isSearching && query === '' && (
-          <>
-            {/* {events && events.length > 0 && <FeaturedList data={events} />} */}
+          <Animated.View entering={FadeIn.duration(300)}>
             {events && events.length > 0 && (
-              <AllEventsList
-                data={events}
-                setQuery={setQuery}
-                setIsSearching={setIsSearching}
-              />
+              <FeaturedList data={events.slice(0, 5)} />
             )}
-          </>
+            {events && events.length > 0 && <AllEventsList data={events} />}
+          </Animated.View>
         )}
         <View style={{flex: 1, height: 100}} />
       </ScrollView>
@@ -202,22 +159,6 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.gray5,
-    borderRadius: 20, // Adjusted borderRadius
-    paddingVertical: 8, // Adjusted padding
-    width: '100%',
-    paddingHorizontal: 12, // Adjusted padding
-  },
-  inputStyle: {
-    flex: 1,
-    color: COLORS.input,
-    fontSize: 14,
-    marginLeft: 8,
-    padding: 8, // Adjusted padding
-  },
   iconStyle: {
     marginLeft: 4,
     color: COLORS.text,
@@ -226,7 +167,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    padding: 16,
   },
   coverImage: {
     width: 100,

@@ -1,47 +1,22 @@
-import {ActionSheetProvider} from '@expo/react-native-action-sheet';
-import auth from '@react-native-firebase/auth';
-import {
-  Stack,
-  useRootNavigationState,
-  useRouter,
-  useSegments,
-} from 'expo-router';
+import {Redirect, useRootNavigationState} from 'expo-router';
 
-import React, {useEffect, useState} from 'react';
-import {StyleSheet} from 'react-native';
+import React from 'react';
+import {StyleSheet, Text, View} from 'react-native';
+import {useAuth} from '../context/useAuth';
 
 export default function Index() {
   const navigationState = useRootNavigationState();
-  const segments = useSegments();
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState();
 
-  useEffect(() => {
-    if (!navigationState?.key) return;
-    auth().onAuthStateChanged(userState => {
-      setUser(userState);
+  const {user} = useAuth();
+  if (!user) {
+    console.log('redirecting to login');
+    return <Redirect href="/auth" />;
+  } else if (user) {
+    console.log('redirect to home');
+    return <Redirect href="/(tabs)/home" />;
+  }
 
-      if (loading) {
-        setLoading(false);
-      }
-    });
-
-    if (!user) {
-      router.replace('/auth');
-    } else {
-      router.replace('/(tabs)/home');
-    }
-  }, [segments, navigationState?.key]);
-
-  return (
-    <ActionSheetProvider>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{headerShown: false}} />
-        <Stack.Screen name="modal" options={{presentation: 'modal'}} />
-      </Stack>
-    </ActionSheetProvider>
-  );
+  return <View>{!navigationState?.key ? <Text>Loading...</Text> : <></>}</View>;
 }
 
 const styles = StyleSheet.create({
