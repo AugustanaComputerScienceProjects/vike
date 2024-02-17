@@ -2,7 +2,7 @@
   "expo": {
     "name": "Vike",
     "slug": "vike",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -23,6 +23,12 @@
         "expo-barcode-scanner",
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access camera."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ],
       "./plugins/react-native-maps-plugin"
@@ -48,9 +54,11 @@
         "backgroundColor": "#fff"
       },
       "googleServicesFile": "./google-services.json",
-      "package": "edu.augustana.osleventsandroid"
+      "package": "edu.augustana.osleventsandroid",
+      "versionCode": 6
     },
     "ios": {
+      "buildNumber": "1.2",
       "config": {
         "googleMapsApiKey": "AIzaSyBr8_x3nXHBPJMJ4EBg5w2clq5t_S1s05o"
       },
