@@ -67,5 +67,10 @@ buck-out/
 credentials.json
 *.keystore
 *.keystore.old
+*.jks
+
+play_store.json
 
 .env*
+
+build*

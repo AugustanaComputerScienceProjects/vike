@@ -1,0 +1,49 @@
+default_platform(:ios)
+
+platform :ios do
+    before_all do
+    ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
+    end
+
+    desc "Submit a new Build to Apple TestFlight"
+    desc "This will also make sure the profile is up to date"
+    lane :alpha do
+        sigh
+        increment_build_number(xcodeproj: './ios/MyApp.xcodeproj') # Increment the build number
+        gym(scheme: "MyApp", project: './ios/MyApp.xcodeproj') # Build the app
+        pilot(skip_submission: true) # Upload the app to TestFlight
+    end
+
+  after_all do |lane|
+    slack(channel: "deploys", message: "Successfully deployed new MyApp alpha update to TestFlight.")
+  end
+end
+
+platform :android do
+    before_all do
+    end
+
+    desc "Submit a new Beta Build to Play Store"
+    lane :beta do
+        gradle(task: 'clean', project_dir: "android/") # Clean the Gradle project
+        gradle(task: "assemble", build_type: "Release", project_dir: "android/") # Build the Release APK
+        # supply(track: "beta", apk: "android/app/build/outputs/apk/app-beta-release.apk") # Upload the APK to the Play Store (alpha)
+    end
+
+    desc "Release for the Android production"
+    lane :release do
+        increment_version_code(app_project_dir: './android/app')
+        increment_version_name(app_project_dir: './android/app', bump_type: 'patch')
+        gradle(task: 'clean', project_dir: './android/')
+        gradle(task: 'bundle', bundle_type: 'Release', project_dir: './andriod', properties: {
+            "android.injected.signing.store.file" => ENV['ANDROID_KEYSTORE_FILE'],
+            "android.injected.signing.store.password" => ENV['ANDROID_KEYSTORE_PASSWORD'],
+            "android.injected.signing.key.alias" => ENV['ANDROID_KEYSTORE_ALIAS'],
+            "android.injected.signing.key.password" => ENV['ANDROID_KEYSTORE_PASSWORD']
+        })
+        # supply(track: 'production', aab: './android/app/build/outputs/bundle/release/app_release.aab', release_status: 'draft')
+    end
+
+    after_all do |lane|
+    end
+end

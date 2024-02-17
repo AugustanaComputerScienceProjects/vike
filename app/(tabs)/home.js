@@ -3,7 +3,6 @@ import storage from '@react-native-firebase/storage';
 import {Image} from 'expo-image';
 import {useEffect, useState} from 'react';
 import {FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
-import Animated, {FadeIn} from 'react-native-reanimated';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {Link} from 'expo-router';
@@ -62,6 +61,7 @@ export default function Home() {
     };
     fetchEvents();
   }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView

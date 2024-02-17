@@ -34,7 +34,7 @@ export const AuthProvider = ({children}) => {
         console.log('AUTHENTICATED: ', user);
         router.replace('/(tabs)/home');
       }
-    }, [user, segments]);
+    }, [user]);
   };
 
   useProtectedRoute();
