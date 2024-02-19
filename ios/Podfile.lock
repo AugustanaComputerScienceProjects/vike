@@ -769,7 +769,7 @@ PODS:
   - Firebase/Storage (10.14.0):
     - Firebase/CoreOnly
     - FirebaseStorage (~> 10.14.0)
-  - FirebaseAppCheckInterop (10.18.0)
+  - FirebaseAppCheckInterop (10.21.0)
   - FirebaseAuth (10.14.0):
     - FirebaseAppCheckInterop (~> 10.0)
     - FirebaseCore (~> 10.0)
@@ -777,14 +777,14 @@ PODS:
     - GoogleUtilities/Environment (~> 7.8)
     - GTMSessionFetcher/Core (< 4.0, >= 2.1)
     - RecaptchaInterop (~> 100.0)
-  - FirebaseAuthInterop (10.18.0)
+  - FirebaseAuthInterop (10.21.0)
   - FirebaseCore (10.14.0):
     - FirebaseCoreInternal (~> 10.0)
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/Logger (~> 7.8)
-  - FirebaseCoreExtension (10.18.0):
+  - FirebaseCoreExtension (10.21.0):
     - FirebaseCore (~> 10.0)
-  - FirebaseCoreInternal (10.18.0):
+  - FirebaseCoreInternal (10.21.0):
     - "GoogleUtilities/NSData+zlib (~> 7.8)"
   - FirebaseDatabase (10.14.0):
     - FirebaseCore (~> 10.0)
@@ -917,11 +917,11 @@ PODS:
   - GTMAppAuth (2.0.0):
     - AppAuth/Core (~> 1.6)
     - GTMSessionFetcher/Core (< 4.0, >= 1.5)
-  - GTMSessionFetcher/Core (3.1.1)
+  - GTMSessionFetcher/Core (3.3.1)
   - hermes-engine (0.72.4):
     - hermes-engine/Pre-built (= 0.72.4)
   - hermes-engine/Pre-built (0.72.4)
-  - leveldb-library (1.22.2)
+  - leveldb-library (1.22.3)
   - libaom (3.0.0):
     - libvmaf (>= 2.2.0)
   - libavif (0.11.1):
@@ -1759,12 +1759,12 @@ SPEC CHECKSUMS:
   FBLazyVector: 5d4a3b7f411219a45a6d952f77d2c0a6c9989da5
   FBReactNativeSpec: 3fc2d478e1c4b08276f9dd9128f80ec6d5d85c1f
   Firebase: 6c1bf3f534bc422d52af2e41fe0d50bf08b6b773
-  FirebaseAppCheckInterop: 3cd914842ba46f4304050874cd284de82f154ffd
+  FirebaseAppCheckInterop: 69fc7d8f6a1cbfa973efb8d1723651de30d12525
   FirebaseAuth: bd1ae3d28beb83bfe9247e50eb82688b683dd770
-  FirebaseAuthInterop: 5818713dcd7239beb96c1125e4b14d6a5a910e5f
+  FirebaseAuthInterop: b4161d3e99b05d2d528d6ee2759bc55a01976eba
   FirebaseCore: 6fc17ac9f03509d51c131298aacb3ee5698b4f02
-  FirebaseCoreExtension: 62b201498aa10535801cdf3448c7f4db5e24ed80
-  FirebaseCoreInternal: 8eb002e564b533bdcf1ba011f33f2b5c10e2ed4a
+  FirebaseCoreExtension: 1c044fd46e95036cccb29134757c499613f3f564
+  FirebaseCoreInternal: 43c1788eaeee9d1b97caaa751af567ce11010d00
   FirebaseDatabase: fa6f8e2747c3f168e6996a5fca6daf5c11ebd11b
   FirebaseFirestore: 808dd08cbc1c7be9052055f62ab312fdae611e37
   FirebaseStorage: e97b4bdd84b21ec060d5737a9c4f8f8fc6a0d041
@@ -1777,9 +1777,9 @@ SPEC CHECKSUMS:
   "gRPC-C++": 0968bace703459fd3e5dcb0b2bed4c573dbff046
   gRPC-Core: 17108291d84332196d3c8466b48f016fc17d816d
   GTMAppAuth: 99fb010047ba3973b7026e45393f51f27ab965ae
-  GTMSessionFetcher: e8647203b65cee28c5f73d0f473d096653945e72
+  GTMSessionFetcher: 8a1b34ad97ebe6f909fb8b9b77fba99943007556
   hermes-engine: 81191603c4eaa01f5e4ae5737a9efcf64756c7b2
-  leveldb-library: f03246171cce0484482ec291f88b6d563699ee06
+  leveldb-library: e74c27d8fbd22854db7cb467968a0b8aa1db7126
   libaom: 144606b1da4b5915a1054383c3a4459ccdb3c661
   libavif: 84bbb62fb232c3018d6f1bab79beea87e35de7b7
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
@@ -1823,23 +1823,6 @@ SPEC CHECKSUMS:
   React-runtimescheduler: 3a9dd3e5f670da419f4d25f002a999e3206c09c2
   React-utils: 665a3d6ee02a030028372599f7eb86829c99d1a8
   ReactCommon: 7df28412ba12501ed9ddeee78c1c352c310b7544
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-  React-runtimescheduler: 67950e13d7ee76718da7844d7985f4c7961255ae
-  React-utils: fea006110840c78f3523c73a6e3b5db1ea3ec12e
-  ReactCommon: cce94837956a2f1520132edc3632b087e146b56b
-  ReactNativeUiLib: 511a5eb03809a0b27f6aefa2b4d6f7c2d6ae4053
->>>>>>> Stashed changes
-=======
-  ReactNativeUiLib: 511a5eb03809a0b27f6aefa2b4d6f7c2d6ae4053
->>>>>>> expo-migration
-=======
-  ReactNativeUiLib: 511a5eb03809a0b27f6aefa2b4d6f7c2d6ae4053
->>>>>>> 40d98bed1ef9d56edfc65c975392fdefaa57d56b
-=======
->>>>>>> expo-migration
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   RNFBApp: a0bc818210d2c452461842f7a0a4e456c11ed831
   RNFBAuth: a304236349f219f95b5334977596253a04209fbf
@@ -1860,4 +1843,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: df941691bbba56b10f48152eabaf44668bb6e734
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.14.3
