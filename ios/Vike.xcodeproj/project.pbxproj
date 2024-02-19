@@ -10,6 +10,8 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		1B96C1C684F04BA0AC6F7A0F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AD9A141082984DB080F0960F /* GoogleService-Info.plist */; };
+		3776C49101A44DBABB7BD4C8 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54243380C8564C76886590B4 /* noop-file.swift */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
 		69DB53AB07A959798FC970D6 /* Pods_Vike.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B038A9B0D60804C17BA6ACF /* Pods_Vike.framework */; };
 		6E52600F23EE4AA292FE976D /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D26BA5024B34EA5A4B6D1ED /* noop-file.swift */; };
@@ -33,6 +35,8 @@
 		8D26BA5024B34EA5A4B6D1ED /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "Vike/noop-file.swift"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = Vike/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
+		BCF5E9866AED43BBB4BB88BF /* Vike-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "Vike-Bridging-Header.h"; path = "Vike/Vike-Bridging-Header.h"; sourceTree = "<group>"; };
+		DB15EC778EBE86F2280C734E /* Pods_Vike.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Vike.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Vike/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */

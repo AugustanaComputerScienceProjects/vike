@@ -2,14 +2,18 @@ import Icon from '@expo/vector-icons/Feather';
 import {addMinutes, format} from 'date-fns';
 import {Image} from 'expo-image';
 import {Link, router, useLocalSearchParams} from 'expo-router';
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {
   Animated,
+  Dimensions,
   Linking,
   Platform,
   StyleSheet,
   Text,
   View,
+  Modal,
+  Alert,
+  Pressable
 } from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import MapView, {
@@ -24,6 +28,7 @@ import {useEventStore} from '../../context/store';
 const HEADER_HEIGHT =
   SIZES.height < 700 ? SIZES.height * 0.3 : SIZES.height * 0.4;
 
+const windowWidth = Dimensions.get('window').width;
 export default function Event() {
   const {id} = useLocalSearchParams();
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -31,6 +36,15 @@ export default function Event() {
   const getCurrentEvent = useEventStore(state => state.getCurrentEvent);
   const event = getCurrentEvent(id);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false); 
+
+  const handleRegisterClick = () => {
+    console.log('Registration submitted!');
+    setIsRegistered(true);  
+    setModalVisible(!modalVisible)
+  };
+  
   return (
     <View style={styles.container}>
       <Animated.ScrollView
@@ -50,6 +64,7 @@ export default function Event() {
           ],
           {useNativeDriver: true},
         )}
+
         style={{width: '100%'}}>
         <Image
           contentFit="cover"
@@ -65,6 +80,7 @@ export default function Event() {
               style={{color: COLORS.black, fontWeight: 'bold', fontSize: 25}}>
               {event?.name}
             </Text>
+
             <View
               style={{
                 flexDirection: 'row',
@@ -80,7 +96,7 @@ export default function Event() {
               <Text
                 style={{
                   color: COLORS.orange,
-                  fontSize: 17, // replace 'sm' with the actual size in points
+                  fontSize: 16, // replace 'sm' with the actual size in points
                   opacity: 0.7,
                   marginLeft: 4,
                 }}>
@@ -93,6 +109,7 @@ export default function Event() {
                 )}
               </Text>
             </View>
+
             <View
               style={{
                 flexDirection: 'row',
@@ -108,9 +125,10 @@ export default function Event() {
               <Text
                 style={{
                   color: COLORS.black,
-                  fontSize: 17,
+                  fontSize: 16,
                   opacity: 0.7,
                   marginLeft: 4,
+                  flex: 1,
                 }}>
                 {event?.location}
               </Text>
@@ -130,7 +148,7 @@ export default function Event() {
               <Text
                 style={{
                   color: COLORS.black,
-                  fontSize: 17,
+                  fontSize: 16,
                   opacity: 0.7,
                   marginLeft: 4,
                 }}>
@@ -175,6 +193,7 @@ export default function Event() {
                 style={{
                   fontSize: 16,
                   color: COLORS.primary,
+                  paddingBottom: 18,
                 }}
                 onPress={() =>
                   event?.webLink && Linking.openURL(event?.webLink)
@@ -184,7 +203,6 @@ export default function Event() {
             </View>
           </>
         ) : null}
-
         {/* Location Section */}
         <View
           style={{
@@ -254,6 +272,16 @@ export default function Event() {
           <View style={{paddingBottom: 100}}></View>
         </View>
       </Animated.ScrollView>
+      {/* <LinearGradient
+          colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 75,
+            height: 30,
+          }}
+        /> */}
       <View
         style={{
           position: 'absolute',
@@ -309,11 +337,12 @@ export default function Event() {
           <EventShare event={event} />
         </View>
       </View>
+      
+      
       <View
         style={{
-          height: 111,
+          height: 90,
           width: SIZES.width,
-          borderRadius: SIZES.radius,
           backgroundColor: 'transparent',
           position: 'absolute',
           bottom: 0,
@@ -325,7 +354,68 @@ export default function Event() {
           },
           shadowOpacity: 0.2,
         }}>
-        <Link href="/camera" asChild>
+        
+        {/* Modal */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onSwipeComplete={() => setModalVisible(false)}
+          swipeDirection="down"
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setModalVisible(!modalVisible);
+          }}>
+          <View style={styles.centeredView}>
+
+            <View style={styles.modalView}>
+              <View style={styles.listItem}>
+                <Image source={{uri: event?.image}} style={styles.coverImage} />
+                <View style={styles.metaInfo}>
+                    <Text style={styles.title}>{`${event?.name}`}</Text>
+                    <Text style={{color: 'chocolate', fontWeight: 'bold'}}>{event.startDate}</Text>
+                    <Text>{`${event?.location} `}
+                    </Text>
+                  </View>
+              </View>
+            </View>
+
+            <View style={styles.modalView}>
+              <View style={[styles.listItem, { justifyContent: 'space-between' }]}>
+                <Text style={styles.title}>Ticket</Text>
+                <Text style={{fontSize: 20}}>Free</Text>
+              </View>
+            </View>
+              <Pressable
+                style={{
+                  marginHorizontal: 30,
+                  height: 53,
+                  width: windowWidth - 30,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 15,
+                  backgroundColor: COLORS.primary,
+                  position: 'absolute',
+                  bottom: 18,
+                }}
+                onPress={handleRegisterClick}
+                >
+                <View>
+                  <Text
+                    style={{
+                      color: COLORS.white,
+                      fontSize: 20,
+                      fontWeight: 'bold',
+                    }}>
+                    Register
+                  </Text>
+                </View>
+              </Pressable>
+          </View>
+        </Modal>
+
+        {/* Register Button */}
+        {/* <Link href=/camera asChild> */}
           <TouchableOpacity
             style={{
               marginHorizontal: 30,
@@ -334,19 +424,52 @@ export default function Event() {
               alignItems: 'center',
               borderRadius: 15,
               backgroundColor: COLORS.primary,
-            }}>
+            }}
+            onPress={() => {
+              if (!isRegistered) {
+                setModalVisible(true); 
+              } else {
+                //View ticket action 
+                console.log('View ticket');
+              }
+            }}
+            >
             <View>
+              {!isRegistered && (
               <Text
                 style={{
                   color: COLORS.white,
                   fontSize: 20,
                   fontWeight: 'bold',
                 }}>
-                Check In
+                Register
               </Text>
+              )}
+              {isRegistered && (
+                <View>
+                <Text
+                  style={{
+                    color: COLORS.white,
+                    fontSize: 20,
+                    fontWeight: 'bold',
+                  }}
+                >
+                  You're Going
+                </Text>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 14,
+                    fontWeight: 'normal',
+                  }}
+                >
+                  View Ticket
+                </Text>
+              </View>
+            )}
             </View>
           </TouchableOpacity>
-        </Link>
+        {/* </Link> */}
       </View>
     </View>
   );
@@ -450,5 +573,56 @@ const styles = StyleSheet.create({
   },
   userRow: {
     marginBottom: 12,
+  },
+
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // marginTop: 22,
+    backgroundColor: 'rgba(0, 0, 0, .8)',
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+
+
+  coverImage: {
+      width: 100,
+      height: 100,
+      borderRadius: 8,
+  },
+  listItem: {
+      // maxWidth: windowWidth - 100,
+      width: windowWidth - 100,
+      // paddingVertical: 15,
+      paddingHorizontal: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      overflow: 'hidden',
+  },
+  metaInfo: {
+      // paddingLeft: 20,
+      flex:1,
+      marginHorizontal: 20,
+  },
+  title: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: COLORS.text,
   },
 });
