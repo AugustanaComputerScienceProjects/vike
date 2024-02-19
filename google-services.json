@@ -8,59 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:559059413195:android:007adf0c4f4ebb35b8934e",
-        "android_client_info": {
-          "package_name": "edu.augustana.osleventapp"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "559059413195-fhk1jl584tti885ikmtd3sp2643cg9g8.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "edu.augustana.osleventapp",
-            "certificate_hash": "bf8c0568ee4748b7cda15e05f06cdcfe4c12d8c2"
-          }
-        },
-        {
-          "client_id": "559059413195-va5s8h0c6019v90hbuh7g9o0v4sd1fnd.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "edu.augustana.osleventapp",
-            "certificate_hash": "1f36efc8ce045add1d07c2a7e400f40242b56e48"
-          }
-        },
-        {
-          "client_id": "559059413195-kc0din44sr01g9opm9nnnb3ve06mvrcq.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCd_sydusdVLPZAXKDbWf-dDUhISt5QNBQ"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "559059413195-kc0din44sr01g9opm9nnnb3ve06mvrcq.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "559059413195-ar460uuho85d6pmua37pj10fuv7i2mrh.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "edu.augustana.osl-events-ios-app",
-                "app_store_id": "1473326895"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:559059413195:android:27f2d61187a00f38",
         "android_client_info": {
           "package_name": "edu.augustana.osleventsandroid"
@@ -89,6 +36,14 @@
           "android_info": {
             "package_name": "edu.augustana.osleventsandroid",
             "certificate_hash": "7c92f500c8e3ddaacad5bc02d46bd7329a88b4cf"
+          }
+        },
+        {
+          "client_id": "559059413195-kdksr3ivc25ralmbk0hf30c9rh28vfk4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.augustana.osleventsandroid",
+            "certificate_hash": "bf8c0568ee4748b7cda15e05f06cdcfe4c12d8c2"
           }
         },
         {
@@ -132,7 +87,7 @@
           }
         },
         {
-          "client_id": "559059413195-kc0din44sr01g9opm9nnnb3ve06mvrcq.apps.googleusercontent.com",
+          "client_id": "559059413195-lrs55dujb4j5jkoc3tjoemjpasdhntj3.apps.googleusercontent.com",
           "client_type": 3
         }
       ],

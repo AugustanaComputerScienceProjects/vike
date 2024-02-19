@@ -14,6 +14,7 @@ const FeaturedList = ({data}) => {
         width: '100%',
         height: '100%',
         flex: 1,
+        marginBottom: 15,
       }}>
       <View
         style={{
@@ -29,15 +30,12 @@ const FeaturedList = ({data}) => {
           Feature Events
         </Text>
       </View>
-      <View>
+      <View style={{minHeight: 400}}>
         <Carousel
           loop={false}
-          style={{width: '100%'}}
           width={windowWidth}
-          height={420}
           data={data}
           scrollAnimationDuration={500}
-          onSnapToItem={index => console.log('current index:', index)}
           renderItem={({item}, index) => {
             return <Card item={item} index={index} length={data?.length} />;
           }}

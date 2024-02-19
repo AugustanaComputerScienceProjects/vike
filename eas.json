@@ -1,4 +1,7 @@
 {
+  "cli": {
+    "appVersionSource": "remote"
+  },
   "build": {
     "development": {
       "developmentClient": true,
@@ -11,8 +14,26 @@
       }
     },
     "preview": {
-      "distribution": "internal"
+      "android": {
+        "buildType": "apk",
+        "credentialsSource": "local"
+      }
     },
-    "production": {}
+    "production": {
+      "android": {
+        "credentialsSource": "local"
+      },
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {
+      "android": {
+        "track": "internal"
+      },
+      "ios": {
+        "ascAppId": "1473326895"
+      }
+    }
   }
 }

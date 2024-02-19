@@ -1,4 +1,4 @@
-package edu.augustana.osleventapp;
+package edu.augustana.osleventsandroid;
 
 import android.app.Application;
 import android.content.res.Configuration;

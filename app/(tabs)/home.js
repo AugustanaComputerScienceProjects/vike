@@ -62,6 +62,7 @@ export default function Home() {
     };
     fetchEvents();
   }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
