@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
-import firebase from '../config';
-import { EventsView } from '../components/EventsView';
+import EventsView from "../components/events/EventsView";
+import firebase from "../config";
 
 // File for managing the Pending Events page
 
@@ -10,17 +10,17 @@ class PendingEvents extends Component {
   // Reads a given user's (reference) pending events from Firebase
   readPendingEvents(ref) {
     let self = this;
-    let reference = firebase.database.ref(ref).orderByChild('name');
+    let reference = firebase.database.ref(ref).orderByChild("name");
     this.listeners.push(reference);
-    reference.on('value', function(snapshot) {
+    reference.on("value", function(snapshot) {
       let listEvents = [];
       let listURLS = [];
       let index = -1;
       snapshot.forEach(function(child) {
         let event = child.val();
-        if (event['email'] !== 'Deleted by user') {
-          event['status'] = 'Status: Pending';
-          event['key'] = child.key;
+        if (event["email"] !== "Deleted by user") {
+          event["status"] = "Status: Pending";
+          event["key"] = child.key;
           listEvents.push(event);
           index = index + 1;
           self.getImage(
@@ -38,8 +38,8 @@ class PendingEvents extends Component {
           self.setState({ events: [], urls: [] });
           if (self.state.isInitial) {
             self.setState({
-              hidden: 'hidden',
-              message: 'No Events Found',
+              hidden: "hidden",
+              message: "No Events Found",
               open: true,
             });
           }
@@ -51,7 +51,7 @@ class PendingEvents extends Component {
 
   // Render the Pending Events page
   render() {
-    return <EventsView eventType={'/pending-events'} />;
+    return <EventsView eventType={"/pending-events"} />;
   }
 }
 export default PendingEvents;

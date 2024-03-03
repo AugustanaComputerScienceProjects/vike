@@ -303,7 +303,6 @@ const AddEvent = () => {
         tagsList.push(child.val());
       });
       setDatabaseTags(tagsList);
-      // console.log(tagsList);
     });
   };
 
