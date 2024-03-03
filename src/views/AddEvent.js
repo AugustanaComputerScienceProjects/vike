@@ -1,43 +1,43 @@
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
-import CardMedia from '@mui/material/CardMedia';
-import Checkbox from '@mui/material/Checkbox';
-import Chip from '@mui/material/Chip';
-import Container from '@mui/material/Container';
-import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Grid from '@mui/material/Grid';
-import moment from 'moment';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import Select from '@mui/material/Select';
-import Snackbar from '@mui/material/Snackbar';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import React, { useEffect, useState } from 'react';
-import { FilePicker } from 'react-file-picker';
-import Resizer from 'react-image-file-resizer';
-import defaultImage from '../assets/default.jpg';
-import firebase from '../config';
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
+import CardMedia from "@mui/material/CardMedia";
+import Checkbox from "@mui/material/Checkbox";
+import Chip from "@mui/material/Chip";
+import Container from "@mui/material/Container";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Grid from "@mui/material/Grid";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Select from "@mui/material/Select";
+import Snackbar from "@mui/material/Snackbar";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { FilePicker } from "react-file-picker";
+import Resizer from "react-image-file-resizer";
+import defaultImage from "../assets/default.jpg";
+import firebase from "../config";
 
 // File for the Add Event Screen
 
-var QRCode = require('qrcode');
+var QRCode = require("qrcode");
 
-const uuidv4 = require('uuid/v4');
+const uuidv4 = require("uuid/v4");
 const listeners = [];
 
 // Parent component for the preview
 const ParentComponent = (props) => (
   <div>
-    <Grid container id='children-pane' direction='row' spacing={8}>
+    <Grid container id="children-pane" direction="row" spacing={8}>
       {props.children}
     </Grid>
   </div>
@@ -49,12 +49,12 @@ const ChildComponent = (props) => (
     <Card style={{ minHeight: 400, minWidth: 300 }}>
       <CardHeader title={props.title} subheader={props.date}></CardHeader>
       <CardMedia
-        style={{ height: 0, paddingTop: '56.25%' }}
+        style={{ height: 0, paddingTop: "56.25%" }}
         image={props.image}
         title={props.title}
       />
       <CardContent>
-        <Typography component='p'>
+        <Typography component="p">
           {props.location}
           <br />
           {props.organization}
@@ -70,21 +70,21 @@ const ChildComponent = (props) => (
 
 const AddEvent = () => {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState("");
   const [date, setDate] = useState(new Date());
-  const [duration, setDuration] = useState('');
+  const [duration, setDuration] = useState("");
   const [email, setEmail] = useState();
-  const [location, setLocation] = useState('');
-  const [organization, setOrganization] = useState('');
-  const [description, setDescription] = useState('');
-  const [webLink, setWebLink] = useState('');
+  const [location, setLocation] = useState("");
+  const [organization, setOrganization] = useState("");
+  const [description, setDescription] = useState("");
+  const [webLink, setWebLink] = useState("");
   const [tags, setTags] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState('EventAdded');
+  const [message, setMessage] = useState("EventAdded");
   const [image64, setImage64] = useState(defaultImage);
-  const [submitBtnText, setSubmitBtnText] = useState('Request Event');
+  const [submitBtnText, setSubmitBtnText] = useState("Request Event");
   // eslint-disable-next-line no-unused-vars
-  const [uid, setUid] = useState('');
+  const [uid, setUid] = useState("");
   const [qrChecked, setQrChecked] = useState(false);
   const [qrDisabled, setQrDisabled] = useState(true);
   const [databaseTags, setDatabaseTags] = useState([]);
@@ -97,8 +97,8 @@ const AddEvent = () => {
     readTags();
     firebase.auth.onAuthStateChanged((user) => {
       if (user) {
-        checkRole(user, 'admin');
-        checkRole(user, 'leaders');
+        checkRole(user, "admin");
+        checkRole(user, "leaders");
       } else {
         setAdminSignedIn(false);
       }
@@ -113,7 +113,7 @@ const AddEvent = () => {
 
   // Handle closing of the Snackbar
   const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setOpen(false);
@@ -128,13 +128,13 @@ const AddEvent = () => {
   const saveImage = (ref, image, imageName, onSuccess, onError) => {
     if (image64 !== defaultImage) {
       setUploading(true);
-      displayMessage('Uploading Image...');
+      displayMessage("Uploading Image...");
       var firebaseStorageRef = firebase.storage.ref(ref);
       const id = uuidv4();
-      const imageRef = firebaseStorageRef.child(id + '.jpg');
+      const imageRef = firebaseStorageRef.child(id + ".jpg");
 
-      const i = image.indexOf('base64,');
-      const buffer = Buffer.from(image.slice(i + 7), 'base64');
+      const i = image.indexOf("base64,");
+      const buffer = Buffer.from(image.slice(i + 7), "base64");
       const file = new File([buffer], id);
 
       imageRef
@@ -148,7 +148,7 @@ const AddEvent = () => {
         })
         .catch(function(error) {
           console.log(error);
-          displayMessage('Error Uploading Image');
+          displayMessage("Error Uploading Image");
         });
     } else {
       submitEvent();
@@ -156,12 +156,8 @@ const AddEvent = () => {
   };
 
   // Check authorization and add to Firebase
-  const submitEvent = (id = 'default') => {
-    if (adminSignedIn) {
-      pushEvent('/current-events', 'Event Added', id);
-    } else if (leaderSignedIn) {
-      pushEvent('/pending-events/', 'Event Requested', id);
-    }
+  const submitEvent = (id = "default") => {
+    pushEvent("/current-events", "Event Added", id);
   };
 
   // Push event to Firebase
@@ -170,7 +166,7 @@ const AddEvent = () => {
       .ref(ref)
       .push({
         name: title,
-        startDate: moment(date).format('YYYY-MM-DD hh:mm'),
+        startDate: moment(date).format("YYYY-MM-DD HH:mm"),
         duration: parseInt(duration),
         location: location,
         organization: organization,
@@ -193,15 +189,15 @@ const AddEvent = () => {
   // Download the QR code as a jpg
   const downloadQR = (key, name) => {
     QRCode.toDataURL(
-      'https://osl-events-app.firebaseapp.com/event?id=' +
+      "https://osl-events-app.firebaseapp.com/event?id=" +
         key +
-        '&name=' +
-        name.replaceAll(' ', '+'),
+        "&name=" +
+        name.replaceAll(" ", "+"),
       function(err, url) {
         // console.log(url);
-        var link = document.createElement('a');
+        var link = document.createElement("a");
         link.href = url;
-        link.download = name + '-QR Code.png';
+        link.download = name + "-QR Code.png";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -213,14 +209,14 @@ const AddEvent = () => {
   const submitAction = (event) => {
     // Check inputs
     if (
-      title !== '' &&
-      location !== '' &&
-      organization !== '' &&
-      duration !== ''
+      title !== "" &&
+      location !== "" &&
+      organization !== "" &&
+      duration !== ""
     ) {
-      saveImage('Images', image64);
+      saveImage("Images", image64);
     } else {
-      alert('Required fields are not filled in.');
+      alert("Required fields are not filled in.");
     }
   };
 
@@ -231,13 +227,13 @@ const AddEvent = () => {
       theFile,
       2160,
       1080,
-      'JPEG',
+      "JPEG",
       100, // compression quality
       0, // no rotation
       (uri) => {
         setImage64(uri);
       },
-      'base64'
+      "base64"
     );
   };
 
@@ -249,16 +245,16 @@ const AddEvent = () => {
   // Resets the state after adding/requesting an event
   const resetState = (self) => {
     setOpen(false);
-    setTitle('');
+    setTitle("");
     setDate(new Date());
-    setDuration('');
-    setLocation('');
-    setOrganization('');
+    setDuration("");
+    setLocation("");
+    setOrganization("");
     setTags([]);
-    setDescription('');
-    setWebLink('');
+    setDescription("");
+    setWebLink("");
     setUploading(false);
-    setMessage('Event Added');
+    setMessage("Event Added");
     setImage64(defaultImage);
   };
 
@@ -273,21 +269,21 @@ const AddEvent = () => {
   const checkRole = (user, role) => {
     firebase.database
       .ref(role)
-      .once('value')
+      .once("value")
       .then(function(snapshot) {
-        if (snapshot.hasChild(user.email.replace('.', ','))) {
-          if (role === 'admin') {
+        if (snapshot.hasChild(user.email.replace(".", ","))) {
+          if (role === "admin") {
             setAdminSignedIn(true);
-            setSubmitBtnText('Add Event');
+            setSubmitBtnText("Add Event");
             setUid(user.uid);
             setEmail(user.email);
             setQrChecked(true);
             setQrDisabled(false);
 
             readAllGroups();
-          } else if (role === 'leaders' && !adminSignedIn) {
+          } else if (role === "leaders" && !adminSignedIn) {
             setLeaderSignedIn(true);
-            setSubmitBtnText('Request Event');
+            setSubmitBtnText("Add Event");
             setUid(user.uid);
             setEmail(user.email);
 
@@ -299,9 +295,9 @@ const AddEvent = () => {
 
   // Reads the tags from Firebase and sets the tags list
   const readTags = () => {
-    let ref = firebase.database.ref('/tags');
+    let ref = firebase.database.ref("/tags");
     listeners.push(ref);
-    ref.on('value', function(snapshot) {
+    ref.on("value", function(snapshot) {
       let tagsList = [];
       snapshot.forEach(function(child) {
         tagsList.push(child.val());
@@ -313,9 +309,9 @@ const AddEvent = () => {
 
   // Reads the groups from Firebase and sets the groups list
   const readAllGroups = () => {
-    let ref = firebase.database.ref('/groups');
+    let ref = firebase.database.ref("/groups");
     listeners.push(ref);
-    ref.on('value', function(snapshot) {
+    ref.on("value", function(snapshot) {
       let groupsList = [];
       snapshot.forEach(function(child) {
         let decodedGroup = decodeGroup(child);
@@ -329,10 +325,10 @@ const AddEvent = () => {
   const readLeaderGroups = () => {
     let email = firebase.auth.currentUser.email;
     let ref = firebase.database
-      .ref('/leaders')
-      .child(email.replace('.', ','))
-      .child('groups');
-    ref.on('value', function(snapshot) {
+      .ref("/leaders")
+      .child(email.replace(".", ","))
+      .child("groups");
+    ref.on("value", function(snapshot) {
       let myGroups = [];
       snapshot.forEach(function(child) {
         let decodedGroup = decodeGroup(child.key);
@@ -344,24 +340,24 @@ const AddEvent = () => {
 
   const decodeGroup = (codedGroup) => {
     let group = codedGroup;
-    if (typeof group === 'string' || group instanceof String) {
-      while (group.includes('*%&')) {
-        group = group.replace('*%&', '.');
+    if (typeof group === "string" || group instanceof String) {
+      while (group.includes("*%&")) {
+        group = group.replace("*%&", ".");
       }
-      while (group.includes('@%*')) {
-        group = group.replace('@%*', '$');
+      while (group.includes("@%*")) {
+        group = group.replace("@%*", "$");
       }
-      while (group.includes('*<=')) {
-        group = group.replace('*<=', '[');
+      while (group.includes("*<=")) {
+        group = group.replace("*<=", "[");
       }
-      while (group.includes('<@+')) {
-        group = group.replace('<@+', ']');
+      while (group.includes("<@+")) {
+        group = group.replace("<@+", "]");
       }
-      while (group.includes('!*>')) {
-        group = group.replace('!*>', '#');
+      while (group.includes("!*>")) {
+        group = group.replace("!*>", "#");
       }
-      while (group.includes('!<^')) {
-        group = group.replace('!<^', '/');
+      while (group.includes("!<^")) {
+        group = group.replace("!<^", "/");
       }
     }
     return group;
@@ -371,39 +367,39 @@ const AddEvent = () => {
 
   // Format Date - display preview
   var month = (1 + date.getMonth()).toString();
-  month = month.length > 1 ? month : '0' + month;
+  month = month.length > 1 ? month : "0" + month;
   var day = date.getDate().toString();
-  day = day.length > 1 ? day : '0' + day;
+  day = day.length > 1 ? day : "0" + day;
   var hours = date.getHours().toString();
-  hours = hours.length > 1 ? hours : '0' + hours;
+  hours = hours.length > 1 ? hours : "0" + hours;
   var minutes = date.getMinutes().toString();
-  minutes = minutes.length > 1 ? minutes : '0' + minutes;
+  minutes = minutes.length > 1 ? minutes : "0" + minutes;
   let startDate =
-    month + '-' + day + '-' + date.getFullYear() + ' ' + hours + ':' + minutes;
+    month + "-" + day + "-" + date.getFullYear() + " " + hours + ":" + minutes;
   let endDate = new Date(date);
   endDate.setMilliseconds(date.getMilliseconds() + duration * 60000);
 
   hours = endDate.getHours().toString();
-  hours = hours.length > 1 ? hours : '0' + hours;
+  hours = hours.length > 1 ? hours : "0" + hours;
   minutes = endDate.getMinutes().toString();
-  minutes = minutes.length > 1 ? minutes : '0' + minutes;
-  let fullDate = startDate + '-' + hours + ':' + minutes;
+  minutes = minutes.length > 1 ? minutes : "0" + minutes;
+  let fullDate = startDate + "-" + hours + ":" + minutes;
 
   child.push(
     <ChildComponent
       key={0}
       title={title}
       date={fullDate}
-      location={'Location: ' + location}
-      organization={'Group: ' + organization}
-      description={'Description: ' + description}
-      tags={'Tags: ' + tags}
+      location={"Location: " + location}
+      organization={"Group: " + organization}
+      description={"Description: " + description}
+      tags={"Tags: " + tags}
       image={image64}
     />
   );
 
   return (
-    <Container maxWidth='md'>
+    <Container maxWidth="md">
       {/* <MuiPickersUtilsProvider utils={MomentUtils}> */}
       <Grid
         container
@@ -423,9 +419,9 @@ const AddEvent = () => {
           <Grid item>
             <TextField
               fullWidth
-              label='Event Title'
-              id='event-title'
-              margin='normal'
+              label="Event Title"
+              id="event-title"
+              margin="normal"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -434,7 +430,7 @@ const AddEvent = () => {
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <DateTimePicker
                 renderInput={(props) => <TextField {...props} />}
-                label='Start Date/Time'
+                label="Start Date/Time"
                 value={date}
                 onChange={handleDateChange}
               />
@@ -453,20 +449,20 @@ const AddEvent = () => {
             <TextField
               style={{ marginLeft: 10 }}
               // fullWidth
-              id='event-dur'
-              label='Duration (minutes)'
+              id="event-dur"
+              label="Duration (minutes)"
               // margin='normal'
               value={duration}
-              type='number'
+              type="number"
               onChange={(e) => setDuration(e.target.value)}
             />
           </Grid>
           <Grid item>
             <TextField
               fullWidth
-              id='event-org'
-              label='Location'
-              margin='normal'
+              id="event-org"
+              label="Location"
+              margin="normal"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
             />
@@ -491,23 +487,23 @@ const AddEvent = () => {
             {/* </Grid> */}
             {/* <Grid item> */}
             <FormControl style={{ marginLeft: 10 }}>
-              <InputLabel htmlFor='select-multiple'>Tags</InputLabel>
+              <InputLabel htmlFor="select-multiple">Tags</InputLabel>
               <Select
                 multiple
                 displayEmpty
-                input={<OutlinedInput id='select-multiple-chip' label='Chip' />}
+                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                 value={tags}
                 style={{ minWidth: 200 }}
                 onChange={(e) => setTags(e.target.value)}
                 renderValue={(selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                     {selected.map((value) => (
                       <Chip key={value} label={value} />
                     ))}
                   </Box>
                 )}
               >
-                <MenuItem disabled value=''>
+                <MenuItem disabled value="">
                   <em>Select Tags</em>
                 </MenuItem>
                 {databaseTags.map((tag) => (
@@ -521,9 +517,9 @@ const AddEvent = () => {
           <Grid item>
             <TextField
               fullWidth
-              id='event-link'
-              label='Web Link (Optional)'
-              margin='normal'
+              id="event-link"
+              label="Web Link (Optional)"
+              margin="normal"
               value={webLink}
               onChange={(e) => setWebLink(e.target.value)}
             />
@@ -531,31 +527,31 @@ const AddEvent = () => {
           <Grid item>
             <TextField
               fullWidth
-              id='event-desc'
-              label='Description'
+              id="event-desc"
+              label="Description"
               multiline
-              rows='5'
-              margin='normal'
-              variant='outlined'
+              rows="5"
+              margin="normal"
+              variant="outlined"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
           </Grid>
           <Grid item>
             <FilePicker
-              extensions={['jpg', 'jpeg', 'png']}
+              extensions={["jpg", "jpeg", "png"]}
               onChange={handleImageFileChanged}
               onError={(errMsg) => displayMessage(this, errMsg)}
             >
-              <Button variant='contained' disabled={uploading}>
+              <Button variant="contained" disabled={uploading}>
                 Select Image
               </Button>
             </FilePicker>
           </Grid>
           <Grid item style={{ marginTop: 10 }}>
             <Button
-              variant='contained'
-              color='primary'
+              variant="contained"
+              color="primary"
               disabled={uploading}
               onClick={submitAction}
             >
@@ -578,34 +574,34 @@ const AddEvent = () => {
                 checked={qrChecked}
                 onChange={toggleChecked}
                 disabled={qrDisabled}
-                value='qrChecked'
-                color='primary'
+                value="qrChecked"
+                color="primary"
               />
             }
-            label='Download QR Code'
+            label="Download QR Code"
           />
         </Grid>
       </Grid>
       <Snackbar
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
+          vertical: "bottom",
+          horizontal: "left",
         }}
         open={open}
         autoHideDuration={6000}
         onClose={handleClose}
         ContentProps={{
-          'aria-describedby': 'message-id',
+          "aria-describedby": "message-id",
         }}
         message={message}
         action={[
           <Button
-            key='close'
-            aria-label='Close'
-            color='inherit'
+            key="close"
+            aria-label="Close"
+            color="inherit"
             onClick={handleClose}
           >
-            {' '}
+            {" "}
             X
           </Button>,
         ]}
