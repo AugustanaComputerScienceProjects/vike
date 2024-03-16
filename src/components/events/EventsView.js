@@ -35,7 +35,7 @@ import Typography from "@mui/material/Typography";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { FilePicker } from "react-file-picker";
 import Resizer from "react-image-file-resizer";
 import firebase from "../../config";
@@ -88,20 +88,20 @@ const EventsView = (props) => {
     testThing: "Fail",
   });
 
-  const group = React.useRef(new DispatchGroup()).current;
-  let token = null;
+  const group = useRef(new DispatchGroup()).current;
+  const token = useRef(null);
 
   // Handles opening of the pop up for editing an event
   const handleBeginEdit = () => {
     handleClose();
     setState((prevState) => ({ ...prevState, editing: true }));
-    token = group.enter();
+    token.current = group.enter();
   };
 
   const handleBeginRequest = () => {
     handleClose();
     setState((prevState) => ({ ...prevState, requesting: true }));
-    token = group.enter();
+    token.current = group.enter();
   };
 
   // Handles the deleting/rejecting of an event from Firebase
@@ -117,7 +117,7 @@ const EventsView = (props) => {
       firebaseStorageRef.child(event["imgid"] + ".jpg").delete();
     }
     setState((prevState) => ({ ...prevState, openDelete: false }));
-    group.leave(token);
+    group.leave(token.current);
   };
 
   // Removes a given value from the given array
@@ -192,7 +192,7 @@ const EventsView = (props) => {
     let revertEvents = state.events;
     revertEvents[state.index] = state.oldEvent;
     setState({ ...state, editing: false, events: revertEvents });
-    group.leave(token);
+    group.leave(token.current);
   };
 
   const handleCloseRequest = () => {
@@ -218,7 +218,7 @@ const EventsView = (props) => {
       });
     setState({ ...state, uploading: false });
     displayMessage(message);
-    group.leave(token);
+    group.leave(token.current);
   };
 
   // Displays a message to the user using the Snackbar
@@ -687,7 +687,7 @@ const EventsView = (props) => {
           raffleTitle: `Raffle - ${length} Attendee`,
         }));
       }
-      token = group.enter();
+      token.current = group.enter();
     } else {
       displayMessage("No users checked into the event.");
     }

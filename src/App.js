@@ -1,48 +1,49 @@
-import React, { useState } from 'react';
-import './App.css';
-import Home from './views/Home';
-import Events from './views/AddEvent';
-import PendingEvents from './views/PendingEvents';
-import CurrentEvents from './views/CurrentEvents';
-import PastEvents from './views/PastEvents';
-import Tags from './views/Tags';
-import Users from './views/Users';
-import NavBar from './views/NavBar';
-import Event from './routes/Event';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import React, { useState } from "react";
+import { Route, BrowserRouter as Router } from "react-router-dom";
+import "./App.css";
+import ManageEvent from "./components/events/ManageEvent";
+import Event from "./routes/Event";
+import AddEventView from "./views/AddEventView";
+import CurrentEvents from "./views/CurrentEvents";
+import Home from "./views/Home";
+import NavBar from "./views/NavBar";
+import PastEvents from "./views/PastEvents";
+import PendingEvents from "./views/PendingEvents";
+import Tags from "./views/Tags";
+import Users from "./views/Users";
 
 // Main application file that manages all the different views
 
 const App = () => {
-  const [selected, setSelected] = useState('Home');
+  const [selected, setSelected] = useState("Home");
 
   // Checks which display should be visible
   const mainDisplay = () => {
-    if (selected === 'Home') {
+    if (selected === "Home") {
       return Home;
     }
 
-    if (selected === 'Add Event') {
-      return Events;
+    if (selected === "Add Event") {
+      return AddEventView;
     }
 
-    if (selected === 'Pending Events') {
+    if (selected === "Pending Events") {
       return PendingEvents;
     }
 
-    if (selected === 'Current Events') {
+    if (selected === "Current Events") {
       return CurrentEvents;
     }
 
-    if (selected === 'Past Events') {
+    if (selected === "Past Events") {
       return PastEvents;
     }
 
-    if (selected === 'Groups/Tags') {
+    if (selected === "Groups/Tags") {
       return Tags;
     }
 
-    if (selected === 'Users') {
+    if (selected === "Users") {
       return Users;
     }
   };
@@ -54,9 +55,9 @@ const App = () => {
 
   // Render the page
   return (
-    <div className='fullPage'>
-      <div style={{ width: '100%', position: 'absolute' }}>
-        <div style={{ height: '10%' }}>
+    <div className="fullPage">
+      <div style={{ width: "100%", position: "absolute" }}>
+        <div style={{ height: "10%" }}>
           <NavBar navChanged={onNavChanged}></NavBar>
         </div>
         <div
@@ -68,8 +69,9 @@ const App = () => {
           }}
         >
           <Router>
-            <Route path='/' exact component={mainDisplay()} />
-            <Route path='/event' component={Event} />
+            <Route path="/" exact component={mainDisplay()} />
+            <Route path="/event" component={Event} />
+            <Route path="/manage/:eventId" component={ManageEvent} />
           </Router>
         </div>
       </div>

@@ -13,6 +13,7 @@
     "@mui/x-data-grid": "^5.1.0",
     "@mui/x-date-pickers": "^5.0.0-alpha.0",
     "cors": "^2.8.5",
+    "date-fns": "^3.5.0",
     "express": "^4.17.1",
     "firebase": "8.10.0",
     "lint": "^0.6.5",
