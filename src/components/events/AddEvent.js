@@ -8,12 +8,15 @@ import {
 } from "@mui/material";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import Resizer from "react-image-file-resizer";
 import defaultImage from "../../assets/default.jpg";
 import firebase from "../../config";
 import AddEventForm from "./AddEventForm";
 import ImageUpload from "./ImageUpload";
-import { addHours, roundToNearestHalfHour } from "./utils";
+import {
+  addHours,
+  handleImageFileChanged,
+  roundToNearestHalfHour,
+} from "./utils";
 
 const AddEvent = () => {
   const [formData, setFormData] = useState({
@@ -64,30 +67,15 @@ const AddEvent = () => {
     }));
   };
 
-  const handleImageFileChanged = (theFile) => {
-    Resizer.imageFileResizer(
-      theFile,
-      2160,
-      1080,
-      "JPEG",
-      100,
-      0,
-      (uri) => {
-        setImage64(uri);
-      },
-      "base64"
-    );
-  };
-
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
-    handleImageFileChanged(file);
+    handleImageFileChanged(file, (uri) => setImage64(uri));
   };
 
   const handleImageDrop = (event) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
-    handleImageFileChanged(file);
+    handleImageFileChanged(file, (uri) => setImage64(uri));
   };
 
   const handleSnackbarClose = (event, reason) => {
@@ -120,7 +108,6 @@ const AddEvent = () => {
           return imageRef.getDownloadURL();
         })
         .then((url) => {
-          console.log(url);
           submitEvent(id);
         })
         .catch((error) => {

@@ -3,6 +3,7 @@ import {
   Button,
   Container,
   Grid,
+  Snackbar,
   Tab,
   Tabs,
   TextField,
@@ -10,23 +11,39 @@ import {
 } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import moment from "moment";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
+import defaultImage from "../../assets/default.jpg";
 import firebase from "../../config";
 import ImageUpload from "./ImageUpload";
+import { handleImageFileChanged } from "./utils";
 
 const ManageEvent = () => {
   const { eventId } = useParams();
   const [event, setEvent] = useState(null);
+  const [message, setMessage] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [tabValue, setTabValue] = useState(0);
-  console.log("eventId", eventId);
+  const [image64, setImage64] = useState(null);
+  const [currImage, setCurrImage] = useState(null);
+  const history = useHistory();
 
   useEffect(() => {
     const fetchEvent = async () => {
       const eventRef = firebase.database.ref(`/current-events/${eventId}`);
       const snapshot = await eventRef.once("value");
-      console.log(snapshot.val());
-      setEvent(snapshot.val());
+      const fetchedEvent = snapshot.val();
+      setEvent(fetchedEvent);
+
+      // Get the existing image
+      const imageUrl = await firebase.storage
+        .ref("Images")
+        .child(fetchedEvent.imgid + ".jpg")
+        .getDownloadURL();
+      setImage64(imageUrl);
+      setCurrImage(imageUrl);
     };
 
     fetchEvent();
@@ -34,6 +51,10 @@ const ManageEvent = () => {
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
+  };
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    handleImageFileChanged(file, (uri) => setImage64(uri));
   };
 
   const handleInputChange = (e) => {
@@ -50,17 +71,102 @@ const ManageEvent = () => {
     }));
   };
 
-  const handleImageUpload = (image64) => {
-    setEvent((prevEvent) => ({
-      ...prevEvent,
-      imageUrl: image64,
-    }));
+  const handleCancelEvent = async () => {
+    if (
+      window.confirm(
+        "Cancel and permanently delete this event. This operation cannot be undone. Are you sure you want to cancel this event?"
+      )
+    ) {
+      const eventRef = firebase.database.ref(`/current-events/${eventId}`);
+      await eventRef.remove();
+      alert("Event canceled successfully!");
+      history.push("/events");
+    }
+  };
+  const displayMessage = (message) => {
+    setMessage(message);
+    setOpenSnackbar(true);
   };
 
-  const handleUpdateEvent = async () => {
-    const eventRef = firebase.database().ref(`/current-events/${eventId}`);
-    await eventRef.update(event);
-    // Show success message or redirect to events page
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
+
+  const saveImage = (ref, image, imageName) => {
+    if (image !== defaultImage) {
+      setUploading(true);
+      displayMessage("Uploading Image...");
+      const firebaseStorageRef = firebase.storage.ref(ref);
+      const id = Date.now().toString();
+      const imageRef = firebaseStorageRef.child(id + ".jpg");
+
+      const i = image.indexOf("base64,");
+      const buffer = Buffer.from(image.slice(i + 7), "base64");
+      const file = new File([buffer], id);
+
+      imageRef
+        .put(file)
+        .then(() => {
+          return imageRef.getDownloadURL();
+        })
+        .then((url) => {
+          submitEvent(id);
+        })
+        .catch((error) => {
+          console.log(error);
+          displayMessage("Error Uploading Image");
+        });
+    } else {
+      submitEvent();
+    }
+  };
+
+  const submitEvent = (id = "default") => {
+    const startDate = moment(event.startDate);
+    const endDate = moment(event.endDate);
+    const duration = endDate.diff(startDate, "minutes");
+
+    const eventData = {
+      ...event,
+      startDate: startDate.format("YYYY-MM-DD HH:mm"),
+      duration: duration,
+      imgid: id,
+      email: firebase.auth.currentUser.email,
+      tags: event.tags.toString(),
+    };
+
+    firebase.database
+      .ref(`/current-events/${eventId}`)
+      .update(eventData)
+      .then(() => {
+        setUploading(false);
+        displayMessage("Event Updated");
+      })
+      .catch((error) => {
+        console.log(error);
+        displayMessage("Error Updating Event");
+      });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (
+      event.name !== "" &&
+      event.location !== "" &&
+      event.organization !== ""
+    ) {
+      if (image64 !== currImage) {
+        saveImage("Images", image64);
+      } else {
+        submitEvent(event.imgid);
+      }
+    } else {
+      displayMessage("Required fields are not filled in.");
+    }
   };
 
   if (!event) {
@@ -82,7 +188,7 @@ const ManageEvent = () => {
             <Grid container spacing={4}>
               <Grid item xs={12} sm={6}>
                 <ImageUpload
-                  image64={event.imageUrl}
+                  image64={image64}
                   onImageUpload={handleImageUpload}
                 />
               </Grid>
@@ -192,17 +298,26 @@ const ManageEvent = () => {
                   label="Description"
                   fullWidth
                   multiline
-                  rows={4}
                   value={event.description}
                   onChange={handleInputChange}
                 />
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleUpdateEvent}
-                >
-                  Update Event
-                </Button>
+                <Box display="flex" justifyContent={"space-between"}>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={handleCancelEvent}
+                  >
+                    Cancel Event
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSubmit}
+                    disabled={uploading}
+                  >
+                    Update Event
+                  </Button>
+                </Box>
               </Grid>
             </Grid>
           )}
@@ -212,6 +327,27 @@ const ManageEvent = () => {
             </Typography>
           )}
         </Box>
+
+        <Snackbar
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={handleSnackbarClose}
+          message={message}
+          action={[
+            <Button
+              key="close"
+              aria-label="Close"
+              color="inherit"
+              onClick={handleSnackbarClose}
+            >
+              X
+            </Button>,
+          ]}
+        />
       </Box>
     </Container>
   );

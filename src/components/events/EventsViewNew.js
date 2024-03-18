@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogContent,
   Grid,
+  Skeleton,
   Stack,
   Typography,
 } from "@mui/material";
@@ -19,10 +20,6 @@ import useEvents from "./useEvents";
 const EventsView = () => {
   const { events, loading, refreshEvents } = useEvents();
   const [isAddEventFormOpen, setIsAddEventFormOpen] = useState(false);
-
-  const handleEventAdded = () => {
-    refreshEvents();
-  };
 
   const groupEventsByDate = (events) => {
     const groupedEvents = {};
@@ -62,6 +59,7 @@ const EventsView = () => {
 
   const handleAddEventFormClose = () => {
     setIsAddEventFormOpen(false);
+    refreshEvents();
   };
 
   return (
@@ -82,18 +80,28 @@ const EventsView = () => {
           </Button>
         </Stack>
         {loading ? (
-          <Typography variant="body1">Loading...</Typography>
+          [...Array(8)].map((e, i) => (
+            <Skeleton
+              variant="rounded"
+              width={"100%"}
+              height={100}
+              sx={{ mt: 2 }}
+            />
+          ))
         ) : (
           <>
             {renderEventSection(
               format(new Date(), "yyyy-MM-dd"),
-              events.filter((event) =>
-                isSameDay(new Date(event.startDate), new Date())
-              )
+              events
+                .filter((event) =>
+                  isSameDay(new Date(event.startDate), new Date())
+                )
+                .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
             )}
 
             {Object.entries(groupEventsByDate(events))
               .filter(([date]) => new Date(date) > new Date())
+              .sort((a, b) => new Date(a[0]) - new Date(b[0]))
               .map(([date, events]) => renderEventSection(date, events))}
           </>
         )}
