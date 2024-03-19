@@ -7,7 +7,7 @@ podfile_properties = JSON.parse(File.read(File.join(__dir__, 'Podfile.properties
 ENV['RCT_NEW_ARCH_ENABLED'] = podfile_properties['newArchEnabled'] == 'true' ? '1' : '0'
 ENV['EX_DEV_CLIENT_NETWORK_INSPECTOR'] = podfile_properties['EX_DEV_CLIENT_NETWORK_INSPECTOR']
 
-platform :ios, podfile_properties['ios.deploymentTarget'] || '13.0'
+platform :ios, podfile_properties['ios.deploymentTarget'] || '13.4'
 install! 'cocoapods',
   :deterministic_uuids => false
 
@@ -44,19 +44,19 @@ target 'Vike' do
 # @generated end react-native-maps
   config = use_native_modules!
 
+  ### WORKAROUND CODE FOR FIREBASE
+  use_frameworks! :linkage => :static
+  $RNFirebaseAsStaticFramework = true
+  pod 'RNFBStorage', :path => '../node_modules/@react-native-firebase/storage'
+  $FirebaseSDKVersion = '10.22.0'
+  ###
+
   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
   use_frameworks! :linkage => ENV['USE_FRAMEWORKS'].to_sym if ENV['USE_FRAMEWORKS']
 
-  # Flags change depending on the env values.
-  flags = get_default_flags()
-
-# @generated begin withGoogleMapsIOSWorkaroundPlugin - expo prebuild (DO NOT MODIFY) sync-6f9ce947e031fa8993ca955f7d7bc266e1349be9
-pod 'Google-Maps-iOS-Utils', :git => 'https://github.com/Simon-TechForm/google-maps-ios-utils.git', :branch => 'feat/support-apple-silicon'
-# @generated end withGoogleMapsIOSWorkaroundPlugin
   use_react_native!(
     :path => config[:reactNativePath],
     :hermes_enabled => podfile_properties['expo.jsEngine'] == nil || podfile_properties['expo.jsEngine'] == 'hermes',
-    :fabric_enabled => flags[:fabric_enabled],
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/..",
     # Note that if you have use_frameworks! enabled, Flipper will not work if enabled
@@ -69,7 +69,6 @@ pod 'Google-Maps-iOS-Utils', :git => 'https://github.com/Simon-TechForm/google-m
       config[:reactNativePath],
       :mac_catalyst_enabled => false
     )
-    __apply_Xcode_12_5_M1_post_install_workaround(installer)
 
     # This is necessary for Xcode 14, because it signs resource bundles by default
     # when building for devices.

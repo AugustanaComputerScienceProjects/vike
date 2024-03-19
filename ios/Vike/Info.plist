@@ -53,15 +53,9 @@
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
+      <false/>
+      <key>NSAllowsLocalNetworking</key>
       <true/>
-      <key>NSExceptionDomains</key>
-      <dict>
-        <key>localhost</key>
-        <dict>
-          <key>NSExceptionAllowsInsecureHTTPLoads</key>
-          <true/>
-        </dict>
-      </dict>
     </dict>
     <key>NSCalendarsFullAccessUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your calendars</string>
@@ -83,7 +77,6 @@
     <string>Allow $(PRODUCT_NAME) to access your reminders</string>
     <key>NSUserActivityTypes</key>
     <array>
-      <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
     </array>
     <key>UILaunchStoryboardName</key>

@@ -11,6 +11,7 @@ import {
 } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import React, {useCallback} from 'react';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {AuthProvider} from '../context/useAuth';
 
 SplashScreen.preventAutoHideAsync();
@@ -45,11 +46,13 @@ export default function Layout() {
         fontFamily: 'Inter_400Regular',
       }}>
       <AuthProvider>
-        <ActionSheetProvider>
-          <Stack screenOptions={{headerShown: false}}>
-            <Stack.Screen name="camera" options={{presentation: 'modal'}} />
-          </Stack>
-        </ActionSheetProvider>
+        <GestureHandlerRootView style={{flex: 1}}>
+          <ActionSheetProvider>
+            <Stack screenOptions={{headerShown: false}}>
+              <Stack.Screen name="camera" options={{presentation: 'modal'}} />
+            </Stack>
+          </ActionSheetProvider>
+        </GestureHandlerRootView>
       </AuthProvider>
     </SafeAreaProvider>
   );

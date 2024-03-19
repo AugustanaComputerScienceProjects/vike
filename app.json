@@ -30,8 +30,7 @@
         {
           "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
-      ],
-      "./plugins/react-native-maps-plugin"
+      ]
     ],
     "icon": "./assets/icon.png",
     "splash": {
