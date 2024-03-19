@@ -1,6 +1,6 @@
 import Icon from '@expo/vector-icons/Feather';
 import auth from '@react-native-firebase/auth';
-import {Link} from 'expo-router';
+import {router} from 'expo-router';
 import React from 'react';
 import {ActionSheetIOS, StyleSheet, Text, View} from 'react-native';
 import {Avatar} from 'react-native-elements';
@@ -10,14 +10,9 @@ import {COLORS} from '../../../constants/theme';
 
 const getInitials = fullName => {
   const allNames = fullName.trim().split(' ');
-  const initials = allNames.reduce((acc, curr, index) => {
-    if (index === 0 || index === allNames.length - 1) {
-      acc = `${acc}${curr.charAt(0).toUpperCase()}`;
-    }
-    return acc;
-  }, '');
-  return initials;
+  return allNames.map(name => name.charAt(0).toUpperCase()).join('');
 };
+
 export default function Profile() {
   const settingsOptions = [
     {
@@ -57,7 +52,6 @@ export default function Profile() {
         <View style={styles.headerContainer}>
           <View style={styles.userRow}>
             <Avatar
-              // style={styles.userImage}
               overlayContainerStyle={{backgroundColor: 'grey'}}
               size="small"
               activeOpacity={0.7}
@@ -83,7 +77,9 @@ export default function Profile() {
           </Text>
           <View>
             {settingsOptions.map(({title, icon, subTitle, href}) => (
-              <Link key={title} href={href}>
+              <TouchableOpacity
+                onPress={() => router.navigate(href)} // Assuming you have access to the navigation prop
+                style={{flex: 1}}>
                 <View style={styles.menuItem}>
                   <Icon color={COLORS.text} size={18} name={icon} />
                   <View style={{marginLeft: 16}}>
@@ -94,7 +90,6 @@ export default function Profile() {
                       </Text>
                     )}
                   </View>
-
                   <Icon
                     color={COLORS.text}
                     size={18}
@@ -104,7 +99,7 @@ export default function Profile() {
                 </View>
 
                 <View style={{height: 0.5, backgroundColor: COLORS.gray}} />
-              </Link>
+              </TouchableOpacity>
             ))}
           </View>
         </View>
@@ -135,7 +130,6 @@ export default function Profile() {
               Log out
             </Text>
           </View>
-          <View style={{height: 0.5, backgroundColor: COLORS.gray}} />
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
