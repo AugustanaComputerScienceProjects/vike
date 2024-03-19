@@ -44,6 +44,10 @@ const ManageEvent = () => {
       const fetchedEvent = snapshot.val();
       setEvent({
         ...fetchedEvent,
+        endDate: moment(fetchedEvent.startDate).add(
+          fetchedEvent.duration,
+          "minutes"
+        ),
         tags: fetchedEvent.tags.split(","),
       });
 
