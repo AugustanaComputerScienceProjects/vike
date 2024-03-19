@@ -14,6 +14,28 @@ import {
 import { format } from "date-fns";
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import firebase from "../../config";
+
+export const STATUS = {
+  GOING: "GOING",
+  CHECKED_IN: "CHECKED_IN",
+  INVITED: "INVITED",
+  NOT_GOING: "NOT_GOING",
+};
+
+export const toTitleCase = (str) => {
+  return str.replace(/\w\S*/g, function(txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+};
+
+const generateUniqueTicketId = () => {
+  const timestamp = Date.now().toString();
+  const randomChars = Math.random()
+    .toString(36)
+    .substring(2, 7);
+  return `${timestamp}-${randomChars}`;
+};
 
 const EventCard = ({ event }) => {
   const history = useHistory();
@@ -28,6 +50,27 @@ const EventCard = ({ event }) => {
 
   const handlePreviewClose = () => {
     setOpenPreview(false);
+  };
+  const handleRegister = async () => {
+    const eventRef = firebase.database.ref(`/current-events/${event.key}`);
+
+    const ticketId = generateUniqueTicketId();
+    const userId = firebase.auth.currentUser.email.split("@")[0];
+
+    const updatedEvent = {
+      ...event,
+      guests: {
+        ...event.guests,
+        [userId]: {
+          ticketId,
+          status: STATUS.GOING,
+        },
+      },
+    };
+    console.log("updatedEvent", updatedEvent);
+
+    await eventRef.update(updatedEvent);
+    alert("Registration successful!");
   };
 
   return (
@@ -109,6 +152,9 @@ const EventCard = ({ event }) => {
           <Typography variant="body1" gutterBottom>
             Location: {event.location}
           </Typography>
+          <Button variant="contained" size="small" onClick={handleRegister}>
+            Register
+          </Button>
         </DialogContent>
       </Dialog>
     </>

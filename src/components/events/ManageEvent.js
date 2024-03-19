@@ -4,8 +4,12 @@ import {
   Button,
   Chip,
   Container,
+  Divider,
   FormControl,
   Grid,
+  List,
+  ListItem,
+  ListItemText,
   Snackbar,
   Tab,
   Tabs,
@@ -19,6 +23,7 @@ import { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import defaultImage from "../../assets/default.jpg";
 import firebase from "../../config";
+import { toTitleCase } from "./EventCard";
 import ImageUpload from "./ImageUpload";
 import useRoleData from "./useRoleData";
 import { handleImageFileChanged } from "./utils";
@@ -338,9 +343,34 @@ const ManageEvent = () => {
             </Grid>
           )}
           {tabValue === 1 && (
-            <Typography variant="body1">
-              Guests management coming soon!
-            </Typography>
+            <>
+              <Typography variant="h6">Guest List</Typography>
+              {event.guests ? (
+                <List>
+                  {Object.entries(event.guests).map(
+                    ([userHandle, userDetails]) => (
+                      <ListItem
+                        key={userHandle}
+                        secondaryAction={
+                          <>
+                            <Chip
+                              label={toTitleCase(userDetails.status)}
+                              color="success"
+                              variant="outlined"
+                            />
+                          </>
+                        }
+                      >
+                        <ListItemText primary={userHandle} />
+                        <Divider variant="inset" />
+                      </ListItem>
+                    )
+                  )}
+                </List>
+              ) : (
+                <Typography variant="body1">No guests yet.</Typography>
+              )}
+            </>
           )}
         </Box>
 
