@@ -1,8 +1,9 @@
-import Drawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import React, { useEffect, useState } from 'react';
-import firebase from '../config';
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import firebase from "../config";
 
 // File for the navigation drawer (the menu that pops out when clicking the left menu button in the app bar)
 
@@ -10,45 +11,16 @@ const NavDrawer = (props) => {
   const [adminSignedIn, setAdminSignedIn] = useState(false);
   const [leaderSignedIn, setLeaderSignedIn] = useState(false);
 
-  // Actions for when each menu item is clicked
-  const homeClicked = () => {
-    props.navChanged('Home');
-  };
-
-  const eventClicked = () => {
-    props.navChanged('Add Event');
-  };
-
-  const pendingClicked = () => {
-    props.navChanged('Pending Events');
-  };
-
-  const currentClicked = () => {
-    props.navChanged('Current Events');
-  };
-
-  const pastClicked = () => {
-    props.navChanged('Past Events');
-  };
-
-  const tagsClicked = () => {
-    props.navChanged('Groups/Tags');
-  };
-
-  const usersClicked = () => {
-    props.navChanged('Users');
-  };
-
   // Checks the role of the current user
   const checkRole = (user, role) => {
     firebase.database
       .ref(role)
-      .once('value')
+      .once("value")
       .then(function(snapshot) {
-        if (snapshot.hasChild(user.email.replace('.', ','))) {
-          if (role === 'admin') {
+        if (snapshot.hasChild(user.email.replace(".", ","))) {
+          if (role === "admin") {
             setAdminSignedIn(true);
-          } else if (role === 'leaders') {
+          } else if (role === "leaders") {
             setLeaderSignedIn(true);
           }
         }
@@ -59,8 +31,8 @@ const NavDrawer = (props) => {
   useEffect(() => {
     firebase.auth.onAuthStateChanged((user) => {
       if (user) {
-        checkRole(user, 'admin');
-        checkRole(user, 'leaders');
+        checkRole(user, "admin");
+        checkRole(user, "leaders");
       } else {
         setAdminSignedIn(false);
         setLeaderSignedIn(false);
@@ -71,7 +43,7 @@ const NavDrawer = (props) => {
   // Render the drawer
   return (
     <Drawer
-      anchor='left'
+      anchor="left"
       onClose={props.toggleDrawer(false)}
       open={props.drawerOpened}
     >
@@ -80,47 +52,53 @@ const NavDrawer = (props) => {
         onKeyDown={props.toggleDrawer(false)}
       >
         <List>
-          <ListItemButton name='Home' onClick={homeClicked}>
+          <ListItemButton component={Link} to="/" name="Home">
             Home
           </ListItemButton>
           <ListItemButton
-            name='Add Event'
-            onClick={eventClicked}
+            component={Link}
+            to="/add-event"
+            name="Add Event"
             disabled={!adminSignedIn && !leaderSignedIn}
           >
             Add Event
           </ListItemButton>
           <ListItemButton
-            name='Pending Events'
-            onClick={pendingClicked}
+            component={Link}
+            to="/pending-events"
+            name="Pending Events"
             disabled={!adminSignedIn && !leaderSignedIn}
           >
             Pending Events
           </ListItemButton>
           <ListItemButton
-            name='Current Events'
-            onClick={currentClicked}
+            component={Link}
+            to="/events"
+            name="Current Events"
             disabled={!adminSignedIn && !leaderSignedIn}
           >
             Current Events
           </ListItemButton>
           <ListItemButton
-            name='Past Events'
-            onClick={pastClicked}
+            component={Link}
+            to="/past-events"
+            name="Past Events"
             disabled={!adminSignedIn}
           >
             Past Events
           </ListItemButton>
           <ListItemButton
-            name='Groups/Tags'
-            onClick={tagsClicked}
+            component={Link}
+            to="/tags"
+            name="Groups/Tags"
             disabled={!adminSignedIn && !leaderSignedIn}
           >
             Groups/Tags
           </ListItemButton>
           <ListItemButton
-            name='Users'
-            onClick={usersClicked}
+            component={Link}
+            to="/users"
+            name="Users"
             disabled={!adminSignedIn}
           >
             Users

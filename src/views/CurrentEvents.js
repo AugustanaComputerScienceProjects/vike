@@ -1,13 +1,13 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
-import { EventsView } from '../components/EventsView';
+import EventsViewNew from "../components/events/EventsViewNew";
 
 // File for managing the Current Events page
 
 class CurrentEvents extends Component {
   // Render the Current Events page
   render() {
-    return <EventsView eventType={'/current-events'} />;
+    return <EventsViewNew eventType={"/current-events"} />;
   }
 }
 
