@@ -7,11 +7,12 @@ import {
   Typography,
 } from "@mui/material";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import defaultImage from "../../assets/default.jpg";
 import firebase from "../../config";
 import AddEventForm from "./AddEventForm";
 import ImageUpload from "./ImageUpload";
+import useRoleData from "./useRoleData";
 import {
   addHours,
   handleImageFileChanged,
@@ -35,22 +36,7 @@ const AddEvent = () => {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [databaseTags, setDatabaseTags] = useState([]);
-  const [groups, setGroups] = useState([]);
-  const [leaderSignedIn, setLeaderSignedIn] = useState(false);
-  const [adminSignedIn, setAdminSignedIn] = useState(false);
-
-  useEffect(() => {
-    readTags();
-    firebase.auth.onAuthStateChanged((user) => {
-      if (user) {
-        checkRole(user, "admin");
-        checkRole(user, "leaders");
-      } else {
-        setAdminSignedIn(false);
-      }
-    });
-  }, []);
+  const { adminSignedIn, leaderSignedIn, databaseTags, groups } = useRoleData();
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -176,76 +162,6 @@ const AddEvent = () => {
       email: "",
     });
     setImage64(defaultImage);
-  };
-
-  const checkRole = (user, role) => {
-    firebase.database
-      .ref(role)
-      .once("value")
-      .then((snapshot) => {
-        if (snapshot.hasChild(user.email.replace(".", ","))) {
-          if (role === "admin") {
-            setAdminSignedIn(true);
-            readAllGroups();
-          } else if (role === "leaders" && !adminSignedIn) {
-            setLeaderSignedIn(true);
-            readLeaderGroups();
-          }
-        }
-      });
-  };
-
-  const readTags = () => {
-    let ref = firebase.database.ref("/tags");
-    ref.on("value", (snapshot) => {
-      let tagsList = [];
-      snapshot.forEach((child) => {
-        tagsList.push(child.val());
-      });
-      setDatabaseTags(tagsList);
-    });
-  };
-
-  const readAllGroups = () => {
-    let ref = firebase.database.ref("/groups");
-    ref.on("value", (snapshot) => {
-      let groupsList = [];
-      snapshot.forEach((child) => {
-        let decodedGroup = decodeGroup(child.val());
-        groupsList.push(decodedGroup);
-      });
-      console.log(groupsList);
-      setGroups(groupsList);
-    });
-  };
-
-  const readLeaderGroups = () => {
-    let email = firebase.auth.currentUser.email;
-    let ref = firebase.database
-      .ref("/leaders")
-      .child(email.replace(".", ","))
-      .child("groups");
-    ref.on("value", (snapshot) => {
-      let myGroups = [];
-      snapshot.forEach((child) => {
-        let decodedGroup = decodeGroup(child.key);
-        myGroups.push(decodedGroup);
-      });
-      setGroups(myGroups);
-    });
-  };
-
-  const decodeGroup = (codedGroup) => {
-    let group = codedGroup;
-    if (typeof group === "string" || group instanceof String) {
-      group = group.replace(/\*%&/g, ".");
-      group = group.replace(/@%\*/g, "$");
-      group = group.replace(/\*<=/g, "[");
-      group = group.replace(/<@\+/g, "]");
-      group = group.replace(/!\*>/g, "#");
-      group = group.replace(/!<\^/g, "/");
-    }
-    return group;
   };
 
   return (

@@ -1,7 +1,10 @@
 import {
+  Autocomplete,
   Box,
   Button,
+  Chip,
   Container,
+  FormControl,
   Grid,
   Snackbar,
   Tab,
@@ -17,6 +20,7 @@ import { useHistory, useParams } from "react-router-dom";
 import defaultImage from "../../assets/default.jpg";
 import firebase from "../../config";
 import ImageUpload from "./ImageUpload";
+import useRoleData from "./useRoleData";
 import { handleImageFileChanged } from "./utils";
 
 const ManageEvent = () => {
@@ -28,6 +32,9 @@ const ManageEvent = () => {
   const [tabValue, setTabValue] = useState(0);
   const [image64, setImage64] = useState(null);
   const [currImage, setCurrImage] = useState(null);
+
+  const { databaseTags, groups } = useRoleData();
+
   const history = useHistory();
 
   useEffect(() => {
@@ -35,7 +42,10 @@ const ManageEvent = () => {
       const eventRef = firebase.database.ref(`/current-events/${eventId}`);
       const snapshot = await eventRef.once("value");
       const fetchedEvent = snapshot.val();
-      setEvent(fetchedEvent);
+      setEvent({
+        ...fetchedEvent,
+        tags: fetchedEvent.tags.split(","),
+      });
 
       // Get the existing image
       const imageUrl = await firebase.storage
@@ -238,11 +248,11 @@ const ManageEvent = () => {
                   value={event.location}
                   onChange={handleInputChange}
                 />
-                {/* <FormControl margin="dense" fullWidth>
+                <FormControl margin="dense" fullWidth>
                   <Autocomplete
                     margin="dense"
                     fullWidth
-                    options={event.groups}
+                    options={groups}
                     getOptionLabel={(option) => option}
                     value={event.organization}
                     onChange={(event, newValue) => {
@@ -256,34 +266,36 @@ const ManageEvent = () => {
                     )}
                   />
                 </FormControl>
-                <FormControl margin="dense" fullWidth>
-                  <Autocomplete
-                    multiple
-                    margin="dense"
-                    fullWidth
-                    options={event.tags}
-                    getOptionLabel={(option) => option}
-                    value={event.tags}
-                    onChange={(event, newValue) => {
-                      setEvent((prevEvent) => ({
-                        ...prevEvent,
-                        tags: newValue,
-                      }));
-                    }}
-                    renderInput={(params) => (
-                      <TextField {...params} label="Tags" />
-                    )}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          key={option}
-                          label={option}
-                          {...getTagProps({ index })}
-                        />
-                      ))
-                    }
-                  />
-                </FormControl> */}
+                {databaseTags.length > 0 && (
+                  <FormControl margin="dense" fullWidth>
+                    <Autocomplete
+                      multiple
+                      margin="dense"
+                      fullWidth
+                      options={databaseTags}
+                      getOptionLabel={(option) => option}
+                      value={event.tags}
+                      onChange={(event, newValue) => {
+                        setEvent((prevEvent) => ({
+                          ...prevEvent,
+                          tags: newValue,
+                        }));
+                      }}
+                      renderInput={(params) => (
+                        <TextField {...params} label="Tags" />
+                      )}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => (
+                          <Chip
+                            key={option}
+                            label={option}
+                            {...getTagProps({ index })}
+                          />
+                        ))
+                      }
+                    />
+                  </FormControl>
+                )}
                 <TextField
                   margin="dense"
                   name="webLink"
