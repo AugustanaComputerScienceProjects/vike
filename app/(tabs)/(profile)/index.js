@@ -19,29 +19,15 @@ export default function Profile() {
       title: 'About Vike',
       href: '/about',
       icon: 'info',
-      subTitle: null,
     },
     {
       title: 'Give us feedback',
       href: '/feedback',
       icon: 'edit-2',
-      subTitle: null,
     },
     // {
     //   title: 'Share Vike',
     //   icon: 'share',
-    //   subTitle: null,
-    //   onPress: () => {},
-    // },
-    // {
-    //   title: 'Terms of Service',
-    //   icon: 'file-text',
-    //   subTitle: null,
-    //   onPress: () => {},
-    // },
-    // {
-    //   title: 'Privacy Policy',
-    //   icon: 'file-text',
     //   subTitle: null,
     //   onPress: () => {},
     // },
@@ -78,17 +64,13 @@ export default function Profile() {
           <View>
             {settingsOptions.map(({title, icon, subTitle, href}) => (
               <TouchableOpacity
+                key={title}
                 onPress={() => router.navigate(href)} // Assuming you have access to the navigation prop
                 style={{flex: 1}}>
                 <View style={styles.menuItem}>
                   <Icon color={COLORS.text} size={18} name={icon} />
                   <View style={{marginLeft: 16}}>
                     <Text style={{fontSize: 17}}>{title}</Text>
-                    {subTitle && (
-                      <Text style={{fontSize: 14, opacity: 0.5}}>
-                        {subTitle}
-                      </Text>
-                    )}
                   </View>
                   <Icon
                     color={COLORS.text}
@@ -141,24 +123,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
     flexGrow: 1,
-    // alignItems: 'center',
-  },
-  cardContainer: {
-    flex: 1,
   },
   headerContainer: {
-    // alignItems: 'center',
-    // backgroundColor: '#FFF',
     marginBottom: 10,
     marginTop: 45,
   },
-  indicatorTab: {
-    backgroundColor: 'transparent',
-  },
   scroll: {
     flexGrow: 1,
-    // justifyContent: 'space-between',
-    // flexDirection: 'column',
     paddingHorizontal: 24,
     marginBottom: 100,
   },
@@ -168,47 +139,6 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     alignItems: 'center',
   },
-  sceneContainer: {
-    marginTop: 10,
-  },
-  socialIcon: {
-    marginLeft: 14,
-    marginRight: 14,
-  },
-  socialRow: {
-    flexDirection: 'row',
-  },
-  tabBar: {},
-  tabContainer: {
-    flex: 1,
-    marginBottom: 12,
-  },
-  tabLabelNumber: {
-    color: 'gray',
-    fontSize: 12.5,
-    textAlign: 'center',
-  },
-  tabLabelText: {
-    color: COLORS.text,
-    fontSize: 22.5,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  userBioRow: {
-    marginLeft: 40,
-    marginRight: 40,
-  },
-  userBioText: {
-    color: 'gray',
-    fontSize: 13.5,
-    textAlign: 'center',
-  },
-  userImage: {
-    // borderRadius: 60,
-    height: 120,
-    marginBottom: 20,
-    width: 120,
-  },
   userNameRow: {
     marginBottom: 10,
   },
@@ -217,12 +147,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     lineHeight: 30,
-    // textAlign: 'center',
   },
   userRow: {
-    // alignItems: 'center',
-    // flexDirection: 'column',
-    // justifyContent: 'center',
     marginBottom: 12,
   },
 });

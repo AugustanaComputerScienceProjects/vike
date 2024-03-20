@@ -2,7 +2,7 @@
   "expo": {
     "name": "Vike",
     "slug": "vike",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -54,10 +54,10 @@
       },
       "googleServicesFile": "./google-services.json",
       "package": "edu.augustana.osleventsandroid",
-      "versionCode": 6
+      "versionCode": 9
     },
     "ios": {
-      "buildNumber": "1.2",
+      "buildNumber": "1",
       "config": {
         "googleMapsApiKey": "AIzaSyBr8_x3nXHBPJMJ4EBg5w2clq5t_S1s05o"
       },

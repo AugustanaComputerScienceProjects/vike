@@ -85,7 +85,7 @@ export default function Home() {
 
         {searchQuery === '' ? (
           <>
-            <FeaturedList data={events.slice(0, 5)} />
+            <FeaturedList data={events?.slice(0, 5)} />
             <AllEventsList data={events} />
           </>
         ) : (
