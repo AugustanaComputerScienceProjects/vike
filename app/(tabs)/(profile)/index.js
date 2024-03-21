@@ -62,7 +62,7 @@ export default function Profile() {
             Settings
           </Text>
           <View>
-            {settingsOptions.map(({title, icon, subTitle, href}) => (
+            {settingsOptions.map(({title, icon, href}) => (
               <TouchableOpacity
                 key={title}
                 onPress={() => router.navigate(href)} // Assuming you have access to the navigation prop
@@ -120,24 +120,24 @@ export default function Profile() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: COLORS.background,
+    flex: 1,
     flexGrow: 1,
   },
   headerContainer: {
     marginBottom: 10,
     marginTop: 45,
   },
+  menuItem: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: 14,
+    marginTop: 14,
+  },
   scroll: {
     flexGrow: 1,
-    paddingHorizontal: 24,
     marginBottom: 100,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    marginTop: 14,
-    marginBottom: 14,
-    alignItems: 'center',
+    paddingHorizontal: 24,
   },
   userNameRow: {
     marginBottom: 10,

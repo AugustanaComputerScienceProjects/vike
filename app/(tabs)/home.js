@@ -19,10 +19,6 @@ export const getStorageImgURL = async imageName => {
 
 export default function Home() {
   const events = useEventStore(state => state.events);
-  const sortedEvents = events?.sort(
-    (a, b) => new Date(a.startDate) - new Date(b.startDate),
-  );
-  const [isSearching, setIsSearching] = useState();
   const updateEvents = useEventStore(state => state.updateEvents);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -105,13 +101,13 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: COLORS.background,
+    flex: 1,
   },
   heading: {
+    color: COLORS.text,
     fontSize: 24,
     fontWeight: 'bold',
-    color: COLORS.text,
     marginBottom: 16,
   },
   listContainer: {

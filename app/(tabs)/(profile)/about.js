@@ -4,7 +4,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {COLORS} from '../../../constants/theme';
 
-const About = ({props}) => {
+const About = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
@@ -31,26 +31,26 @@ Advised by: Dr. Stonedahl
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: COLORS.background,
+    flex: 1,
   },
   content: {
     margin: 24,
+  },
+  description: {
+    fontSize: 18,
   },
   header: {
     alignItems: 'center',
     marginBottom: 20,
   },
+  logo: {
+    height: 100,
+    width: 100,
+  },
   titleText: {
     fontSize: 18,
     marginBottom: 20,
-  },
-  logo: {
-    width: 100,
-    height: 100,
-  },
-  description: {
-    fontSize: 18,
   },
 });
 

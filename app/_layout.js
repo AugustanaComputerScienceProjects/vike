@@ -1,17 +1,17 @@
-import {ActionSheetProvider} from '@expo/react-native-action-sheet';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {Stack} from 'expo-router';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-
 import {
   Inter_400Regular,
   Inter_500Medium,
   Inter_700Bold,
   useFonts,
 } from '@expo-google-fonts/inter';
+import {ActionSheetProvider} from '@expo/react-native-action-sheet';
+import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {Stack} from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, {useCallback} from 'react';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {AuthProvider} from '../context/useAuth';
 
 SplashScreen.preventAutoHideAsync();
@@ -48,9 +48,11 @@ export default function Layout() {
       <AuthProvider>
         <GestureHandlerRootView style={{flex: 1}}>
           <ActionSheetProvider>
-            <Stack screenOptions={{headerShown: false}}>
-              <Stack.Screen name="camera" options={{presentation: 'modal'}} />
-            </Stack>
+            <BottomSheetModalProvider>
+              <Stack screenOptions={{headerShown: false}}>
+                <Stack.Screen name="camera" options={{presentation: 'modal'}} />
+              </Stack>
+            </BottomSheetModalProvider>
           </ActionSheetProvider>
         </GestureHandlerRootView>
       </AuthProvider>
