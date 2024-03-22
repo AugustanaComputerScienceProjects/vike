@@ -19,9 +19,13 @@ const About = () => {
           {`
 To provide an easy way to find and check in for the upcoming events on Augustana campus.
 
-Developed by: Hung Tran
-Designed by: Viet (Ethan) Bui
+Developed by: Hung Tran, Stephanie Nhi Le
+
+Formerly developed by: Kyle Workman, Jared Haeme, Brandon Thompson, Jack Cannell, Brent Pierce, Paige Oucheriah
+
 Advised by: Dr. Stonedahl
+
+Logo designed by: Viet (Ethan) Bui
 `}
         </Text>
       </View>

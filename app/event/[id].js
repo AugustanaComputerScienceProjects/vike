@@ -1,8 +1,9 @@
 import Icon from '@expo/vector-icons/Feather';
+import database from '@react-native-firebase/database';
 import {addMinutes, format} from 'date-fns';
 import {Image} from 'expo-image';
 import {router, useLocalSearchParams} from 'expo-router';
-import React, {useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Animated,
   Linking,
@@ -17,10 +18,10 @@ import MapView, {
   PROVIDER_DEFAULT,
   PROVIDER_GOOGLE,
 } from 'react-native-maps';
+import {getStorageImgURL} from '../(tabs)/home';
 import EventShare from '../../components/EventShare';
 import Registration from '../../components/event/Registration';
 import {COLORS, SIZES} from '../../constants/theme';
-import {useEventStore} from '../../context/store';
 
 const HEADER_HEIGHT =
   SIZES.height < 700 ? SIZES.height * 0.3 : SIZES.height * 0.4;
@@ -28,11 +29,26 @@ const HEADER_HEIGHT =
 export default function Event() {
   const {id} = useLocalSearchParams();
   const scrollY = useRef(new Animated.Value(0)).current;
+  const [event, setEvent] = useState(null);
 
-  const getCurrentEvent = useEventStore(state => state.getCurrentEvent);
-  const event = getCurrentEvent(id);
+  useEffect(() => {
+    const eventRef = database().ref(`/current-events/${id}`);
+    const onValueChange = eventRef.on('value', async snapshot => {
+      const data = snapshot.val();
+      const imgURL = await getStorageImgURL(data.imgid);
+      if (data) {
+        setEvent({
+          id,
+          image: imgURL,
+          ...data,
+        });
+      }
+    });
 
-  return (
+    return () => eventRef.off('value', onValueChange);
+  }, [id]);
+
+  return event ? (
     <View style={styles.container}>
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
@@ -54,7 +70,7 @@ export default function Event() {
         style={{width: '100%'}}>
         <Image
           contentFit="cover"
-          source={{uri: event?.image}}
+          source={{uri: event.image}}
           style={{
             width: '100%',
             height: HEADER_HEIGHT,
@@ -64,7 +80,7 @@ export default function Event() {
           <View style={{flex: 1}}>
             <Text
               style={{color: COLORS.black, fontWeight: 'bold', fontSize: 25}}>
-              {event?.name}
+              {event.name}
             </Text>
 
             <View
@@ -82,7 +98,7 @@ export default function Event() {
               <Text
                 style={{
                   color: COLORS.orange,
-                  fontSize: 16, // replace 'sm' with the actual size in points
+                  fontSize: 16,
                   opacity: 0.7,
                   marginLeft: 4,
                 }}>
@@ -116,7 +132,7 @@ export default function Event() {
                   marginLeft: 4,
                   flex: 1,
                 }}>
-                {event?.location}
+                {event.location}
               </Text>
             </View>
             <View
@@ -138,7 +154,7 @@ export default function Event() {
                   opacity: 0.7,
                   marginLeft: 4,
                 }}>
-                Hosted by {event?.organization}
+                Hosted by {event.organization}
               </Text>
             </View>
           </View>
@@ -159,10 +175,10 @@ export default function Event() {
               color: COLORS.text,
               fontSize: 16,
             }}>
-            {event?.description}
+            {event.description}
           </Text>
         </View>
-        {event?.webLink ? (
+        {event.webLink ? (
           <>
             <View style={styles.buttonSection}>
               <Text
@@ -181,10 +197,8 @@ export default function Event() {
                   color: COLORS.primary,
                   paddingBottom: 18,
                 }}
-                onPress={() =>
-                  event?.webLink && Linking.openURL(event?.webLink)
-                }>
-                {event?.webLink}
+                onPress={() => event.webLink && Linking.openURL(event.webLink)}>
+                {event.webLink}
               </Text>
             </View>
           </>
@@ -208,7 +222,7 @@ export default function Event() {
               fontSize: 16,
               color: COLORS.text,
             }}>
-            {event?.location}
+            {event.location}
           </Text>
           <View style={{height: 250}}>
             <MapView
@@ -315,7 +329,7 @@ export default function Event() {
       </View>
       <Registration event={event} />
     </View>
-  );
+  ) : null;
 }
 
 const styles = StyleSheet.create({

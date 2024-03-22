@@ -5,12 +5,11 @@ import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import {Image} from 'expo-image';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {Alert, Pressable, StyleSheet, Text, View} from 'react-native';
 import {Divider} from 'react-native-elements';
 import QRCode from 'react-native-qrcode-svg';
 import {COLORS, SIZES} from '../../constants/theme';
-import {useEventStore} from '../../context/store';
 
 export const STATUS = {
   GOING: 'GOING',
@@ -59,25 +58,19 @@ const generateUniqueTicketId = (userHandle, eventId) => {
 };
 
 const Registration = ({event}) => {
-  const [status, setStatus] = useState(null);
+  console.log('event', event);
   const bottomSheetModalRef = React.useRef(null);
   const snapPoints = useMemo(() => ['50%', '98%'], []);
-  const fetchEvents = useEventStore(state => state.fetchEvents);
+
+  const checkRegistrationStatus = () => {
+    const userHandle = currentUser.email.split('@')[0];
+    const guestData = event.guests[userHandle];
+    return guestData.status;
+  };
+
+  const status = event.guests ? checkRegistrationStatus() : null;
 
   const {showActionSheetWithOptions} = useActionSheet();
-
-  useEffect(() => {
-    const checkRegistrationStatus = () => {
-      const userHandle = currentUser.email.split('@')[0];
-      const guestData = event.guests[userHandle];
-      setStatus(guestData.status);
-    };
-
-    if (event.guests) {
-      checkRegistrationStatus();
-    }
-  }, [event]);
-  console.log('event', event);
 
   const handleRegister = async status => {
     const eventRef = database().ref(`/current-events/${event.id}`);
@@ -96,14 +89,12 @@ const Registration = ({event}) => {
     };
 
     await eventRef.update(updatedEvent);
-    setStatus(STATUS.GOING);
     bottomSheetModalRef.current?.dismiss();
     Alert.alert(
       status === STATUS.GOING
         ? 'Registration successful!'
         : 'You have opted out of the event.',
     );
-    fetchEvents();
   };
 
   const handleRegisterClick = useCallback(() => {
@@ -117,10 +108,6 @@ const Registration = ({event}) => {
   const handleOptOut = () => {
     handleRegister(STATUS.NOT_GOING);
   };
-
-  const handleSheetChanges = useCallback(index => {
-    console.log('handleSheetChanges', index);
-  }, []);
 
   const renderRegistrationButton = () => {
     if (status == STATUS.GOING) {
@@ -173,8 +160,7 @@ const Registration = ({event}) => {
         ref={bottomSheetModalRef}
         index={1}
         snapPoints={snapPoints}
-        enablePanDownToClose={true}
-        onChange={handleSheetChanges}>
+        enablePanDownToClose={true}>
         <BottomSheetView style={styles.contentContainer}>
           {status == STATUS.GOING && event.guests ? (
             <>
