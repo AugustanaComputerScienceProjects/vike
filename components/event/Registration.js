@@ -1,5 +1,5 @@
 import {useActionSheet} from '@expo/react-native-action-sheet';
-import {AntDesign} from '@expo/vector-icons';
+import {FontAwesome} from '@expo/vector-icons';
 import Icon from '@expo/vector-icons/Feather';
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
 import auth from '@react-native-firebase/auth';
@@ -58,7 +58,6 @@ const generateUniqueTicketId = (userHandle, eventId) => {
 };
 
 const Registration = ({event}) => {
-  console.log('event', event);
   const bottomSheetModalRef = React.useRef(null);
   const snapPoints = useMemo(() => ['50%', '98%'], []);
 
@@ -144,6 +143,34 @@ const Registration = ({event}) => {
           </Pressable>
         </View>
       );
+    } else if (status == STATUS.NOT_GOING) {
+      return (
+        <View style={styles.registeredContainer}>
+          <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+            <FontAwesome name="ticket" size={28} color="#E72929" />
+            <View style={{flexDirection: 'column', gap: 8}}>
+              <Text style={styles.registeredText}>You're Not Going!</Text>
+            </View>
+          </View>
+          <Pressable
+            style={styles.optOutButton}
+            onPress={() => {
+              showActionSheetWithOptions(
+                {
+                  options: ['Register', 'Cancel'],
+                  cancelButtonIndex: 1,
+                },
+                buttonIndex => {
+                  if (buttonIndex === 0) {
+                    handleRegisterClick();
+                  }
+                },
+              );
+            }}>
+            <Icon name="more-vertical" size={24} color={COLORS.gray} />
+          </Pressable>
+        </View>
+      );
     } else {
       return (
         <Pressable onPress={handleRegisterClick} style={styles.registerButton}>
@@ -183,6 +210,17 @@ const Registration = ({event}) => {
                   size={250}
                   value={event.guests[currentUser.email.split('@')[0]].ticketId}
                 />
+                <View
+                  style={{
+                    marginTop: 40,
+                    paddingHorizontal: 40,
+                    gap: 8,
+                  }}>
+                  <Text style={styles.modalTitle}>
+                    Show this ticket to the organizer when you check in at the
+                    event
+                  </Text>
+                </View>
               </View>
             </>
           ) : (
@@ -288,16 +326,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 20,
-    marginVertical: 20,
     padding: 16,
   },
   registeredText: {
     color: COLORS.white,
     fontWeight: 'bold',
   },
-  viewTicketButton: {
-    paddingBottom: 8,
-  },
+  viewTicketButton: {},
   viewTicketText: {
     color: COLORS.lightGray,
   },
