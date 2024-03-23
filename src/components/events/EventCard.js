@@ -29,12 +29,9 @@ export const toTitleCase = (str) => {
   });
 };
 
-const generateUniqueTicketId = () => {
+const generateUniqueTicketId = (userHandle, eventId) => {
   const timestamp = Date.now().toString();
-  const randomChars = Math.random()
-    .toString(36)
-    .substring(2, 7);
-  return `${timestamp}-${randomChars}`;
+  return `${userHandle}-${eventId}-${timestamp}`;
 };
 
 const EventCard = ({ event }) => {
@@ -58,9 +55,10 @@ const EventCard = ({ event }) => {
     setOpenPreview(false);
   };
   const handleRegister = async () => {
+    const userHandle = firebase.auth.currentUser.email.split("@")[0];
     const eventRef = firebase.database.ref(`/current-events/${event.key}`);
 
-    const ticketId = generateUniqueTicketId();
+    const ticketId = generateUniqueTicketId(userHandle, event.key);
     const userId = firebase.auth.currentUser.email.split("@")[0];
 
     const updatedEvent = {

@@ -154,7 +154,7 @@ const CheckInPage = () => {
         <DialogContent>
           <p>
             Registration Date:{" "}
-            {selectedGuest
+            {selectedGuest && selectedGuest?.[1].ticketId
               ? format(
                   new Date(
                     parseInt(selectedGuest?.[1].ticketId?.split("-")[3])
@@ -165,7 +165,9 @@ const CheckInPage = () => {
           </p>
           <p>
             Status:{" "}
-            {selectedGuest ? toTitleCase(selectedGuest?.[1].status) : ""}
+            {selectedGuest && selectedGuest?.[1].status
+              ? toTitleCase(selectedGuest?.[1].status)
+              : ""}
           </p>
         </DialogContent>
         <DialogActions>
