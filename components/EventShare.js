@@ -15,8 +15,11 @@ const EventShare = ({event}) => {
       const {status} = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
         setCalendarAuth(true);
-        const calendars = await Calendar.getCalendarsAsync();
-        const primaryCalendar = calendars.find(calendar => calendar.isPrimary);
+        const calendars = await Calendar.getCalendarsAsync(
+          Calendar.EntityTypes.EVENT,
+        );
+        const primaryCalendar =
+          calendars.find(calendar => calendar.isPrimary) || calendars[0];
         const startDate = new Date(event.startDate);
         const endDate = addMinutes(startDate, event.duration);
 
@@ -24,7 +27,7 @@ const EventShare = ({event}) => {
           title: event.name,
           startDate,
           endDate,
-          timeZone: 'GMT', // You may need to adjust this based on your needs
+          timeZone: 'America/Chicago',
           location: event.location,
         };
 
@@ -51,11 +54,18 @@ const EventShare = ({event}) => {
         );
       }
     } catch (error) {
-      console.error(error);
-      Alert.alert(
-        'Error',
-        'An error occurred while adding the event to your calendar.',
-      );
+      if (error.code === 'ERR_MISSING_PERMISSION') {
+        Alert.alert(
+          'Permission required',
+          'Please grant permission to add the event to your calendar.',
+        );
+      } else {
+        console.error(error);
+        Alert.alert(
+          'Error',
+          'An error occurred while adding the event to your calendar.',
+        );
+      }
     }
   };
 

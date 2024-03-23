@@ -1,4 +1,4 @@
-import {Link, useRouter} from 'expo-router';
+import {Link} from 'expo-router';
 import React from 'react';
 import {Dimensions, Image, StyleSheet, Text, View} from 'react-native';
 import {COLORS} from '../../constants/theme';
@@ -7,16 +7,7 @@ const windowWidth = Dimensions.get('window').width;
 import {parseDate} from './utils';
 
 const EventCard = ({event}) => {
-  const router = useRouter();
-
   const {formattedDate, formattedTime} = parseDate(event.startDate);
-
-  const handlePress = () => {
-    router.push({
-      pathname: '/event/[id]',
-      params: {id: event.id, event: event},
-    });
-  };
 
   return (
     <Link
@@ -40,36 +31,28 @@ const EventCard = ({event}) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    backgroundColor: COLORS.white,
-    borderRadius: 8,
-    padding: 12,
-  },
   coverImage: {
-    width: 100,
-    height: 100,
     borderRadius: 8,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: COLORS.text,
+    height: 100,
+    width: 100,
   },
   listItem: {
-    maxWidth: windowWidth - 100,
-    paddingVertical: 15,
-    paddingLeft: 10,
     flexDirection: 'row',
+    maxWidth: windowWidth - 100,
+    paddingLeft: 10,
+    paddingVertical: 15,
+  },
+  location: {
+    color: COLORS.gray,
+    fontSize: 14,
   },
   metaInfo: {
     paddingLeft: 20,
   },
-  location: {
-    fontSize: 14,
-    color: COLORS.gray,
+  title: {
+    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

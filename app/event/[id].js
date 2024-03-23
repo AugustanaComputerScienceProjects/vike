@@ -1,19 +1,16 @@
 import Icon from '@expo/vector-icons/Feather';
+import database from '@react-native-firebase/database';
 import {addMinutes, format} from 'date-fns';
 import {Image} from 'expo-image';
-import {Link, router, useLocalSearchParams} from 'expo-router';
-import React, {useRef, useState} from 'react';
+import {router, useLocalSearchParams} from 'expo-router';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Animated,
-  Dimensions,
   Linking,
   Platform,
   StyleSheet,
   Text,
   View,
-  Modal,
-  Alert,
-  Pressable
 } from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import MapView, {
@@ -21,31 +18,37 @@ import MapView, {
   PROVIDER_DEFAULT,
   PROVIDER_GOOGLE,
 } from 'react-native-maps';
+import {getStorageImgURL} from '../(tabs)/home';
 import EventShare from '../../components/EventShare';
+import Registration from '../../components/event/Registration';
 import {COLORS, SIZES} from '../../constants/theme';
-import {useEventStore} from '../../context/store';
 
 const HEADER_HEIGHT =
   SIZES.height < 700 ? SIZES.height * 0.3 : SIZES.height * 0.4;
 
-const windowWidth = Dimensions.get('window').width;
 export default function Event() {
   const {id} = useLocalSearchParams();
   const scrollY = useRef(new Animated.Value(0)).current;
+  const [event, setEvent] = useState(null);
 
-  const getCurrentEvent = useEventStore(state => state.getCurrentEvent);
-  const event = getCurrentEvent(id);
+  useEffect(() => {
+    const eventRef = database().ref(`/current-events/${id}`);
+    const onValueChange = eventRef.on('value', async snapshot => {
+      const data = snapshot.val();
+      const imgURL = await getStorageImgURL(data.imgid);
+      if (data) {
+        setEvent({
+          id,
+          image: imgURL,
+          ...data,
+        });
+      }
+    });
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [isRegistered, setIsRegistered] = useState(false); 
+    return () => eventRef.off('value', onValueChange);
+  }, [id]);
 
-  const handleRegisterClick = () => {
-    console.log('Registration submitted!');
-    setIsRegistered(true);  
-    setModalVisible(!modalVisible)
-  };
-  
-  return (
+  return event ? (
     <View style={styles.container}>
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
@@ -64,11 +67,10 @@ export default function Event() {
           ],
           {useNativeDriver: true},
         )}
-
         style={{width: '100%'}}>
         <Image
           contentFit="cover"
-          source={{uri: event?.image}}
+          source={{uri: event.image}}
           style={{
             width: '100%',
             height: HEADER_HEIGHT,
@@ -78,7 +80,7 @@ export default function Event() {
           <View style={{flex: 1}}>
             <Text
               style={{color: COLORS.black, fontWeight: 'bold', fontSize: 25}}>
-              {event?.name}
+              {event.name}
             </Text>
 
             <View
@@ -96,7 +98,7 @@ export default function Event() {
               <Text
                 style={{
                   color: COLORS.orange,
-                  fontSize: 16, // replace 'sm' with the actual size in points
+                  fontSize: 16,
                   opacity: 0.7,
                   marginLeft: 4,
                 }}>
@@ -130,7 +132,7 @@ export default function Event() {
                   marginLeft: 4,
                   flex: 1,
                 }}>
-                {event?.location}
+                {event.location}
               </Text>
             </View>
             <View
@@ -152,7 +154,7 @@ export default function Event() {
                   opacity: 0.7,
                   marginLeft: 4,
                 }}>
-                Hosted by {event?.organization}
+                Hosted by {event.organization}
               </Text>
             </View>
           </View>
@@ -173,10 +175,10 @@ export default function Event() {
               color: COLORS.text,
               fontSize: 16,
             }}>
-            {event?.description}
+            {event.description}
           </Text>
         </View>
-        {event?.webLink ? (
+        {event.webLink ? (
           <>
             <View style={styles.buttonSection}>
               <Text
@@ -195,10 +197,8 @@ export default function Event() {
                   color: COLORS.primary,
                   paddingBottom: 18,
                 }}
-                onPress={() =>
-                  event?.webLink && Linking.openURL(event?.webLink)
-                }>
-                {event?.webLink}
+                onPress={() => event.webLink && Linking.openURL(event.webLink)}>
+                {event.webLink}
               </Text>
             </View>
           </>
@@ -222,7 +222,7 @@ export default function Event() {
               fontSize: 16,
               color: COLORS.text,
             }}>
-            {event?.location}
+            {event.location}
           </Text>
           <View style={{height: 250}}>
             <MapView
@@ -235,7 +235,7 @@ export default function Event() {
                 marginTop: 20,
               }}
               minZoomLevel={15}
-              onPress={e => {
+              onPress={() => {
                 let lat = event.latitude || 41.503;
                 let lng = event.longitude || -90.5504;
                 const scheme = Platform.select({
@@ -272,16 +272,6 @@ export default function Event() {
           <View style={{paddingBottom: 100}}></View>
         </View>
       </Animated.ScrollView>
-      {/* <LinearGradient
-          colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 75,
-            height: 30,
-          }}
-        /> */}
       <View
         style={{
           position: 'absolute',
@@ -337,292 +327,35 @@ export default function Event() {
           <EventShare event={event} />
         </View>
       </View>
-      
-      
-      <View
-        style={{
-          height: 90,
-          width: SIZES.width,
-          backgroundColor: 'transparent',
-          position: 'absolute',
-          bottom: 0,
-          justifyContent: 'center',
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 1,
-            height: 3,
-          },
-          shadowOpacity: 0.2,
-        }}>
-        
-        {/* Modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onSwipeComplete={() => setModalVisible(false)}
-          swipeDirection="down"
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-            setModalVisible(!modalVisible);
-          }}>
-          <View style={styles.centeredView}>
-
-            <View style={styles.modalView}>
-              <View style={styles.listItem}>
-                <Image source={{uri: event?.image}} style={styles.coverImage} />
-                <View style={styles.metaInfo}>
-                    <Text style={styles.title}>{`${event?.name}`}</Text>
-                    <Text style={{color: 'chocolate', fontWeight: 'bold'}}>{event.startDate}</Text>
-                    <Text>{`${event?.location} `}
-                    </Text>
-                  </View>
-              </View>
-            </View>
-
-            <View style={styles.modalView}>
-              <View style={[styles.listItem, { justifyContent: 'space-between' }]}>
-                <Text style={styles.title}>Ticket</Text>
-                <Text style={{fontSize: 20}}>Free</Text>
-              </View>
-            </View>
-              <Pressable
-                style={{
-                  marginHorizontal: 30,
-                  height: 53,
-                  width: windowWidth - 30,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 15,
-                  backgroundColor: COLORS.primary,
-                  position: 'absolute',
-                  bottom: 18,
-                }}
-                onPress={handleRegisterClick}
-                >
-                <View>
-                  <Text
-                    style={{
-                      color: COLORS.white,
-                      fontSize: 20,
-                      fontWeight: 'bold',
-                    }}>
-                    Register
-                  </Text>
-                </View>
-              </Pressable>
-          </View>
-        </Modal>
-
-        {/* Register Button */}
-        {/* <Link href=/camera asChild> */}
-          <TouchableOpacity
-            style={{
-              marginHorizontal: 30,
-              height: 53,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 15,
-              backgroundColor: COLORS.primary,
-            }}
-            onPress={() => {
-              if (!isRegistered) {
-                setModalVisible(true); 
-              } else {
-                //View ticket action 
-                console.log('View ticket');
-              }
-            }}
-            >
-            <View>
-              {!isRegistered && (
-              <Text
-                style={{
-                  color: COLORS.white,
-                  fontSize: 20,
-                  fontWeight: 'bold',
-                }}>
-                Register
-              </Text>
-              )}
-              {isRegistered && (
-                <View>
-                <Text
-                  style={{
-                    color: COLORS.white,
-                    fontSize: 20,
-                    fontWeight: 'bold',
-                  }}
-                >
-                  You're Going
-                </Text>
-                <Text
-                  style={{
-                    color: '#fff',
-                    fontSize: 14,
-                    fontWeight: 'normal',
-                  }}
-                >
-                  View Ticket
-                </Text>
-              </View>
-            )}
-            </View>
-          </TouchableOpacity>
-        {/* </Link> */}
-      </View>
+      <Registration event={event} />
     </View>
-  );
+  ) : null;
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexGrow: 1,
-  },
-  infoContent: {
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginTop: 20,
-    marginBottom: 10,
-    marginHorizontal: 25,
-  },
   buttonSection: {
-    marginTop: 20,
+    flexDirection: 'row',
     marginBottom: 10,
     marginHorizontal: 30,
-    flexDirection: 'row',
+    marginTop: 20,
+  },
+  container: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    flex: 1,
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   descriptionSection: {
-    marginVertical: 0,
     marginHorizontal: 30,
+    marginVertical: 0,
   },
-  cardContainer: {
-    flex: 1,
-  },
-  headerContainer: {
-    marginBottom: 10,
-    marginTop: 45,
-  },
-  indicatorTab: {
-    backgroundColor: 'transparent',
-  },
-  scroll: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    marginBottom: 100,
-  },
-  menuItem: {
+  infoContent: {
+    alignItems: 'flex-start',
     flexDirection: 'row',
-    marginTop: 14,
-    marginBottom: 14,
-    alignItems: 'center',
-  },
-  sceneContainer: {
-    marginTop: 10,
-  },
-  socialIcon: {
-    marginLeft: 14,
-    marginRight: 14,
-  },
-  socialRow: {
-    flexDirection: 'row',
-  },
-  tabBar: {},
-  tabContainer: {
-    flex: 1,
-    marginBottom: 12,
-  },
-  tabLabelNumber: {
-    color: 'gray',
-    fontSize: 12.5,
-    textAlign: 'center',
-  },
-  tabLabelText: {
-    color: COLORS.text,
-    fontSize: 22.5,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  userBioRow: {
-    marginLeft: 40,
-    marginRight: 40,
-  },
-  userBioText: {
-    color: 'gray',
-    fontSize: 13.5,
-    textAlign: 'center',
-  },
-  userImage: {
-    height: 120,
-    marginBottom: 20,
-    width: 120,
-  },
-  userNameRow: {
+    justifyContent: 'space-between',
     marginBottom: 10,
-  },
-  userNameText: {
-    color: COLORS.text,
-    fontSize: 24,
-    fontWeight: 'bold',
-    lineHeight: 30,
-  },
-  userRow: {
-    marginBottom: 12,
-  },
-
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    // marginTop: 22,
-    backgroundColor: 'rgba(0, 0, 0, .8)',
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-
-
-  coverImage: {
-      width: 100,
-      height: 100,
-      borderRadius: 8,
-  },
-  listItem: {
-      // maxWidth: windowWidth - 100,
-      width: windowWidth - 100,
-      // paddingVertical: 15,
-      paddingHorizontal: 10,
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      overflow: 'hidden',
-  },
-  metaInfo: {
-      // paddingLeft: 20,
-      flex:1,
-      marginHorizontal: 20,
-  },
-  title: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      color: COLORS.text,
+    marginHorizontal: 25,
+    marginTop: 20,
   },
 });
