@@ -1,11 +1,12 @@
 import React from "react";
 import { Route } from "react-router-dom";
 import "./App.css";
-import ManageEvent from "./components/events/ManageEvent";
 import Event from "./routes/Event";
 import AddEventView from "./views/AddEventView";
+import CheckInPage from "./views/CheckIn";
 import CurrentEvents from "./views/CurrentEvents";
 import Home from "./views/Home";
+import ManageEvent from "./views/ManageEvent";
 import NavBar from "./views/NavBar";
 import PastEvents from "./views/PastEvents";
 import PendingEvents from "./views/PendingEvents";
@@ -37,6 +38,7 @@ const App = () => {
           <Route path="/past-events" component={PastEvents} />
           <Route path="/event" component={Event} />
           <Route path="/manage/:eventId" component={ManageEvent} />
+          <Route path="/check-in/:eventId" component={CheckInPage} />
           <Route path="/tags" component={Tags} />
           <Route path="/users" component={Users} />
         </div>

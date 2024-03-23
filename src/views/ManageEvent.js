@@ -4,8 +4,12 @@ import {
   Button,
   Chip,
   Container,
+  Divider,
   FormControl,
   Grid,
+  List,
+  ListItem,
+  ListItemText,
   Snackbar,
   Tab,
   Tabs,
@@ -17,11 +21,12 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import defaultImage from "../../assets/default.jpg";
-import firebase from "../../config";
-import ImageUpload from "./ImageUpload";
-import useRoleData from "./useRoleData";
-import { handleImageFileChanged } from "./utils";
+import defaultImage from "../assets/default.jpg";
+import { toTitleCase } from "../components/events/EventCard";
+import ImageUpload from "../components/events/ImageUpload";
+import useRoleData from "../components/events/useRoleData";
+import { handleImageFileChanged } from "../components/events/utils";
+import firebase from "../config";
 
 const ManageEvent = () => {
   const { eventId } = useParams();
@@ -44,6 +49,10 @@ const ManageEvent = () => {
       const fetchedEvent = snapshot.val();
       setEvent({
         ...fetchedEvent,
+        endDate: moment(fetchedEvent.startDate).add(
+          fetchedEvent.duration,
+          "minutes"
+        ),
         tags: fetchedEvent.tags.split(","),
       });
 
@@ -334,9 +343,32 @@ const ManageEvent = () => {
             </Grid>
           )}
           {tabValue === 1 && (
-            <Typography variant="body1">
-              Guests management coming soon!
-            </Typography>
+            <>
+              <Typography variant="h6">Guest List</Typography>
+              {event.guests ? (
+                <List>
+                  {Object.entries(event.guests).map(
+                    ([userHandle, userDetails]) => (
+                      <ListItem
+                        key={userHandle}
+                        secondaryAction={
+                          <Chip
+                            label={toTitleCase(userDetails.status)}
+                            color="success"
+                            variant="outlined"
+                          />
+                        }
+                      >
+                        <ListItemText primary={userHandle} />
+                        <Divider variant="inset" />
+                      </ListItem>
+                    )
+                  )}
+                </List>
+              ) : (
+                <Typography variant="body1">No guests yet.</Typography>
+              )}
+            </>
           )}
         </Box>
 
