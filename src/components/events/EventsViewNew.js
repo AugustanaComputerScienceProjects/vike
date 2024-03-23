@@ -82,6 +82,7 @@ const EventsView = () => {
         {loading ? (
           [...Array(8)].map((e, i) => (
             <Skeleton
+              key={i}
               variant="rounded"
               width={"100%"}
               height={100}

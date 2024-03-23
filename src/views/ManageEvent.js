@@ -21,12 +21,12 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import defaultImage from "../../assets/default.jpg";
-import firebase from "../../config";
-import { toTitleCase } from "./EventCard";
-import ImageUpload from "./ImageUpload";
-import useRoleData from "./useRoleData";
-import { handleImageFileChanged } from "./utils";
+import defaultImage from "../assets/default.jpg";
+import { toTitleCase } from "../components/events/EventCard";
+import ImageUpload from "../components/events/ImageUpload";
+import useRoleData from "../components/events/useRoleData";
+import { handleImageFileChanged } from "../components/events/utils";
+import firebase from "../config";
 
 const ManageEvent = () => {
   const { eventId } = useParams();
@@ -352,13 +352,11 @@ const ManageEvent = () => {
                       <ListItem
                         key={userHandle}
                         secondaryAction={
-                          <>
-                            <Chip
-                              label={toTitleCase(userDetails.status)}
-                              color="success"
-                              variant="outlined"
-                            />
-                          </>
+                          <Chip
+                            label={toTitleCase(userDetails.status)}
+                            color="success"
+                            variant="outlined"
+                          />
                         }
                       >
                         <ListItemText primary={userHandle} />

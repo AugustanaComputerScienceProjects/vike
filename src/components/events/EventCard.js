@@ -24,7 +24,7 @@ export const STATUS = {
 };
 
 export const toTitleCase = (str) => {
-  return str.replace(/\w\S*/g, function(txt) {
+  return str.replace(/_/g, " ").replace(/\w\S*/g, function(txt) {
     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
   });
 };
@@ -40,6 +40,12 @@ const generateUniqueTicketId = () => {
 const EventCard = ({ event }) => {
   const history = useHistory();
   const [openPreview, setOpenPreview] = useState(false);
+  const eventGuest = event.guests
+    ? Object.entries(event.guests).find(
+        ([userHandle, _]) =>
+          userHandle === firebase.auth.currentUser.email.split("@")[0]
+      )
+    : [];
 
   const handleManageClick = () => {
     history.push(`/manage/${event.key}`);
@@ -67,10 +73,54 @@ const EventCard = ({ event }) => {
         },
       },
     };
-    console.log("updatedEvent", updatedEvent);
 
     await eventRef.update(updatedEvent);
     alert("Registration successful!");
+  };
+  const handleAddToCalendar = () => {
+    const startTime = new Date(event.startDate)
+      .toISOString()
+      .replace(/-|:|\.\d\d\d/g, "");
+    const endTime = new Date(event.endDate)
+      .toISOString()
+      .replace(/-|:|\.\d\d\d/g, "");
+    const title = encodeURIComponent(event.name);
+    const details = encodeURIComponent(
+      event.description || "No details provided."
+    );
+    const location = encodeURIComponent(
+      event.location || "No location provided."
+    );
+
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startTime}/${endTime}&details=${details}&location=${location}`;
+
+    window.open(googleCalendarUrl, "_blank");
+  };
+
+  const handleSeeTicket = () => {
+    const userId = firebase.auth.currentUser.email.split("@")[0];
+    const ticketInfo = event.guests[userId];
+    if (ticketInfo && ticketInfo.ticketId) {
+      alert(`Your ticket ID is: ${ticketInfo.ticketId}`);
+    } else {
+      alert("No ticket found.");
+    }
+  };
+
+  const handleCancelRegistration = async () => {
+    const userId = firebase.auth.currentUser.email.split("@")[0];
+    const eventRef = firebase.database.ref(
+      `/current-events/${event.key}/guests/${userId}`
+    );
+
+    try {
+      await eventRef.update({ status: STATUS.NOT_GOING });
+
+      alert("Registration cancelled successfully.");
+    } catch (error) {
+      console.error("Error cancelling registration: ", error);
+      alert("Failed to cancel registration.");
+    }
   };
 
   return (
@@ -95,9 +145,6 @@ const EventCard = ({ event }) => {
                     Location Missing
                   </Typography>
                 )}
-                {/* <Typography variant="body2" color="text.secondary">
-                {event.guests ? `${event.guests} guests` : "No guests"}
-              </Typography> */}
               </CardContent>
             </Grid>
             <Grid item xs={5} md={3}>
@@ -123,7 +170,11 @@ const EventCard = ({ event }) => {
             py: 1,
           }}
         >
-          <Button size="small" color="primary">
+          <Button
+            size="small"
+            color="primary"
+            onClick={() => history.push(`/check-in/${event.key}`)}
+          >
             Check In
           </Button>
           <Button size="small" onClick={handleManageClick}>
@@ -152,9 +203,52 @@ const EventCard = ({ event }) => {
           <Typography variant="body1" gutterBottom>
             Location: {event.location}
           </Typography>
-          <Button variant="contained" size="small" onClick={handleRegister}>
-            Register
-          </Button>
+          {eventGuest && eventGuest?.[1]?.status === STATUS.GOING ? (
+            <Box>
+              <h2>You're In!</h2>
+              <p>
+                Event started in{" "}
+                {format(new Date(event.startDate), "MMM d, yyyy h:mm a")}
+              </p>
+              <Box
+                sx={{ gap: 2, display: "flex", flexDirection: "flex-start" }}
+              >
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={handleAddToCalendar}
+                >
+                  Add to Calendar
+                </Button>
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={handleSeeTicket}
+                >
+                  See Ticket
+                </Button>
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={handleCancelRegistration}
+                >
+                  Cancel Registration
+                </Button>
+              </Box>
+            </Box>
+          ) : eventGuest?.[1]?.status === STATUS.NOT_GOING ? (
+            <Box>
+              <h2>You're Not Going.</h2>
+              <p>Changed your mind? You can register again.</p>
+              <Button variant="contained" size="small" onClick={handleRegister}>
+                Register Again
+              </Button>
+            </Box>
+          ) : (
+            <Button variant="contained" size="small" onClick={handleRegister}>
+              Register
+            </Button>
+          )}
         </DialogContent>
       </Dialog>
     </>
