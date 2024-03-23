@@ -1,5 +1,5 @@
 import {useActionSheet} from '@expo/react-native-action-sheet';
-import {FontAwesome} from '@expo/vector-icons';
+import {AntDesign, FontAwesome} from '@expo/vector-icons';
 import Icon from '@expo/vector-icons/Feather';
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
 import auth from '@react-native-firebase/auth';
