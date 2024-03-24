@@ -2354,7 +2354,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector-modern`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
-  - react-native-google-maps (from `/Users/huwng/code/react-native/OSL-Calendar-ReactNativeApp/node_modules/react-native-maps`)
+  - react-native-google-maps (from `/Users/stephanienhile/git/osl/OSL-Calendar-ReactNativeApp/node_modules/react-native-maps`)
   - react-native-maps (from `../node_modules/react-native-maps`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-webview (from `../node_modules/react-native-webview`)
@@ -2536,7 +2536,7 @@ EXTERNAL SOURCES:
   React-Mapbuffer:
     :path: "../node_modules/react-native/ReactCommon"
   react-native-google-maps:
-    :path: "/Users/huwng/code/react-native/OSL-Calendar-ReactNativeApp/node_modules/react-native-maps"
+    :path: "/Users/stephanienhile/git/osl/OSL-Calendar-ReactNativeApp/node_modules/react-native-maps"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
   react-native-safe-area-context:
