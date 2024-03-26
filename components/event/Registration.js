@@ -64,7 +64,7 @@ const Registration = ({event}) => {
   const checkRegistrationStatus = () => {
     const userHandle = currentUser.email.split('@')[0];
     const guestData = event.guests[userHandle];
-    return guestData.status;
+    return guestData ? guestData.status: null;
   };
 
   const status = event.guests ? checkRegistrationStatus() : null;
