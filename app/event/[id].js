@@ -73,7 +73,7 @@ export default function Event() {
           source={{uri: event.image}}
           style={{
             width: '100%',
-            height: HEADER_HEIGHT,
+            height: HEADER_HEIGHT * 1.5,
           }}
         />
         <View style={styles.infoContent}>

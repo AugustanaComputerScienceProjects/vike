@@ -2,7 +2,6 @@ import React from 'react';
 import {Dimensions, FlatList, StyleSheet, Text, View} from 'react-native';
 import {COLORS} from '../../constants/theme';
 import EventCard from './EventCard';
-import { parseDate } from './utils';
 import { format } from 'date-fns';
 
 const windowWidth = Dimensions.get('window').width;
@@ -10,7 +9,7 @@ const windowWidth = Dimensions.get('window').width;
 const groupEventByDate = (events) => {
   const groupedEvents = {};
   events.forEach(event => { 
-    const date = format(new Date(event.startDate), 'MMM dd / eeeeeeee')
+    const date = format(new Date(event.startDate), 'MMM dd eeeeeeee')
     if (!groupedEvents[date]) {
       groupedEvents[date] = [];
     }
@@ -20,6 +19,9 @@ const groupEventByDate = (events) => {
 }
 
 const AllEventsList = ({data}) => {
+  if (!data){
+    return null;
+  }
   const groupedEvents = groupEventByDate(data);
 
   return (
@@ -32,7 +34,7 @@ const AllEventsList = ({data}) => {
       <View
         style={{
           marginTop: 20,
-          marginHorizontal: 20,
+          // marginHorizontal: 10,
         }}>
         <Text
           style={{
@@ -52,10 +54,16 @@ const AllEventsList = ({data}) => {
           keyExtractor={(item) => item[0]}
           renderItem={({item}) => {
             const [date, events] = item;
+            const [month, day, dayOfWeek] = date.split(' ');
             // return <EventCard event={item} />;
             return (
               <View>
-                <Text style={styles.dateText}>{date}</Text>
+                {/* <Text style={styles.dateText}>{date}</Text> */}
+                <Text style={styles.dateText}>
+                  <Text style={{fontWeight: '500', color: COLORS.text}}>{month} {day} </Text> 
+                  /
+                  <Text> {dayOfWeek}</Text>
+                </Text>
                 {events.map((event) => (
                   <EventCard key={event.id} event={event}/>
                 ))}
@@ -75,10 +83,10 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: COLORS.text,
+    fontWeight: '500',
+    color: COLORS.gray,
     marginTop: 10,
-    marginLeft: 20,
+    marginLeft: 10,
   },
 });
 

@@ -23,7 +23,7 @@ const EventCard = ({event}) => {
 
           <Text style={{color: COLORS.black}}>{formattedTime}</Text>
 
-          <Text style={styles.location}>{`${event.location} `}</Text>
+          <Text style={styles.location} numberOfLines={1}>{`${event.location} `}</Text>
         </View>
       </View>
     </Link>
@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
   },
   listItem: {
     flexDirection: 'row',
-    maxWidth: windowWidth - 100,
-    paddingLeft: 10,
+    maxWidth: windowWidth,
+    paddingHorizontal: 10,
     paddingVertical: 15,
   },
   location: {
@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
   },
   metaInfo: {
     paddingLeft: 20,
+    flex: 1,
   },
   title: {
     color: COLORS.text,

@@ -73,7 +73,7 @@ export default function Home() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{
-          padding: 16,
+          padding: 20,
         }}>
         <Text style={styles.heading}>Explore Events</Text>
 
@@ -81,7 +81,7 @@ export default function Home() {
 
         {searchQuery === '' ? (
           <>
-            <FeaturedList data={events?.slice(0, 5)} />
+            {/* <FeaturedList data={events?.slice(0, 5)} /> */}
             <AllEventsList data={events} />
           </>
         ) : (
