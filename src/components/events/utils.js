@@ -23,3 +23,8 @@ export const handleImageFileChanged = (theFile, onFinish) => {
     "base64"
   );
 };
+
+export const generateUniqueTicketId = (userHandle, eventId) => {
+  const timestamp = Date.now().toString();
+  return `${userHandle}-${eventId}-${timestamp}`;
+};

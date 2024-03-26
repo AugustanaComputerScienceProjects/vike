@@ -10,6 +10,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  Snackbar,
   TextField,
 } from "@mui/material";
 import { Scanner } from "@yudiel/react-qr-scanner";
@@ -27,6 +28,8 @@ const CheckInPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [openQRScanner, setOpenQRScanner] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -47,19 +50,25 @@ const CheckInPage = () => {
   };
 
   const handleManualCheckIn = async () => {
-    const [userHandle] = selectedGuest;
+    const [userHandle, guestData] = selectedGuest;
     if (userHandle) {
+      const newStatus =
+        guestData.status === STATUS.CHECKED_IN
+          ? STATUS.GOING
+          : STATUS.CHECKED_IN;
       await firebase.database
         .ref(`/current-events/${eventId}/guests/${userHandle}/status`)
-        .set(STATUS.CHECKED_IN);
+        .set(newStatus);
       setOpenDialog(false);
       // Refresh the guest list
       const eventRef = firebase.database.ref(`/current-events/${eventId}`);
       const snapshot = await eventRef.once("value");
       const fetchedEvent = snapshot.val();
-      if (fetchedEvent) {
+      if (fetchedEvent && fetchedEvent.guests) {
         setGuests(Object.entries(fetchedEvent.guests));
       }
+      setSnackbarMessage(`Status for ${userHandle} updated successfully.`);
+      setSnackbarOpen(true);
     }
   };
 
@@ -83,10 +92,11 @@ const CheckInPage = () => {
           const snapshot = await eventRef.once("value");
           const fetchedEvent = snapshot.val();
           if (fetchedEvent) {
-            setGuests(Object.entries(fetchedEvent.guests.going));
+            setGuests(Object.entries(fetchedEvent.guests));
           }
-          // Alert checked in successful and disable scanning
-          alert("Checked in successfully");
+          // Show snackbar message for successful check-in
+          setSnackbarMessage(`Checked in ${userHandle} successfully!`);
+          setSnackbarOpen(true);
         }
       }
     }
@@ -99,7 +109,6 @@ const CheckInPage = () => {
   const filteredGuests = guests.filter(([userHandle]) =>
     userHandle.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  console.log("selectedGuest", selectedGuest);
 
   return (
     <Container>
@@ -172,7 +181,9 @@ const CheckInPage = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleManualCheckIn} variant="contained">
-            Check In
+            {selectedGuest?.[1].status === STATUS.CHECKED_IN
+              ? "Undo Check In"
+              : "Check In"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -190,6 +201,12 @@ const CheckInPage = () => {
           />
         </DialogContent>
       </Dialog>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+        message={snackbarMessage}
+      />
     </Container>
   );
 };
