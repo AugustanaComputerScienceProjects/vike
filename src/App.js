@@ -16,12 +16,12 @@ import Users from "./views/Users";
 // Main application file that manages all the different views
 
 const App = () => {
-  // Render the page
+  const onNavChanged = () => {};
   return (
     <div className="fullPage">
       <div style={{ width: "100%", position: "absolute" }}>
         <div style={{ height: "10%" }}>
-          <NavBar />
+          <NavBar navChanged={onNavChanged} />
         </div>
         <div
           style={{
