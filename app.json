@@ -2,7 +2,7 @@
   "expo": {
     "name": "Vike",
     "slug": "vike",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -10,6 +10,13 @@
     "plugins": [
       "@react-native-firebase/app",
       "@react-native-google-signin/google-signin",
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "huwng",
+          "project": "osl-vike"
+        }
+      ],
       [
         "expo-build-properties",
         {
@@ -60,10 +67,11 @@
       },
       "googleServicesFile": "./google-services.json",
       "package": "edu.augustana.osleventsandroid",
-      "versionCode": 9
+      "versionCode": 10
     },
     "ios": {
-      "buildNumber": "1",
+      "buildNumber": "2",
+      "supportsTablet": true,
       "config": {
         "googleMapsApiKey": "AIzaSyBr8_x3nXHBPJMJ4EBg5w2clq5t_S1s05o"
       },

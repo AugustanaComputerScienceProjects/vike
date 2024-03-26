@@ -7,12 +7,24 @@ import {
 import {ActionSheetProvider} from '@expo/react-native-action-sheet';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {Stack} from 'expo-router';
+import * as Sentry from '@sentry/react-native';
+import {Stack, useNavigationContainerRef} from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, {useCallback} from 'react';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {AuthProvider} from '../context/useAuth';
+
+const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
+
+Sentry.init({
+  dsn: 'https://9ed9d86dee1fd3e4ddd425b331cfb747@o4506978302820352.ingest.us.sentry.io/4506978304196608',
+  integrations: [
+    new Sentry.ReactNativeTracing({
+      routingInstrumentation,
+    }),
+  ],
+});
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,12 +35,20 @@ GoogleSignin.configure({
   hostedDomain: 'augustana.edu',
 });
 
-export default function Layout() {
+const Layout = () => {
+  const ref = useNavigationContainerRef();
+
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_700Bold,
   });
+
+  React.useEffect(() => {
+    if (ref) {
+      routingInstrumentation.registerNavigationContainer(ref);
+    }
+  }, [ref]);
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded || fontError) {
@@ -58,4 +78,5 @@ export default function Layout() {
       </AuthProvider>
     </SafeAreaProvider>
   );
-}
+};
+export default Sentry.wrap(Layout);
