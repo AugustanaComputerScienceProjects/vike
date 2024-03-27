@@ -8,7 +8,6 @@ import AllEventsList from '../../components/home/AllEventsList';
 import EventCard from '../../components/home/EventCard';
 import FeaturedList from '../../components/home/FeaturedList';
 import {COLORS} from '../../constants/theme';
-import {useEventStore} from '../../context/store';
 
 export const getStorageImgURL = async imageName => {
   const imgURL = await storage()
@@ -18,9 +17,7 @@ export const getStorageImgURL = async imageName => {
 };
 
 export default function Home() {
-  const events = useEventStore(state => state.events);
-  const updateEvents = useEventStore(state => state.updateEvents);
-
+  const [events, setEvents] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredEvents, setFilteredEvents] = useState([]);
 
@@ -44,26 +41,23 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const fetchEvents = () => {
-      return database()
-        .ref('/current-events')
-        .on('value', async snapshot => {
-          const unresolved = Object.entries(snapshot.val()).map(
-            async childSnapShot => {
-              const [key, value] = childSnapShot;
+    const fetchEvents = async () => {
+      const snapshot = await database().ref('/current-events').once('value');
+      const unresolved = Object.entries(snapshot.val()).map(
+        async childSnapShot => {
+          const [key, value] = childSnapShot;
 
-              const imgURL = await getStorageImgURL(value.imgid);
+          const imgURL = await getStorageImgURL(value.imgid);
 
-              return {
-                id: key,
-                image: imgURL,
-                ...value,
-              };
-            },
-          );
-          const resolved = await Promise.all(unresolved);
-          updateEvents(resolved);
-        });
+          return {
+            id: key,
+            image: imgURL,
+            ...value,
+          };
+        },
+      );
+      const resolved = await Promise.all(unresolved);
+      setEvents(resolved);
     };
     fetchEvents();
   }, []);

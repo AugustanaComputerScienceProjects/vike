@@ -75,3 +75,6 @@ play_store.json
 .env*
 
 build*
+
+android
+ios

@@ -1,18 +1,21 @@
 import Icon from '@expo/vector-icons/Feather';
 import database from '@react-native-firebase/database';
 import {addMinutes, format} from 'date-fns';
-import {Image} from 'expo-image';
 import {router, useLocalSearchParams} from 'expo-router';
 import React, {useEffect, useRef, useState} from 'react';
 import {
   Animated,
+  Dimensions,
+  Image,
   Linking,
+  Modal,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
 import MapView, {
   Marker,
   PROVIDER_DEFAULT,
@@ -23,6 +26,8 @@ import EventShare from '../../components/EventShare';
 import Registration from '../../components/event/Registration';
 import {COLORS, SIZES} from '../../constants/theme';
 
+const {width, height} = Dimensions.get('window');
+
 const HEADER_HEIGHT =
   SIZES.height < 700 ? SIZES.height * 0.3 : SIZES.height * 0.4;
 
@@ -30,6 +35,7 @@ export default function Event() {
   const {id} = useLocalSearchParams();
   const scrollY = useRef(new Animated.Value(0)).current;
   const [event, setEvent] = useState(null);
+  const [isImageFullscreen, setImageFullscreen] = useState(false);
 
   useEffect(() => {
     const eventRef = database().ref(`/current-events/${id}`);
@@ -68,14 +74,36 @@ export default function Event() {
           {useNativeDriver: true},
         )}
         style={{width: '100%'}}>
-        <Image
-          contentFit="cover"
-          source={{uri: event.image}}
-          style={{
-            width: '100%',
-            height: HEADER_HEIGHT,
-          }}
-        />
+        <Pressable onPress={() => setImageFullscreen(true)}>
+          <Image
+            resizeMode="cover"
+            source={{uri: event.image}}
+            style={{
+              width: '100%',
+              height: HEADER_HEIGHT,
+            }}
+          />
+        </Pressable>
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={isImageFullscreen}
+          onRequestClose={() => setImageFullscreen(false)}>
+          <View style={{flex: 1, backgroundColor: COLORS.black}}>
+            <Pressable
+              style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
+              onPress={() => setImageFullscreen(false)}>
+              <Image
+                resizeMode="contain"
+                source={{uri: event.image}}
+                style={{
+                  width,
+                  height: height * 0.8,
+                }}
+              />
+            </Pressable>
+          </View>
+        </Modal>
         <View style={styles.infoContent}>
           <View style={{flex: 1}}>
             <Text

@@ -3,23 +3,21 @@ import {Link} from 'expo-router';
 import React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import {COLORS, SIZES} from '../constants/theme';
-const blurhash =
-  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
-const Card = ({item, index, length}) => {
+const Card = ({item}) => {
   return (
     <Link
       href={{
         pathname: '/event/[id]',
         params: {id: item.id, event: item},
-      }}
-      style={{
-        marginLeft: index === 0 ? 30 : 20,
-        marginRight: index === length - 1 ? 30 : 0,
       }}>
       <View style={styles.card}>
         <View style={styles.imageContainer}>
-          <Image source={{uri: item.image}} style={styles.image} />
+          <Image
+            source={{uri: item.image}}
+            style={styles.image}
+            contentFit="contain"
+          />
           <View style={styles.overlayTextContainer}>
             <View style={styles.dateContainer}>
               <View style={styles.dateBox}>
@@ -47,69 +45,68 @@ const Card = ({item, index, length}) => {
 
 const styles = StyleSheet.create({
   card: {
-    width: 300,
-    borderRadius: 30,
-    overflow: 'hidden',
     backgroundColor: '#F5F5F5',
     borderColor: '#CCCCCC',
+    borderRadius: 30,
     borderWidth: 1,
+    overflow: 'hidden',
+    width: 300,
   },
-  imageContainer: {
-    height: SIZES.width / 2 + 100,
-  },
-  overlayTextContainer: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    justifyContent: 'flex-end',
-  },
-  image: {
-    flex: 1,
-    width: '100%',
-    justifyContent: 'flex-end',
+  dateBox: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: 15,
+    elevation: 3,
+    height: 60,
+    justifyContent: 'center',
+    width: 60,
   },
   dateContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     padding: 15,
   },
-  dateBox: {
-    width: 60,
-    height: 60,
-    borderRadius: 15,
-    backgroundColor: COLORS.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 3,
-  },
-  monthText: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: COLORS.darkGray,
+  dateText: {
+    color: COLORS.secondary,
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 5,
   },
   dayText: {
+    color: COLORS.primary,
     fontSize: 18,
     fontWeight: 'bold',
-    color: COLORS.primary,
   },
   details: {
     padding: 16,
   },
-  dateText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.secondary,
-    marginBottom: 5,
+  image: {
+    flex: 1,
+    width: '100%',
   },
-  nameText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: COLORS.dark,
-    marginBottom: 3,
+  imageContainer: {
+    height: SIZES.width / 2 + 100,
   },
   locationText: {
-    fontSize: 14,
     color: COLORS.gray,
+    fontSize: 14,
+  },
+  monthText: {
+    color: COLORS.darkGray,
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  nameText: {
+    color: COLORS.dark,
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 3,
+  },
+  overlayTextContainer: {
+    bottom: 0,
+    justifyContent: 'flex-end',
+    position: 'absolute',
+    width: '100%',
   },
 });
 
