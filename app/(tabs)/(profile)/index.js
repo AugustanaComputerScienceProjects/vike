@@ -1,8 +1,9 @@
+import {useActionSheet} from '@expo/react-native-action-sheet';
 import Icon from '@expo/vector-icons/Feather';
 import auth from '@react-native-firebase/auth';
 import {router} from 'expo-router';
 import React from 'react';
-import {ActionSheetIOS, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import {Avatar} from 'react-native-elements';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -14,6 +15,7 @@ const getInitials = fullName => {
 };
 
 export default function Profile() {
+  const {showActionSheetWithOptions} = useActionSheet();
   const settingsOptions = [
     {
       title: 'About Vike',
@@ -32,6 +34,28 @@ export default function Profile() {
     //   onPress: () => {},
     // },
   ];
+
+  const onLogout = () => {
+    const options = ['Log out', 'Cancel'];
+    const destructiveButtonIndex = 0;
+    const cancelButtonIndex = 1;
+
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+      },
+      buttonIndex => {
+        if (buttonIndex === destructiveButtonIndex) {
+          auth()
+            .signOut()
+            .then(() => console.log('User signed out!'));
+        }
+      },
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scroll}>
@@ -43,6 +67,7 @@ export default function Profile() {
               activeOpacity={0.7}
               rounded
               title={getInitials(auth().currentUser?.displayName)}
+              source={{uri: 'data:image/png'}}
             />
             <View style={styles.userNameRow}>
               <Text style={styles.userNameText}>
@@ -86,23 +111,7 @@ export default function Profile() {
           </View>
         </View>
 
-        <TouchableOpacity
-          onPress={() => {
-            ActionSheetIOS.showActionSheetWithOptions(
-              {
-                options: ['Log out', 'Cancel'],
-                cancelButtonIndex: 1,
-                cancelButtonTintColor: 'red',
-              },
-              buttonIndex => {
-                if (buttonIndex === 0) {
-                  auth()
-                    .signOut()
-                    .then(() => console.log('User signed out!'));
-                }
-              },
-            );
-          }}>
+        <TouchableOpacity onPress={onLogout}>
           <View style={{marginTop: 48, paddingBottom: 10}}>
             <Text
               style={{

@@ -848,7 +848,7 @@ PODS:
     - ExpoModulesCore
   - EXManifests (0.13.2):
     - ExpoModulesCore
-  - Expo (50.0.13):
+  - Expo (50.0.14):
     - ExpoModulesCore
   - expo-dev-client (3.3.10):
     - EXManifests
@@ -1152,7 +1152,7 @@ PODS:
   - GTMAppAuth (2.0.0):
     - AppAuth/Core (~> 1.6)
     - GTMSessionFetcher/Core (< 4.0, >= 1.5)
-  - GTMSessionFetcher/Core (3.3.1)
+  - GTMSessionFetcher/Core (3.3.2)
   - hermes-engine (0.73.5):
     - hermes-engine/Pre-built (= 0.73.5)
   - hermes-engine/Pre-built (0.73.5)
@@ -2622,7 +2622,7 @@ SPEC CHECKSUMS:
   EXJSONUtils: 5c42959e87be238b045ef37cc5268b16a6c0ad4a
   EXLocation: a631bd8dc4e7db986fb27edb7fc9ea8174ebe249
   EXManifests: 5e8c29f36c716af768a4ea47ec05e1b89ab93091
-  Expo: a7c9bd836cb7c86e699c2539a906c9ff873f19f8
+  Expo: e01a77c6fa4bc80a6d1bb949cda1d12d21044abd
   expo-dev-client: fb0c407295ad73c7f356dbb30d858ec44c0d7b70
   expo-dev-launcher: 6a3534bbc55a598006c32b8f50abf6749f753d80
   expo-dev-menu: 01168c33c88f679d80f81ccc33041bbd01fbb359
@@ -2659,7 +2659,7 @@ SPEC CHECKSUMS:
   "gRPC-C++": 12f33a422dcab88dcd0c53e52cd549a929f0f244
   gRPC-Core: 6ec9002832e1e22c5bb8c54994b050b0ee4205c6
   GTMAppAuth: 99fb010047ba3973b7026e45393f51f27ab965ae
-  GTMSessionFetcher: 8a1b34ad97ebe6f909fb8b9b77fba99943007556
+  GTMSessionFetcher: 0e876eea9782ec6462e91ab872711c357322c94f
   hermes-engine: 1d1835b2cc54c381909d94d1b3c8e0a2f1a94a0e
   leveldb-library: 06a69cc7582d64b29424a63e085e683cc188230a
   libaom: 144606b1da4b5915a1054383c3a4459ccdb3c661
@@ -2715,11 +2715,11 @@ SPEC CHECKSUMS:
   React-utils: 74fc896195fb41a1f7dcd5737d89be59c1fdccc4
   ReactCommon: ab6655d0224cf39c997ea634d257c609d345e23d
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
-  RNFBApp: d0be9224f318cfd6501f1f83809453800cd04868
-  RNFBAuth: f0722d3ea63e6b5c2ed67c8d19acb17d5738438b
-  RNFBDatabase: c570838c2ec61e7a439f812278afafdfd5166263
-  RNFBFirestore: 5fc53b5b7c8fe0863a7ccee49197f1ce0946abff
-  RNFBStorage: db34490f7dc677f930cf4a112faaa14cb14e4748
+  RNFBApp: 94f7fca150585cb1ad3802a6c6d356e9a8b95b34
+  RNFBAuth: ca2801fae5520ab8e4a137c3de402478747c3f79
+  RNFBDatabase: 351dd9cf8136fc0a278118df399dc74cd20fb8a0
+  RNFBFirestore: 53dfb7c35036bc901d4ce9e3d1656d4cb346067c
+  RNFBStorage: 875be7e3052d262dda9d204ce5afc1a59975c701
   RNGestureHandler: 12833709769dde5fdb36ec9d4cdf4d3a1a024122
   RNGoogleSignin: fc408799f1990a12497a32f64280c0fe353ffcc1
   RNReanimated: 41963a348e738c496a9b129bba9a9217017cd530
@@ -2736,6 +2736,6 @@ SPEC CHECKSUMS:
   Yoga: a716eea57d0d3430219c0a5a233e1e93ee931eb7
   ZXingObjC: 8898711ab495761b2dbbdec76d90164a6d7e14c5
 
-PODFILE CHECKSUM: a5577b49afdc12dd629b922fd2ecef646be75247
+PODFILE CHECKSUM: 96b780f3838f1f76e50377f9186f75c755012ef2
 
 COCOAPODS: 1.15.2

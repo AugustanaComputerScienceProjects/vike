@@ -44,13 +44,6 @@ target 'Vike' do
 # @generated end react-native-maps
   config = use_native_modules!
 
-  ### WORKAROUND CODE FOR FIREBASE
-  use_frameworks! :linkage => :static
-  $RNFirebaseAsStaticFramework = true
-  pod 'RNFBStorage', :path => '../node_modules/@react-native-firebase/storage'
-  $FirebaseSDKVersion = '10.22.0'
-  ###
-
   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
   use_frameworks! :linkage => ENV['USE_FRAMEWORKS'].to_sym if ENV['USE_FRAMEWORKS']
 
