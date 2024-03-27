@@ -47,8 +47,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   metaInfo: {
-    paddingLeft: 20,
+    paddingHorizontal: 20,
     flex: 1,
+    backgroundColor: COLORS.background,
   },
   title: {
     color: COLORS.text,

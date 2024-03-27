@@ -6,7 +6,8 @@ import { format } from 'date-fns';
 
 const windowWidth = Dimensions.get('window').width;
 
-const groupEventByDate = (events) => {
+export const groupEventByDate = (events) => {
+  events.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
   const groupedEvents = {};
   events.forEach(event => { 
     const date = format(new Date(event.startDate), 'MMM dd eeeeeeee')
@@ -34,7 +35,6 @@ const AllEventsList = ({data}) => {
       <View
         style={{
           marginTop: 20,
-          // marginHorizontal: 10,
         }}>
         <Text
           style={{
@@ -48,17 +48,13 @@ const AllEventsList = ({data}) => {
       <View>
         <FlatList
           scrollEnabled={false}
-          // data={data}
           data={Object.entries(groupedEvents)}
-          // keyExtractor={item => item.id}
           keyExtractor={(item) => item[0]}
           renderItem={({item}) => {
             const [date, events] = item;
             const [month, day, dayOfWeek] = date.split(' ');
-            // return <EventCard event={item} />;
             return (
               <View>
-                {/* <Text style={styles.dateText}>{date}</Text> */}
                 <Text style={styles.dateText}>
                   <Text style={{fontWeight: '500', color: COLORS.text}}>{month} {day} </Text> 
                   /

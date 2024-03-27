@@ -54,7 +54,7 @@ export const currentUser = auth().currentUser;
 
 const generateUniqueTicketId = (userHandle, eventId) => {
   const timestamp = Date.now().toString();
-  return `${userHandle}-${eventId}-${timestamp}`;
+  return `${userHandle}-${eventId}-${timestamp}`; 
 };
 
 const Registration = ({event}) => {
@@ -318,6 +318,7 @@ const styles = StyleSheet.create({
   registerButtonText: {
     color: COLORS.white,
     fontWeight: 'bold',
+    fontSize: 20,
   },
   registeredContainer: {
     alignItems: 'center',
