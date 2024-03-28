@@ -13,12 +13,12 @@ const FeaturedList = ({data}) => {
         width: '100%',
         height: '100%',
         flex: 1,
-        marginBottom: 15,
+        marginBottom: 10,
       }}>
       <View
         style={{
           marginVertical: 15,
-          marginLeft: 20,
+          marginLeft: 10,
         }}>
         <Text
           style={{
@@ -26,7 +26,7 @@ const FeaturedList = ({data}) => {
             fontWeight: 'bold',
             color: COLORS.text,
           }}>
-          Feature Events
+          Featured Events
         </Text>
       </View>
       <ScrollView

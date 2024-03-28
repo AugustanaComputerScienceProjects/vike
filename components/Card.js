@@ -35,8 +35,8 @@ const Card = ({item}) => {
           <Text style={styles.dateText}>
             {format(new Date(item.startDate), 'eee, MMM dd · h:mm a')}
           </Text>
-          <Text style={styles.nameText}>{item.name}</Text>
-          <Text style={styles.locationText}>{item.location}</Text>
+          <Text style={styles.nameText} numberOfLines={1}>{item.name}</Text>
+          <Text style={styles.locationText} numberOfLines={1}>{item.location}</Text>
         </View>
       </View>
     </Link>

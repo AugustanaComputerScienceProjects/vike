@@ -32,7 +32,7 @@ export const AuthProvider = ({children}) => {
         console.log('NOT AUTHENTICATED: ');
       } else if (user && !inTabsGroup) {
         console.log('AUTHENTICATED: ', user);
-        router.replace('/(tabs)/home');
+        router.replace('/(tabs)/discover');
       }
     }, [user]);
   };

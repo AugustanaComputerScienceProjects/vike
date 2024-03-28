@@ -21,7 +21,7 @@ import MapView, {
   PROVIDER_DEFAULT,
   PROVIDER_GOOGLE,
 } from 'react-native-maps';
-import {getStorageImgURL} from '../(tabs)/home';
+import {getStorageImgURL} from '../(tabs)/discover';
 import EventShare from '../../components/EventShare';
 import Registration from '../../components/event/Registration';
 import {COLORS, SIZES} from '../../constants/theme';
@@ -98,7 +98,7 @@ export default function Event() {
                 source={{uri: event.image}}
                 style={{
                   width,
-                  height: height * 0.8,
+                  height: height * 1.5,
                 }}
               />
             </Pressable>
