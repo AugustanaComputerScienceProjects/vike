@@ -13,7 +13,7 @@ export default function Index() {
     return <Redirect href="/auth" />;
   } else if (user) {
     console.log('redirect to home');
-    return <Redirect href="/(tabs)/home" />;
+    return <Redirect href="/(tabs)/discover" />;
   }
 
   return <View>{!navigationState?.key ? <Text>Loading...</Text> : <></>}</View>;

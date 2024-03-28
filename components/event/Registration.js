@@ -10,13 +10,14 @@ import {Alert, Pressable, StyleSheet, Text, View} from 'react-native';
 import {Divider} from 'react-native-elements';
 import QRCode from 'react-native-qrcode-svg';
 import {COLORS, SIZES} from '../../constants/theme';
+import { STATUS } from '../home/utils';
 
-export const STATUS = {
-  GOING: 'GOING',
-  CHECKED_IN: 'CHECKED_IN',
-  INVITED: 'INVITED',
-  NOT_GOING: 'NOT_GOING',
-};
+// export const STATUS = {
+//   GOING: 'GOING',
+//   CHECKED_IN: 'CHECKED_IN',
+//   INVITED: 'INVITED',
+//   NOT_GOING: 'NOT_GOING',
+// };
 
 const EventDetails = ({event}) => (
   <View style={styles.boxView}>
@@ -54,7 +55,7 @@ export const currentUser = auth().currentUser;
 
 const generateUniqueTicketId = (userHandle, eventId) => {
   const timestamp = Date.now().toString();
-  return `${userHandle}-${eventId}-${timestamp}`;
+  return `${userHandle}-${eventId}-${timestamp}`; 
 };
 
 const Registration = ({event}) => {
@@ -64,7 +65,7 @@ const Registration = ({event}) => {
   const checkRegistrationStatus = () => {
     const userHandle = currentUser.email.split('@')[0];
     const guestData = event.guests[userHandle];
-    return guestData.status;
+    return guestData ? guestData.status: null;
   };
 
   const status = event.guests ? checkRegistrationStatus() : null;
@@ -318,6 +319,7 @@ const styles = StyleSheet.create({
   registerButtonText: {
     color: COLORS.white,
     fontWeight: 'bold',
+    fontSize: 20,
   },
   registeredContainer: {
     alignItems: 'center',

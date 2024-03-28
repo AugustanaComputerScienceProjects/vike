@@ -18,7 +18,7 @@ import MapView, {
   PROVIDER_DEFAULT,
   PROVIDER_GOOGLE,
 } from 'react-native-maps';
-import {getStorageImgURL} from '../(tabs)/home';
+import {getStorageImgURL} from '../(tabs)/discover';
 import EventShare from '../../components/EventShare';
 import Registration from '../../components/event/Registration';
 import {COLORS, SIZES} from '../../constants/theme';
@@ -73,7 +73,7 @@ export default function Event() {
           source={{uri: event.image}}
           style={{
             width: '100%',
-            height: HEADER_HEIGHT,
+            height: HEADER_HEIGHT * 1.5,
           }}
         />
         <View style={styles.infoContent}>

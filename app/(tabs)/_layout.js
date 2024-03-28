@@ -30,7 +30,16 @@ export default function TabLayout() {
       }}>
       <Tabs.Screen
         redirect={!user}
-        name="home"
+        name='home'
+        options={{
+          tabBarIcon: ({focused}) => (
+            <TabIcon focused={focused} icon={'home'}/>
+          )
+        }}
+      />
+      <Tabs.Screen
+        redirect={!user}
+        name="discover"
         options={{
           tabBarIcon: ({focused}) => (
             <TabIcon focused={focused} icon={'compass'} />
