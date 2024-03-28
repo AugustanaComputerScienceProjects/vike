@@ -10,7 +10,7 @@ import {Alert, Pressable, StyleSheet, Text, View} from 'react-native';
 import {Divider} from 'react-native-elements';
 import QRCode from 'react-native-qrcode-svg';
 import {COLORS, SIZES} from '../../constants/theme';
-import { STATUS } from '../home/utils';
+import {STATUS} from '../home/utils';
 
 // export const STATUS = {
 //   GOING: 'GOING',
@@ -55,7 +55,7 @@ export const currentUser = auth().currentUser;
 
 const generateUniqueTicketId = (userHandle, eventId) => {
   const timestamp = Date.now().toString();
-  return `${userHandle}-${eventId}-${timestamp}`; 
+  return `${userHandle}-${eventId}-${timestamp}`;
 };
 
 const Registration = ({event}) => {
@@ -63,9 +63,10 @@ const Registration = ({event}) => {
   const snapPoints = useMemo(() => ['50%', '98%'], []);
 
   const checkRegistrationStatus = () => {
+    if (!currentUser) return null;
     const userHandle = currentUser.email.split('@')[0];
     const guestData = event.guests[userHandle];
-    return guestData ? guestData.status: null;
+    return guestData?.status;
   };
 
   const status = event.guests ? checkRegistrationStatus() : null;
@@ -73,6 +74,8 @@ const Registration = ({event}) => {
   const {showActionSheetWithOptions} = useActionSheet();
 
   const handleRegister = async status => {
+    if (!currentUser) return;
+
     const eventRef = database().ref(`/current-events/${event.id}`);
     const userHandle = currentUser.email.split('@')[0];
     const ticketId = generateUniqueTicketId(userHandle, event.id);
@@ -209,7 +212,9 @@ const Registration = ({event}) => {
                 </View>
                 <QRCode
                   size={250}
-                  value={event.guests[currentUser.email.split('@')[0]].ticketId}
+                  value={
+                    event.guests[currentUser?.email.split('@')[0]].ticketId
+                  }
                 />
                 <View
                   style={{
@@ -225,20 +230,19 @@ const Registration = ({event}) => {
               </View>
             </>
           ) : (
-            <>
-              <View style={{flex: 1, maxHeight: '35%'}}>
+            <View style={{flex: 1, justifyContent: 'space-between'}}>
+              <View style={{flex: 1, maxHeight: 210}}>
                 <Text style={styles.modalTitle}>Registration</Text>
                 <EventDetails event={event} />
               </View>
-
-              <View style={{flex: 2, maxHeight: '50%'}} />
-
-              <Pressable
-                style={styles.confirmRegisterButton}
-                onPress={handleConfirmRegister}>
-                <Text style={styles.confirmRegisterButtonText}>Register</Text>
-              </Pressable>
-            </>
+              <View>
+                <Pressable
+                  style={styles.confirmRegisterButton}
+                  onPress={handleConfirmRegister}>
+                  <Text style={styles.confirmRegisterButtonText}>Register</Text>
+                </Pressable>
+              </View>
+            </View>
           )}
         </BottomSheetView>
       </BottomSheetModal>
@@ -318,8 +322,8 @@ const styles = StyleSheet.create({
   },
   registerButtonText: {
     color: COLORS.white,
-    fontWeight: 'bold',
     fontSize: 20,
+    fontWeight: 'bold',
   },
   registeredContainer: {
     alignItems: 'center',
@@ -328,7 +332,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 20,
-    padding: 16,
+    padding: 12,
   },
   registeredText: {
     color: COLORS.white,

@@ -1,11 +1,10 @@
 import React from 'react';
-import {Dimensions, StyleSheet, Text, View} from 'react-native';
-import Carousel from 'react-native-reanimated-carousel';
+import {Text, View} from 'react-native';
+
+import {ScrollView} from 'react-native';
 
 import {COLORS} from '../../constants/theme';
 import Card from '../Card';
-
-const windowWidth = Dimensions.get('window').width;
 
 const FeaturedList = ({data}) => {
   return (
@@ -30,26 +29,19 @@ const FeaturedList = ({data}) => {
           Featured Events
         </Text>
       </View>
-      <View style={{minHeight: 400}}>
-        <Carousel
-          loop={false}
-          width={windowWidth}
-          data={data}
-          scrollAnimationDuration={500}
-          renderItem={({item}, index) => {
-            return <Card item={item} index={index} length={data?.length} />;
-          }}
-        />
-      </View>
+      <ScrollView
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        style={{minHeight: 300}}
+        contentContainerStyle={{
+          gap: 8,
+        }}>
+        {data.map((item, index) => (
+          <Card key={index} item={item} index={index} length={data?.length} />
+        ))}
+      </ScrollView>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-});
 
 export default FeaturedList;

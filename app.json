@@ -67,10 +67,10 @@
       },
       "googleServicesFile": "./google-services.json",
       "package": "edu.augustana.osleventsandroid",
-      "versionCode": 13
+      "versionCode": 15
     },
     "ios": {
-      "buildNumber": "3",
+      "buildNumber": "12",
       "supportsTablet": true,
       "config": {
         "googleMapsApiKey": "AIzaSyBr8_x3nXHBPJMJ4EBg5w2clq5t_S1s05o"
