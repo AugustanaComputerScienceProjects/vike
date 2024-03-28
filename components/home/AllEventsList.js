@@ -20,9 +20,6 @@ export const groupEventByDate = (events) => {
 }
 
 const AllEventsList = ({data}) => {
-  if (!data){
-    return null;
-  }
   const groupedEvents = groupEventByDate(data);
 
   return (

@@ -1,6 +1,6 @@
 import database from '@react-native-firebase/database';
 import {create} from 'zustand';
-import {getStorageImgURL} from '../app/(tabs)/home';
+import {getStorageImgURL} from '../app/(tabs)/discover';
 
 export const useEventStore = create((set, get) => ({
   events: null,

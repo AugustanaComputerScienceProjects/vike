@@ -25,7 +25,7 @@ export default function Auth() {
       return auth()
         .signInWithCredential(googleCredential)
         .then(user => {
-          router.replace('/(tabs)/home');
+          router.replace('/(tabs)/discover');
         });
     } catch (error) {
       console.log('error', error.code, error.message);
