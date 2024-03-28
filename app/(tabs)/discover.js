@@ -8,7 +8,6 @@ import AllEventsList from '../../components/home/AllEventsList';
 import EventCard from '../../components/home/EventCard';
 import FeaturedList from '../../components/home/FeaturedList';
 import {COLORS} from '../../constants/theme';
-import {useEventStore} from '../../context/store';
 
 export const getStorageImgURL = async imageName => {
   const imgURL = await storage()
@@ -18,9 +17,7 @@ export const getStorageImgURL = async imageName => {
 };
 
 export default function Discover() {
-  const events = useEventStore(state => state.events);
-  const updateEvents = useEventStore(state => state.updateEvents);
-
+  const [events, setEvents] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredEvents, setFilteredEvents] = useState([]);
 
@@ -62,7 +59,7 @@ export default function Discover() {
             },
           );
           const resolved = await Promise.all(unresolved);
-          updateEvents(resolved);
+          setEvents(resolved);
         });
     };
     fetchEvents();

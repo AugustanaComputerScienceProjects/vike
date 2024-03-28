@@ -288,13 +288,15 @@ export default function Event() {
               }}
               zoomEnabled={false}
               scrollEnabled={false}>
-              <Marker
-                coordinate={{
-                  latitude: event.latitude || 41.503,
-                  longitude: event.longitude || -90.5504,
-                }}
-                title={event.location}
-              />
+              {event.latitude && event.longitude && (
+                <Marker
+                  coordinate={{
+                    latitude: event.latitude || 41.503,
+                    longitude: event.longitude || -90.5504,
+                  }}
+                  title={event.location}
+                />
+              )}
             </MapView>
           </View>
           <View style={{paddingBottom: 100}}></View>

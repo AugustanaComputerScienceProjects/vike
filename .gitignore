@@ -76,5 +76,5 @@ play_store.json
 
 build*
 
-android
-ios
+/android
+/ios
