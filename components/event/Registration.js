@@ -12,13 +12,6 @@ import QRCode from 'react-native-qrcode-svg';
 import {COLORS, SIZES} from '../../constants/theme';
 import {STATUS} from '../home/utils';
 
-// export const STATUS = {
-//   GOING: 'GOING',
-//   CHECKED_IN: 'CHECKED_IN',
-//   INVITED: 'INVITED',
-//   NOT_GOING: 'NOT_GOING',
-// };
-
 const EventDetails = ({event}) => (
   <View style={styles.boxView}>
     <View style={styles.item}>
@@ -113,7 +106,7 @@ const Registration = ({event}) => {
   };
 
   const renderRegistrationButton = () => {
-    if (status == STATUS.GOING) {
+    if (status == STATUS.GOING || status == STATUS.CHECKED_IN) {
       return (
         <View style={styles.registeredContainer}>
           <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>

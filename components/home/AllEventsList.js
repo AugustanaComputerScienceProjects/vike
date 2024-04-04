@@ -1,21 +1,8 @@
-import {format} from 'date-fns';
 import React from 'react';
 import {FlatList, StyleSheet, Text, View} from 'react-native';
 import {COLORS} from '../../constants/theme';
 import EventCard from './EventCard';
-
-export const groupEventByDate = events => {
-  events.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-  const groupedEvents = {};
-  events.forEach(event => {
-    const date = format(new Date(event.startDate), 'MMM dd eeeeeeee');
-    if (!groupedEvents[date]) {
-      groupedEvents[date] = [];
-    }
-    groupedEvents[date].push(event);
-  });
-  return groupedEvents;
-};
+import {groupEventByDate} from './utils';
 
 const AllEventsList = ({data}) => {
   const groupedEvents = groupEventByDate(data);

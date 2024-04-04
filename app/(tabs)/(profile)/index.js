@@ -62,7 +62,7 @@ export default function Profile() {
         <View style={styles.headerContainer}>
           <View style={styles.userRow}>
             <Avatar
-              overlayContainerStyle={{backgroundColor: 'grey'}}
+              overlayContainerStyle={{backgroundColor: COLORS.gray1}}
               size="small"
               activeOpacity={0.7}
               rounded
