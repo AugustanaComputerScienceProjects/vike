@@ -11,7 +11,7 @@
     "ios:preview": "eas build -p ios --profile preview --local --non-interactive",
     "android:prod": "eas build -p android --profile production --local --output build.aab --non-interactive",
     "ios:prod": "eas build -p ios --profile production --local --output build.ipa --non-interactive",
-    "prebuild": "expo prebuild --clean",
+    "prebuild": "npx expo prebuild --clean",
     "nuke": "rm -rf ./node_modules && rm -rf ./ios && rm -rf ./android"
   },
   "dependencies": {
