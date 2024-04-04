@@ -1,51 +1,50 @@
+import {FontAwesome} from '@expo/vector-icons';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 
 import React, {useEffect, useState} from 'react';
 import {FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {groupEventByDate} from '../../components/home/AllEventsList';
 import EventCard from '../../components/home/EventCard';
-import {STATUS} from '../../components/home/utils';
+import {STATUS, groupEventByDate} from '../../components/home/utils';
 import {COLORS} from '../../constants/theme';
 import {getStorageImgURL} from './discover';
 
 export default function Home() {
   const [events, setEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const userHandle = auth().currentUser?.email?.split('@')[0];
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      const snapshot = await database().ref('/current-events').once('value');
-      const unresolved = Object.entries(snapshot.val()).map(
-        async childSnapShot => {
-          const [key, value] = childSnapShot;
+    setIsLoading(true);
+    const eventsRef = database().ref('/current-events');
+    const listener = eventsRef.on('value', async snapshot => {
+      if (snapshot.exists()) {
+        const unresolved = Object.entries(snapshot.val()).map(
+          async ([key, value]) => {
+            const imgURL = await getStorageImgURL(value.imgid);
+            return {
+              id: key,
+              image: imgURL,
+              ...value,
+            };
+          },
+        );
+        const resolved = await Promise.all(unresolved);
+        setEvents(resolved);
+      } else {
+        setEvents([]);
+      }
+      setIsLoading(false);
+    });
 
-          const imgURL = await getStorageImgURL(value.imgid);
-
-          return {
-            id: key,
-            image: imgURL,
-            ...value,
-          };
-        },
-      );
-      const resolved = await Promise.all(unresolved);
-      setEvents(resolved);
-    };
-    fetchEvents();
+    return () => eventsRef.off('value', listener);
   }, []);
 
   const filteredEvents = events.filter(event => {
     const listGuestData = event.guests;
-    if (listGuestData) {
-      return (
-        listGuestData[userHandle] &&
-        listGuestData[userHandle].status === STATUS.GOING
-      );
-    }
-    return false;
+    return listGuestData && listGuestData[userHandle]?.status === STATUS.GOING;
   });
 
   const groupedEvents = groupEventByDate(filteredEvents);
@@ -58,36 +57,53 @@ export default function Home() {
           padding: 20,
         }}>
         <Text style={styles.heading}>Your Events</Text>
-        <FlatList
-          scrollEnabled={false}
-          data={Object.entries(groupedEvents)}
-          keyExtractor={item => item[0]}
-          contentContainerStyle={styles.listContainer}
-          renderItem={({item}) => {
-            const [date, events] = item;
-            const [month, day, dayOfWeek] = date.split(' ');
-            const dayEvents = filteredEvents.filter(event =>
-              events.includes(event),
-            );
-            return (
-              <View>
-                <Text style={styles.dateText}>
-                  <Text style={{fontWeight: '500', color: COLORS.text}}>
-                    {month} {day}{' '}
+        {!isLoading && filteredEvents.length === 0 ? (
+          <View style={{flexDirection: 'row', alignItems: 'center', gap: 16}}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                backgroundColor: COLORS.backgroundLight,
+                borderRadius: 10,
+                padding: 20,
+              }}>
+              <FontAwesome name="ticket" size={42} color={COLORS.grayPrimary} />
+            </View>
+            <View style={{flex: 3}}>
+              <Text style={{fontSize: 18, fontWeight: 'bold', lineHeight: 35}}>
+                No upcoming events
+              </Text>
+              <Text>Events you are going will show up here.</Text>
+            </View>
+          </View>
+        ) : (
+          <FlatList
+            scrollEnabled={false}
+            data={Object.entries(groupedEvents)}
+            keyExtractor={item => item[0]}
+            contentContainerStyle={styles.listContainer}
+            renderItem={({item}) => {
+              const [date, events] = item;
+              const [month, day, dayOfWeek] = date.split(' ');
+              const dayEvents = filteredEvents.filter(event =>
+                events.includes(event),
+              );
+              return (
+                <View>
+                  <Text style={styles.dateText}>
+                    <Text style={{fontWeight: '500', color: COLORS.text}}>
+                      {month} {day}{' '}
+                    </Text>
+                    /<Text> {dayOfWeek}</Text>
                   </Text>
-                  /<Text> {dayOfWeek}</Text>
-                </Text>
-                {filteredEvents.length > 0 ? (
-                  dayEvents.map(event => (
+                  {dayEvents.map(event => (
                     <EventCard key={event.id} event={event} />
-                  ))
-                ) : (
-                  <Text>No events found.</Text>
-                )}
-              </View>
-            );
-          }}
-        />
+                  ))}
+                </View>
+              );
+            }}
+          />
+        )}
       </ScrollView>
     </SafeAreaView>
   );
