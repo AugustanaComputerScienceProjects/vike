@@ -24,7 +24,7 @@ const CheckInPage = () => {
   const { eventId } = useParams();
   const [event, setEvent] = useState(null);
   const [guests, setGuests] = useState([]);
-  const [selectedGuest, setSelectedGuest] = useState(null);
+  const [selectedGuest, setSelectedGuest] = useState({});
   const [openDialog, setOpenDialog] = useState(false);
   const [openQRScanner, setOpenQRScanner] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,7 +38,12 @@ const CheckInPage = () => {
       const fetchedEvent = snapshot.val();
       if (fetchedEvent) setEvent(fetchedEvent);
 
-      if (fetchedEvent.guests) setGuests(Object.entries(fetchedEvent.guests));
+      if (fetchedEvent.guests)
+        setGuests(
+          Object.entries(
+            fetchedEvent.guests
+          ).map(([userHandle, guestData]) => ({ userHandle, ...guestData }))
+        );
     };
 
     fetchEvent();
@@ -50,52 +55,56 @@ const CheckInPage = () => {
   };
 
   const handleManualCheckIn = async () => {
-    const [userHandle, guestData] = selectedGuest;
-    if (userHandle) {
+    if (selectedGuest.userHandle) {
       const newStatus =
-        guestData.status === STATUS.CHECKED_IN
+        selectedGuest.status === STATUS.CHECKED_IN
           ? STATUS.GOING
           : STATUS.CHECKED_IN;
       await firebase.database
-        .ref(`/current-events/${eventId}/guests/${userHandle}/status`)
+        .ref(
+          `/current-events/${eventId}/guests/${selectedGuest.userHandle}/status`
+        )
         .set(newStatus);
       setOpenDialog(false);
-      // Refresh the guest list
       const eventRef = firebase.database.ref(`/current-events/${eventId}`);
       const snapshot = await eventRef.once("value");
       const fetchedEvent = snapshot.val();
       if (fetchedEvent && fetchedEvent.guests) {
-        setGuests(Object.entries(fetchedEvent.guests));
+        setGuests(
+          Object.entries(
+            fetchedEvent.guests
+          ).map(([userHandle, guestData]) => ({ userHandle, ...guestData }))
+        );
       }
-      setSnackbarMessage(`Status for ${userHandle} updated successfully.`);
+      setSnackbarMessage(
+        `Status for ${selectedGuest.userHandle} updated successfully.`
+      );
       setSnackbarOpen(true);
     }
   };
 
   const handleQRScan = async (result) => {
-    console.log("result", result);
     if (result) {
       const [ticketUserHandle, _] = result.split("-");
-      console.log("ticketUserHandle", ticketUserHandle);
-      const guest = guests.find(([userHandle, guestData]) => {
-        console.log(userHandle, selectedGuest);
-        return userHandle === ticketUserHandle;
-      });
+      const guest = guests.find(
+        ({ userHandle }) => userHandle === ticketUserHandle
+      );
       if (guest) {
-        const [userHandle] = guest;
-        if (userHandle) {
+        if (guest.userHandle) {
           await firebase.database
-            .ref(`/current-events/${eventId}/guests/${userHandle}/status`)
+            .ref(`/current-events/${eventId}/guests/${guest.userHandle}/status`)
             .set(STATUS.CHECKED_IN);
-          // Refresh the guest list
           const eventRef = firebase.database.ref(`/current-events/${eventId}`);
           const snapshot = await eventRef.once("value");
           const fetchedEvent = snapshot.val();
           if (fetchedEvent) {
-            setGuests(Object.entries(fetchedEvent.guests));
+            setGuests(
+              Object.entries(
+                fetchedEvent.guests
+              ).map(([userHandle, guestData]) => ({ userHandle, ...guestData }))
+            );
           }
-          // Show snackbar message for successful check-in
-          setSnackbarMessage(`Checked in ${userHandle} successfully!`);
+          setSnackbarMessage(`Checked in ${guest.userHandle} successfully!`);
           setSnackbarOpen(true);
         }
       }
@@ -106,9 +115,27 @@ const CheckInPage = () => {
     setSearchQuery(event.target.value);
   };
 
-  const filteredGuests = guests.filter(([userHandle]) =>
+  const filteredGuests = guests.filter(({ userHandle }) =>
     userHandle.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const extractTimestamp = (ticketId) => {
+    const parts = ticketId.split("-");
+    if (parts && parts.length > 0) {
+      const timestamp = parts[parts.length - 1];
+      if (timestamp) {
+        return parseInt(timestamp, 10);
+      }
+    }
+    return null;
+  };
+
+  const registrationDate = selectedGuest.ticketId
+    ? extractTimestamp(selectedGuest.ticketId)
+    : null;
+  const formattedRegistrationDate = registrationDate
+    ? format(new Date(registrationDate), "MMM d, yyyy h:mm a")
+    : "";
 
   return (
     <Container>
@@ -141,14 +168,14 @@ const CheckInPage = () => {
         margin="normal"
       />
       <List>
-        {filteredGuests.map(([userHandle, guestData]) => (
+        {filteredGuests.map(({ userHandle, status, ticketId }) => (
           <ListItem
             key={userHandle}
             button
-            onClick={() => handleGuestClick([userHandle, guestData])}
+            onClick={() => handleGuestClick({ userHandle, status, ticketId })}
             secondaryAction={
               <Chip
-                label={toTitleCase(guestData.status)}
+                label={toTitleCase(status)}
                 color="success"
                 variant="outlined"
               />
@@ -159,29 +186,17 @@ const CheckInPage = () => {
         ))}
       </List>
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>{selectedGuest?.[0]}</DialogTitle>
+        <DialogTitle>{selectedGuest.userHandle}</DialogTitle>
         <DialogContent>
-          <p>
-            Registration Date:{" "}
-            {selectedGuest && selectedGuest?.[1].ticketId
-              ? format(
-                  new Date(
-                    parseInt(selectedGuest?.[1].ticketId?.split("-")[3])
-                  ),
-                  "MMM d, yyyy h:mm a"
-                )
-              : ""}
-          </p>
+          <p>Registration Date: {formattedRegistrationDate}</p>
           <p>
             Status:{" "}
-            {selectedGuest && selectedGuest?.[1].status
-              ? toTitleCase(selectedGuest?.[1].status)
-              : ""}
+            {selectedGuest.status ? toTitleCase(selectedGuest.status) : ""}
           </p>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleManualCheckIn} variant="contained">
-            {selectedGuest?.[1].status === STATUS.CHECKED_IN
+            {selectedGuest.status === STATUS.CHECKED_IN
               ? "Undo Check In"
               : "Check In"}
           </Button>
