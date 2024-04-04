@@ -41,28 +41,26 @@ export default function Discover() {
   };
 
   useEffect(() => {
-    const fetchEvents = () => {
-      return database()
-        .ref('/current-events')
-        .on('value', async snapshot => {
-          const unresolved = Object.entries(snapshot.val()).map(
-            async childSnapShot => {
-              const [key, value] = childSnapShot;
+    const eventsRef = database().ref('/current-events');
+    const fetchEvents = eventsRef.on('value', async snapshot => {
+      const unresolved = Object.entries(snapshot.val() || {}).map(
+        async childSnapShot => {
+          const [key, value] = childSnapShot;
 
-              const imgURL = await getStorageImgURL(value.imgid);
+          const imgURL = await getStorageImgURL(value.imgid);
 
-              return {
-                id: key,
-                image: imgURL,
-                ...value,
-              };
-            },
-          );
-          const resolved = await Promise.all(unresolved);
-          setEvents(resolved);
-        });
-    };
-    fetchEvents();
+          return {
+            id: key,
+            image: imgURL,
+            ...value,
+          };
+        },
+      );
+      const resolved = await Promise.all(unresolved);
+      setEvents(resolved);
+    });
+
+    return () => eventsRef.off('value', fetchEvents);
   }, []);
 
   return (
