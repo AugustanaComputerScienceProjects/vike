@@ -98,12 +98,6 @@ const EventsView = (props) => {
     token.current = group.enter();
   };
 
-  const handleBeginRequest = () => {
-    handleClose();
-    setState((prevState) => ({ ...prevState, requesting: true }));
-    token.current = group.enter();
-  };
-
   // Handles the deleting/rejecting of an event from Firebase
   const handleDelete = () => {
     setState((prevState) => ({ ...prevState, editing: false }));
@@ -118,13 +112,6 @@ const EventsView = (props) => {
     }
     setState((prevState) => ({ ...prevState, openDelete: false }));
     group.leave(token.current);
-  };
-
-  // Removes a given value from the given array
-  const arrayRemove = (arr, value) => {
-    return arr.filter(function(ele) {
-      return ele !== value;
-    });
   };
 
   // Handles closing of the confirm pop up for deleting/rejecting an event
@@ -488,11 +475,6 @@ const EventsView = (props) => {
     handleEventChange("organization", e.target.value);
   };
 
-  const handleTagChange = (e) => {
-    handleEventChange("tags", e.target.value.toString());
-    setState((prevState) => ({ ...prevState, tags: e.target.value }));
-  };
-
   const handleWebLinkChange = (e) => {
     handleEventChange("webLink", e.target.value);
   };
@@ -623,6 +605,7 @@ const EventsView = (props) => {
     return () => {
       off();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const addRafflePopUp = () => {
@@ -732,11 +715,6 @@ const EventsView = (props) => {
   // Handles changing of the number of winners in the raffle pop up
   const numWinnersChange = (e) => {
     setState({ numWinners: e.target.value });
-  };
-
-  // Handles opening of the winners pop up
-  const handleOpenWinners = () => {
-    setState({ winnersOpen: true });
   };
 
   // Handles closing of the winners pop up
@@ -872,6 +850,7 @@ const EventsView = (props) => {
     } else if (state.userRole === "admin") {
       readEvents();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.userRole, state.groups]);
 
   const decodeGroup = (codedGroup) => {

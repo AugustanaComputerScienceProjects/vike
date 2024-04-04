@@ -85,7 +85,7 @@ const CheckInPage = () => {
 
   const handleQRScan = async (result) => {
     if (result) {
-      const [ticketUserHandle, _] = result.split("-");
+      const ticketUserHandle = result.split("-")[0];
       const guest = guests.find(
         ({ userHandle }) => userHandle === ticketUserHandle
       );
