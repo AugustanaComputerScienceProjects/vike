@@ -10,7 +10,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { format, isSameDay } from "date-fns";
+import { format } from "date-fns";
 import React, { useState } from "react";
 
 import AddEvent from "./AddEvent";
@@ -35,15 +35,15 @@ const EventsView = () => {
   };
 
   const renderEventSection = (date, events) => {
+    const eventDate = new Date(date);
+    eventDate.setMinutes(
+      eventDate.getMinutes() + eventDate.getTimezoneOffset()
+    );
     return (
       <Grid container spacing={2} key={date} sx={{ mt: 2 }}>
         <Grid item xs={3}>
-          <Typography variant="h6">
-            {format(new Date(date), "MMM d")}
-          </Typography>
-          <Typography variant="body1">
-            {format(new Date(date), "EEEE")}
-          </Typography>
+          <Typography variant="h6">{format(eventDate, "MMM d")}</Typography>
+          <Typography variant="body1">{format(eventDate, "EEEE")}</Typography>
         </Grid>
         <Grid item xs={9}>
           {events.map((event) => (
@@ -61,6 +61,7 @@ const EventsView = () => {
     setIsAddEventFormOpen(false);
     refreshEvents();
   };
+  console.log("groupEventsByDate(events)", groupEventsByDate(events));
 
   return (
     <Container>
@@ -91,17 +92,7 @@ const EventsView = () => {
           ))
         ) : (
           <>
-            {renderEventSection(
-              format(new Date(), "yyyy-MM-dd"),
-              events
-                .filter((event) =>
-                  isSameDay(new Date(event.startDate), new Date())
-                )
-                .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
-            )}
-
             {Object.entries(groupEventsByDate(events))
-              .filter(([date]) => new Date(date) > new Date())
               .sort((a, b) => new Date(a[0]) - new Date(b[0]))
               .map(([date, events]) => renderEventSection(date, events))}
           </>
