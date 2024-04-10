@@ -1,3 +1,18 @@
+import {format} from 'date-fns';
+
+export const groupEventByDate = events => {
+  events.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+  const groupedEvents = {};
+  events.forEach(event => {
+    const date = format(new Date(event.startDate), 'MMM dd eeeeeeee');
+    if (!groupedEvents[date]) {
+      groupedEvents[date] = [];
+    }
+    groupedEvents[date].push(event);
+  });
+  return groupedEvents;
+};
+
 export const parseDate = dateString => {
   const date = new Date(dateString);
   const formattedDate = date.toLocaleString('en-US', {
