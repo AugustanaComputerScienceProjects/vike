@@ -22,7 +22,7 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import defaultImage from "../assets/default.jpg";
-import TipTapEditor from "../components/editor/Editor";
+import Editor from "../components/editor/Editor";
 import { toTitleCase } from "../components/events/EventCard";
 import ImageUpload from "../components/events/ImageUpload";
 import useRoleData from "../components/events/useRoleData";
@@ -315,7 +315,7 @@ const ManageEvent = () => {
                   value={event.webLink}
                   onChange={handleInputChange}
                 />
-                <TipTapEditor
+                <Editor
                   content={event.description}
                   onUpdate={(newDescription) => {
                     setEvent((prevEvent) => ({
