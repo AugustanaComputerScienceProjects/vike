@@ -22,6 +22,7 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import defaultImage from "../assets/default.jpg";
+import TipTapEditor from "../components/editor/Editor";
 import { toTitleCase } from "../components/events/EventCard";
 import ImageUpload from "../components/events/ImageUpload";
 import useRoleData from "../components/events/useRoleData";
@@ -86,7 +87,7 @@ const ManageEvent = () => {
   const handleDateChange = (field, date) => {
     setEvent((prevEvent) => ({
       ...prevEvent,
-      [field]: date ? date.toISOString() : null,
+      [field]: date ? date.format("YYYY-MM-DD HH:mm") : null,
     }));
   };
 
@@ -151,6 +152,7 @@ const ManageEvent = () => {
     const eventData = {
       ...event,
       startDate: startDate.format("YYYY-MM-DD HH:mm"),
+      endDate: endDate.format("YYYY-MM-DD HH:mm"),
       duration: duration,
       imgid: id,
       email: firebase.auth.currentUser.email,
@@ -193,7 +195,7 @@ const ManageEvent = () => {
   }
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="lg">
       <Box sx={{ mt: 4 }}>
         <Typography variant="h4" gutterBottom>
           {event.name}
@@ -313,16 +315,16 @@ const ManageEvent = () => {
                   value={event.webLink}
                   onChange={handleInputChange}
                 />
-                <TextField
-                  margin="dense"
-                  name="description"
-                  label="Description"
-                  fullWidth
-                  multiline
-                  value={event.description}
-                  onChange={handleInputChange}
+                <TipTapEditor
+                  content={event.description}
+                  onUpdate={(newDescription) => {
+                    setEvent((prevEvent) => ({
+                      ...prevEvent,
+                      description: newDescription,
+                    }));
+                  }}
                 />
-                <Box display="flex" justifyContent={"space-between"}>
+                <Box display="flex" mt={2} justifyContent={"space-between"}>
                   <Button
                     variant="contained"
                     color="error"
