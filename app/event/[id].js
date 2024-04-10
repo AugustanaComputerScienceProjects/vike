@@ -21,6 +21,7 @@ import MapView, {
   PROVIDER_DEFAULT,
   PROVIDER_GOOGLE,
 } from 'react-native-maps';
+import RenderHtml from 'react-native-render-html';
 import {getStorageImgURL} from '../(tabs)/discover';
 import EventShare from '../../components/EventShare';
 import Registration from '../../components/event/Registration';
@@ -119,14 +120,14 @@ export default function Event() {
               }}>
               <Icon
                 name="clock"
-                size={20}
+                size={14}
                 color={COLORS.primary}
                 marginRight={5}
               />
               <Text
                 style={{
                   color: COLORS.orange,
-                  fontSize: 16,
+                  fontSize: 14,
                   opacity: 0.7,
                   marginLeft: 4,
                 }}>
@@ -148,7 +149,7 @@ export default function Event() {
               }}>
               <Icon
                 name="map"
-                size={20}
+                size={14}
                 color={COLORS.primary}
                 marginRight={5}
               />
@@ -190,30 +191,29 @@ export default function Event() {
         <View style={styles.buttonSection}>
           <Text
             style={{
-              fontSize: 20,
+              fontSize: 14,
               fontWeight: 'bold',
-              color: COLORS.text,
+              color: COLORS.gray,
             }}>
             About
           </Text>
         </View>
-        <View style={styles.descriptionSection}>
-          <Text
-            style={{
-              color: COLORS.text,
-              fontSize: 16,
-            }}>
-            {event.description}
-          </Text>
-        </View>
+        {event.description ? (
+          <View style={styles.descriptionSection}>
+            <RenderHtml
+              contentWidth={width}
+              source={{html: event.description}}
+            />
+          </View>
+        ) : null}
         {event.webLink ? (
           <>
             <View style={styles.buttonSection}>
               <Text
                 style={{
-                  fontSize: 20,
+                  fontSize: 14,
                   fontWeight: 'bold',
-                  color: COLORS.text,
+                  color: COLORS.gray,
                 }}>
                 Web Link
               </Text>
@@ -232,27 +232,26 @@ export default function Event() {
           </>
         ) : null}
         {/* Location Section */}
-        <View
-          style={{
-            marginVertical: 25,
-            marginHorizontal: 30,
-          }}>
+        <View>
+          <View style={styles.buttonSection}>
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: 'bold',
+                color: COLORS.gray,
+              }}>
+              Location
+            </Text>
+          </View>
           <Text
             style={{
-              fontSize: 20,
-              fontWeight: 'bold',
-              color: COLORS.text,
-            }}>
-            Location
-          </Text>
-          <Text
-            style={{
-              fontSize: 16,
+              fontSize: 14,
+              marginHorizontal: 30,
               color: COLORS.text,
             }}>
             {event.location}
           </Text>
-          <View style={{height: 250}}>
+          <View style={{height: 250, marginHorizontal: 30}}>
             <MapView
               provider={
                 Platform.OS == 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
@@ -364,10 +363,14 @@ export default function Event() {
 
 const styles = StyleSheet.create({
   buttonSection: {
-    flexDirection: 'row',
+    borderBottomColor: COLORS.grayBorder,
+    borderBottomWidth: 1,
+    display: 'flex',
+    flexDirection: 'column',
     marginBottom: 10,
     marginHorizontal: 30,
     marginTop: 20,
+    paddingBottom: 8,
   },
   container: {
     alignItems: 'center',
