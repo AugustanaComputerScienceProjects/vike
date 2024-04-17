@@ -2,6 +2,7 @@ import { Autocomplete, Chip, FormControl, TextField } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import React from "react";
+import Editor from "../editor/Editor";
 
 const AddEventForm = ({
   formData,
@@ -98,15 +99,14 @@ const AddEventForm = ({
         value={formData.webLink}
         onChange={handleInputChange}
       />
-      <TextField
-        margin="dense"
-        name="description"
-        label="Description"
-        fullWidth
-        multiline
-        rows={4}
-        value={formData.description}
-        onChange={handleInputChange}
+      <Editor
+        content={formData.description}
+        onUpdate={(newDescription) => {
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            description: newDescription,
+          }));
+        }}
       />
     </>
   );

@@ -12,6 +12,9 @@
     "@mui/styles": "^5.1.0",
     "@mui/x-data-grid": "^5.1.0",
     "@mui/x-date-pickers": "^5.0.0-alpha.0",
+    "@tiptap/pm": "^2.3.0",
+    "@tiptap/react": "^2.3.0",
+    "@tiptap/starter-kit": "^2.3.0",
     "@yudiel/react-qr-scanner": "^2.0.0-beta.3",
     "cors": "^2.8.5",
     "date-fns": "^3.5.0",
@@ -31,11 +34,13 @@
     "react-scripts": "4.0.3",
     "react-select": "^3.0.4",
     "react-select-material-ui": "^4.0.0",
+    "styled-components": "^6.1.8",
     "uuid": "^3.3.2",
     "xlsx": "^0.14.3"
   },
   "resolutions": {
-    "react-error-overlay": "6.0.9"
+    "react-error-overlay": "6.0.9",
+    "styled-components": "^5"
   },
   "scripts": {
     "start": "react-scripts --openssl-legacy-provider start",
