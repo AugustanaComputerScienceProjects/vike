@@ -12,6 +12,8 @@ import PastEvents from "./views/PastEvents";
 import PendingEvents from "./views/PendingEvents";
 import Tags from "./views/Tags";
 import Users from "./views/Users";
+import Groups from "./views/Groups";
+import AddCalendarView from "./components/calendars/AddCalendarView";
 
 // Main application file that manages all the different views
 
@@ -41,6 +43,8 @@ const App = () => {
           <Route path="/check-in/:eventId" component={CheckInPage} />
           <Route path="/tags" component={Tags} />
           <Route path="/users" component={Users} />
+          <Route path="/groups" component={Groups} />
+          <Route path="/calendars" component={AddCalendarView} />
         </div>
       </div>
     </div>
