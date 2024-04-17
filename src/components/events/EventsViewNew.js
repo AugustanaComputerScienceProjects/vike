@@ -61,7 +61,6 @@ const EventsView = () => {
     setIsAddEventFormOpen(false);
     refreshEvents();
   };
-  console.log("groupEventsByDate(events)", groupEventsByDate(events));
 
   return (
     <Container>

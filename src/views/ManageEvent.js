@@ -114,7 +114,7 @@ const ManageEvent = () => {
     setOpenSnackbar(false);
   };
 
-  const saveImage = (ref, image, imageName) => {
+  const saveImage = (ref, image) => {
     if (image !== defaultImage) {
       setUploading(true);
       displayMessage("Uploading Image...");
@@ -151,11 +151,13 @@ const ManageEvent = () => {
     const eventData = {
       ...event,
       startDate: startDate.format("YYYY-MM-DD HH:mm"),
+      endDate: endDate.format("YYYY-MM-DD HH:mm"),
       duration: duration,
       imgid: id,
       email: firebase.auth.currentUser.email,
       tags: event.tags.toString(),
     };
+    console.log("eventData", eventData);
 
     firebase.database
       .ref(`/current-events/${eventId}`)
@@ -178,6 +180,8 @@ const ManageEvent = () => {
       event.location !== "" &&
       event.organization !== ""
     ) {
+      console.log("image64", image64);
+      console.log("currImage", currImage);
       if (image64 !== currImage) {
         saveImage("Images", image64);
       } else {
