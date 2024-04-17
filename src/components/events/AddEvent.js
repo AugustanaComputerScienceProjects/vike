@@ -113,6 +113,7 @@ const AddEvent = () => {
     const eventData = {
       ...formData,
       startDate: startDate.format("YYYY-MM-DD HH:mm"),
+      endDate: endDate.format("YYYY-MM-DD HH:mm"),
       duration: duration,
       imgid: id,
       email: firebase.auth.currentUser.email,
