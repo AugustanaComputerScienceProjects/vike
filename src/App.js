@@ -14,6 +14,7 @@ import Tags from "./views/Tags";
 import Users from "./views/Users";
 import Groups from "./views/Groups";
 import AddCalendarView from "./components/calendars/AddCalendarView";
+import CalendarsView from "./components/calendars/CalendarView";
 
 // Main application file that manages all the different views
 
@@ -45,6 +46,7 @@ const App = () => {
           <Route path="/users" component={Users} />
           <Route path="/groups" component={Groups} />
           <Route path="/calendars" component={AddCalendarView} />
+          <Route path="/calendar-view" component={CalendarsView}/>
         </div>
       </div>
     </div>

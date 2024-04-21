@@ -26,27 +26,6 @@ const AddCalendarForm = ({
                 onChange={handleInputChange}
                 placeholder="Ex: Welcome Week"
             />
-            {/* Duration Week */}
-            <LocalizationProvider dateAdapter={AdapterMoment}>
-                <Box display="flex" justifyContent="space-between" gap={2}>
-                <DatePicker
-                    label="Start Date"
-                    value={formData.startDate}
-                    onChange={(date) => handleDateChange("startDate", date)}
-                    renderInput={(params) => (
-                        <TextField {...params} margin="dense" fullWidth required />
-                    )}
-                />
-                <DatePicker
-                    label="End Date"
-                    value={formData.startDate}
-                    onChange={(date) => handleDateChange("endDate", date)}
-                    renderInput={(params) => (
-                        <TextField {...params} margin="dense" fullWidth required />
-                    )}
-                />
-                </Box>
-            </LocalizationProvider>
             {/* Organization */}
             <FormControl margin="dense" fullWidth>
                 <Autocomplete

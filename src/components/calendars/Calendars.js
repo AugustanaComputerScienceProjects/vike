@@ -51,11 +51,9 @@ class Calendars extends Component {
             <div>
             {this.state.calendars.map((calendar, index) => (
                 <div key={index}>
-                {/* Display the calendar details */}
                 console.log(calendar);
                 <h2>{calendar.name}</h2>
                 console.log(calendar.name);
-                {/* ...other calendar details... */}
                 </div>
             ))}
             </div>

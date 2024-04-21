@@ -119,6 +119,14 @@ const NavDrawer = (props) => {
           >
             Calendars/Subscriptions
           </ListItemButton>
+          <ListItemButton
+            component={Link}
+            to="/calendar-view"
+            name="Calendars View"
+            disabled={!adminSignedIn && !leaderSignedIn}
+          >
+            Calendars View
+          </ListItemButton>
         </List>
       </div>
     </Drawer>

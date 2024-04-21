@@ -20,18 +20,19 @@ import {
 const AddCalendar = () => {
     const [formData, setFormData] = useState({
         name: "",
-        startDate: new Date(),
-        endDate: new Date(),
         organization: "",
         description: "",
-        iconId: "vike",
+        profileId: "vike",
         email: "",
+        admin: [],
+        subscribers: [],
     })
-    const [icon64, setIcon64] = useState(vikeLogo);
+    const [profile64, setProfile64] = useState(vikeLogo);
     const [uploading, setUploading] = useState(false);
     const [message, setMessage] = useState("");
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const { adminSignedIn, leaderSignedIn, databaseTags, groups } = useRoleData();
+    const [currProfile, setCurrProfile] = useState(null);
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -48,10 +49,16 @@ const AddCalendar = () => {
         }));
     };
 
-    const handleIconUpload = (event) => {
+    const handleProfileUpload = (event) => {
         const file = event.target.files[0];
-        handleImageFileChanged(file, (uri) => setIcon64(uri));
+        handleImageFileChanged(file, (uri) => setProfile64(uri));
     };
+
+    const handleProfileDrop = (event) => {
+        event.preventDefault();
+        const file = event.dataTransfer.files[0];
+        handleImageFileChanged(file, (uri) => setProfile64(uri));
+      };
 
     const handleSnackbarClose = (event, reason) => {
         if (reason === "clickaway") {
@@ -65,15 +72,10 @@ const AddCalendar = () => {
         setOpenSnackbar(true);
       };
 
-    const submitCalendar = (id = "default") => {
-        const startDate = moment(formData.startDate).format('MMM DD');
-        const endDate = moment(formData.endDate).format('MMM DD');
-
+    const submitCalendar = (id = "vike") => {
         const calendarData = {
             ...formData,
-            startDate: startDate,
-            endDate: endDate,
-            iconId: id,
+            profileId: id,
             email: firebase.auth.currentUser.email,
         }
         console.log(calendarData);
@@ -91,25 +93,24 @@ const AddCalendar = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         console.log('formData', formData)
+        console.log('Profile64', profile64)
         if (
             formData.name !== "" &&
-            formData.startDate !== "" &&
-            formData.endDate !== "" &&
-            formData.organization
+            formData.organization !== ""
         ) {
-            saveImage("Icons", icon64);
+            saveImage("Profiles", profile64);
         } else {
             displayMessage("Please fill in all required fields");
         }
     };
 
-    const saveImage = (ref, image, imageName) => {
+    const saveImage = (ref, image) => {
         if (image !== vikeLogo) {
           setUploading(true);
           displayMessage("Uploading Image...");
           const firebaseStorageRef = firebase.storage.ref(ref);
           const id = Date.now().toString();
-          const imageRef = firebaseStorageRef.child(id + ".jpg");
+          const imageRef = firebaseStorageRef.child(id + ".png");
     
           const i = image.indexOf("base64,");
           const buffer = Buffer.from(image.slice(i + 7), "base64");
@@ -135,14 +136,12 @@ const AddCalendar = () => {
     const resetForm = () => {
         setFormData({
             name: "",
-            startDate: new Date(),
-            endDate: new Date(),
             organization: "",
             description: "",
-            iconId: "vike",
+            profileId: "vike",
             email: "",
         });
-        setIcon64(vikeLogo);
+        setProfile64(vikeLogo);
     };
 
     return (
@@ -154,8 +153,9 @@ const AddCalendar = () => {
                 <Grid container spacing={2} style={{ display: 'flex', justifyContent: 'center', paddingTop: '10px'}}>
                     <Grid item xs={2} style={{ width: '100%', height: '100%', borderRadius: '10%', overflow: 'hidden'}}>
                         <ImageUpload
-                            image64={icon64}
-                            handleImageChange={handleIconUpload}
+                            image64={profile64}
+                            onImageUpload={handleProfileUpload}
+                            onImageDrop={handleProfileDrop}
                             style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                         />
                     </Grid>

@@ -143,6 +143,7 @@ const AddEvent = () => {
       formData.location !== "" &&
       formData.organization !== ""
     ) {
+      console.log("Image64", image64);
       saveImage("Images", image64);
     } else {
       displayMessage("Required fields are not filled in.");
