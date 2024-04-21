@@ -41,7 +41,7 @@ const CalendarCard = ({ calendar }) => {
         <>
             <Card sx={{ mt: 2, mb: 2 }} onClick={() => navigateTo(`/calendar-manage/${calendar.id}`)}>
                 <CardActionArea>
-                    <Grid container spacing={2} key={calendar.startDate}>
+                    <Grid container spacing={2} key={calendar.name}>
                         <Grid item>
                             <CardContent>
                                 <Typography variant="h6" component="div">
