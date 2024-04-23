@@ -34,13 +34,6 @@ const Home = () => {
               <label style={{ fontSize: 20 }}>Created by:</label>
             </Grid>
             return{" "}
-            <button
-              onClick={() => {
-                throw new Error("Break the world");
-              }}
-            >
-              Break the world
-            </button>
             <Grid item>
               <label style={{ fontSize: 20 }}>
                 Kyle Workman, Jared Haeme, Brandon Thompson, Jack Cannell, Brent
