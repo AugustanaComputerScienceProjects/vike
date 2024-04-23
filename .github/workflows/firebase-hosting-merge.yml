@@ -10,6 +10,11 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Create env file
+        run: |
+          touch .env
+          echo SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} >> .env
+          cat .env
       - uses: actions/checkout@v3
       - run: yarn install --frozen-lockfile && yarn build
       - uses: FirebaseExtended/action-hosting-deploy@v0

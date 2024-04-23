@@ -12,6 +12,8 @@
     "@mui/styles": "^5.1.0",
     "@mui/x-data-grid": "^5.1.0",
     "@mui/x-date-pickers": "^5.0.0-alpha.0",
+    "@sentry/cli": "^2.31.0",
+    "@sentry/react": "^7.110.1",
     "@tiptap/pm": "^2.3.0",
     "@tiptap/react": "^2.3.0",
     "@tiptap/starter-kit": "^2.3.0",
@@ -44,9 +46,10 @@
   },
   "scripts": {
     "start": "react-scripts --openssl-legacy-provider start",
-    "build": "react-scripts --openssl-legacy-provider build",
+    "build": "react-scripts --openssl-legacy-provider build && yarn sentry:sourcemaps && yarn sentry:sourcemaps && yarn sentry:sourcemaps",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org vike --project vike-web ./build && sentry-cli sourcemaps upload --org vike --project vike-web ./build"
   },
   "eslintConfig": {
     "extends": "react-app"

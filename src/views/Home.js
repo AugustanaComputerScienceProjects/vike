@@ -1,24 +1,24 @@
-import Grid from '@mui/material/Grid';
-import React from 'react';
-import defaultImage from '../assets/default.jpg';
+import Grid from "@mui/material/Grid";
+import React from "react";
+import defaultImage from "../assets/default.jpg";
 
 // HOME PAGE
 
 const Home = () => {
   return (
-    <div style={{ textAlign: 'center', paddingTop: 30 }}>
-      <div style={{ display: 'inline-block' }}>
+    <div style={{ textAlign: "center", paddingTop: 30 }}>
+      <div style={{ display: "inline-block" }}>
         <Grid container>
-          <Grid item container direction='column' spacing={2}>
+          <Grid item container direction="column" spacing={2}>
             <Grid item style={{ marginBottom: 20 }}>
               <label style={{ fontSize: 40 }}>
                 Welcome to the Augustana Events App
               </label>
             </Grid>
             <img
-              style={{ margin: '0 auto' }}
+              style={{ margin: "0 auto" }}
               src={defaultImage}
-              alt='default'
+              alt="default"
             />
             <Grid item>
               <label style={{ fontSize: 20 }}>
@@ -26,13 +26,21 @@ const Home = () => {
               </label>
             </Grid>
             <Grid item style={{ paddingTop: 0, paddingBottom: 0 }}>
-              <a href='https://osl-events-app.firebaseapp.com/privacy_policy.html'>
+              <a href="https://osl-events-app.firebaseapp.com/privacy_policy.html">
                 Privacy Policy
               </a>
             </Grid>
             <Grid item>
               <label style={{ fontSize: 20 }}>Created by:</label>
             </Grid>
+            return{" "}
+            <button
+              onClick={() => {
+                throw new Error("Break the world");
+              }}
+            >
+              Break the world
+            </button>
             <Grid item>
               <label style={{ fontSize: 20 }}>
                 Kyle Workman, Jared Haeme, Brandon Thompson, Jack Cannell, Brent
