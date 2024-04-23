@@ -43,7 +43,8 @@
         {
           "calendarPermission": "Allow $(PRODUCT_NAME) to access your calendar."
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "icon": "./assets/icon.png",
     "splash": {
