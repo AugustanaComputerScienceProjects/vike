@@ -71,7 +71,7 @@
       "versionCode": 17
     },
     "ios": {
-      "buildNumber": "20",
+      "buildNumber": "21",
       "supportsTablet": true,
       "config": {
         "googleMapsApiKey": "AIzaSyBr8_x3nXHBPJMJ4EBg5w2clq5t_S1s05o"
