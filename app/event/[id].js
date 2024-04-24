@@ -1,5 +1,4 @@
 import Icon from '@expo/vector-icons/Feather';
-import database from '@react-native-firebase/database';
 import {addMinutes, format} from 'date-fns';
 import {router, useLocalSearchParams} from 'expo-router';
 import React, {useEffect, useRef, useState} from 'react';
@@ -22,10 +21,10 @@ import MapView, {
   PROVIDER_GOOGLE,
 } from 'react-native-maps';
 import RenderHtml from 'react-native-render-html';
-import {getStorageImgURL} from '../(tabs)/discover';
 import EventShare from '../../components/EventShare';
 import Registration from '../../components/event/Registration';
 import {COLORS, SIZES} from '../../constants/theme';
+import {db, getStorageImgURL} from '../../services/firebase';
 
 const {width, height} = Dimensions.get('window');
 
@@ -39,7 +38,7 @@ export default function Event() {
   const [isImageFullscreen, setImageFullscreen] = useState(false);
 
   useEffect(() => {
-    const eventRef = database().ref(`/current-events/${id}`);
+    const eventRef = db.ref(`/current-events/${id}`);
     const onValueChange = eventRef.on('value', async snapshot => {
       const data = snapshot.val();
       const imgURL = await getStorageImgURL(data.imgid);
@@ -53,7 +52,7 @@ export default function Event() {
     });
 
     return () => eventRef.off('value', onValueChange);
-  }, [id]);
+  }, []);
 
   return event ? (
     <View style={styles.container}>
@@ -265,18 +264,19 @@ export default function Event() {
               onPress={() => {
                 let lat = event.latitude || 41.503;
                 let lng = event.longitude || -90.5504;
-                const scheme = Platform.select({
-                  ios: 'maps:0,0?q=',
-                  android: 'geo:0,0?q=',
-                });
-                const latLng = `${lat},${lng}`;
                 const label = event.location;
-                const url = Platform.select({
-                  ios: `${scheme}${label}@${latLng}`,
-                  android: `${scheme}${latLng}(${label})`,
-                });
+                let url;
+                if (Platform.OS === 'ios') {
+                  // Use Apple Maps URL scheme
+                  url = `maps://maps.apple.com/?q=${label}@${lat},${lng}`;
+                } else {
+                  // Use Google Maps URL scheme for Android
+                  url = `geo:${lat},${lng}?q=${lat},${lng}(${label})`;
+                }
                 if (url) {
-                  Linking.openURL(url);
+                  Linking.openURL(url).catch(err => {
+                    console.error('Failed to open URL:', err);
+                  });
                 }
               }}
               initialRegion={{
@@ -287,15 +287,13 @@ export default function Event() {
               }}
               zoomEnabled={false}
               scrollEnabled={false}>
-              {event.latitude && event.longitude && (
-                <Marker
-                  coordinate={{
-                    latitude: event.latitude || 41.503,
-                    longitude: event.longitude || -90.5504,
-                  }}
-                  title={event.location}
-                />
-              )}
+              <Marker
+                coordinate={{
+                  latitude: event.latitude || 41.503,
+                  longitude: event.longitude || -90.5504,
+                }}
+                title={event.location}
+              />
             </MapView>
           </View>
           <View style={{paddingBottom: 100}}></View>
