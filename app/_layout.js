@@ -100,19 +100,6 @@ const Layout = () => {
           captureLifecycleEvents: true, // If you don't want to capture the Lifecycle Events (e.g. Application Opened) set this to false
           captureScreens: true, // If you don't want to capture screen events set this to false
           ignoreLabels: [], // Any labels here will be ignored from the stack in touch events
-
-          navigation: {
-            // By default only the Screen name is tracked but it is possible to track the
-            // params or modify the name by intercepting theautocapture like so
-            routeToName: (name, params) => {
-              if (params.id) return `${name}/${params.id}`;
-              return name;
-            },
-            routeToParams: (name, params) => {
-              if (name === 'SensitiveScreen') return undefined;
-              return params;
-            },
-          },
         }}>
         <AuthProvider>
           <GestureHandlerRootView style={{flex: 1}}>

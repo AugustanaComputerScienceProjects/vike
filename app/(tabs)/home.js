@@ -1,6 +1,4 @@
 import {FontAwesome} from '@expo/vector-icons';
-import auth from '@react-native-firebase/auth';
-import database from '@react-native-firebase/database';
 
 import React, {useEffect, useState} from 'react';
 import {FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
@@ -8,17 +6,17 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import EventCard from '../../components/home/EventCard';
 import {STATUS, groupEventByDate} from '../../components/home/utils';
 import {COLORS} from '../../constants/theme';
-import {getStorageImgURL} from './discover';
+import {authInstance, db, getStorageImgURL} from '../../services/firebase';
 
 export default function Home() {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const userHandle = auth().currentUser?.email?.split('@')[0];
+  const userHandle = authInstance.currentUser?.email?.split('@')[0];
 
   useEffect(() => {
     setIsLoading(true);
-    const eventsRef = database().ref('/current-events');
+    const eventsRef = db.ref('/current-events');
     const listener = eventsRef.on('value', async snapshot => {
       if (snapshot.exists()) {
         const unresolved = Object.entries(snapshot.val()).map(
