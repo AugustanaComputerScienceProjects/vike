@@ -1,13 +1,11 @@
-import auth from '@react-native-firebase/auth';
-import database from '@react-native-firebase/database';
-
 import {BarCodeScanner} from 'expo-barcode-scanner';
 import * as React from 'react';
 import {useCallback, useEffect, useState} from 'react';
 import {Alert, StyleSheet, Text, View} from 'react-native';
+import {authInstance, db} from '../services/firebase';
 
-export const currentEventsRef = database().ref('/current-events');
-export const currentUser = auth().currentUser;
+export const currentEventsRef = db.ref('/current-events');
+export const currentUser = authInstance.currentUser;
 
 const CameraScanner = () => {
   const [hasPermission, setHasPermission] = useState(false);
@@ -82,8 +80,8 @@ const CameraScanner = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
+    flex: 1,
     justifyContent: 'center',
   },
 });

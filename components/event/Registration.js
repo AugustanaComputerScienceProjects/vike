@@ -2,14 +2,13 @@ import {useActionSheet} from '@expo/react-native-action-sheet';
 import {AntDesign, FontAwesome} from '@expo/vector-icons';
 import Icon from '@expo/vector-icons/Feather';
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
-import auth from '@react-native-firebase/auth';
-import database from '@react-native-firebase/database';
 import {Image} from 'expo-image';
 import React, {useCallback, useMemo} from 'react';
 import {Alert, Pressable, StyleSheet, Text, View} from 'react-native';
 import {Divider} from 'react-native-elements';
 import QRCode from 'react-native-qrcode-svg';
 import {COLORS, SIZES} from '../../constants/theme';
+import {authInstance, db} from '../../services/firebase';
 import {STATUS} from '../home/utils';
 
 const EventDetails = ({event}) => (
@@ -44,7 +43,7 @@ const EventDetails = ({event}) => (
   </View>
 );
 
-export const currentUser = auth().currentUser;
+export const currentUser = authInstance.currentUser;
 
 const generateUniqueTicketId = (userHandle, eventId) => {
   const timestamp = Date.now().toString();
@@ -69,7 +68,7 @@ const Registration = ({event}) => {
   const handleRegister = async status => {
     if (!currentUser) return;
 
-    const eventRef = database().ref(`/current-events/${event.id}`);
+    const eventRef = db.ref(`/current-events/${event.id}`);
     const userHandle = currentUser.email.split('@')[0];
     const ticketId = generateUniqueTicketId(userHandle, event.id);
 

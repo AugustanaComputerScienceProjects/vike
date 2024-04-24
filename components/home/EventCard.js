@@ -19,7 +19,6 @@ const EventCard = ({event}) => {
         params: {id: event.id, event: event},
       }}
       onPress={async () => {
-        console.log(`event ${event.name} clicked`);
         posthog.capture(`Event ${event.name} clicked`);
         await analytics().logEvent('event_clicked', {
           id: event.id,

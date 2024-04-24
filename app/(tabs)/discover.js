@@ -1,5 +1,3 @@
-import database from '@react-native-firebase/database';
-import storage from '@react-native-firebase/storage';
 import React, {useEffect, useState} from 'react';
 import {FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -8,13 +6,7 @@ import AllEventsList from '../../components/home/AllEventsList';
 import EventCard from '../../components/home/EventCard';
 import FeaturedList from '../../components/home/FeaturedList';
 import {COLORS} from '../../constants/theme';
-
-export const getStorageImgURL = async imageName => {
-  const imgURL = await storage()
-    .ref('Images/' + imageName + '.jpg')
-    .getDownloadURL();
-  return imgURL;
-};
+import {db, getStorageImgURL} from '../../services/firebase';
 
 export default function Discover() {
   const [events, setEvents] = useState([]);
@@ -41,7 +33,7 @@ export default function Discover() {
   };
 
   useEffect(() => {
-    const eventsRef = database().ref('/current-events');
+    const eventsRef = db.ref('/current-events');
     const fetchEvents = eventsRef.on('value', async snapshot => {
       const unresolved = Object.entries(snapshot.val() || {}).map(
         async childSnapShot => {
