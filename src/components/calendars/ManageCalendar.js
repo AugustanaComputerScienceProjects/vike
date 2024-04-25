@@ -1,33 +1,23 @@
 import {
-    Autocomplete,
     Box,
     Button,
-    Chip,
     Container,
     Divider,
-    FormControl,
-    Grid,
-    List,
-    ListItem,
-    ListItemText,
-    Snackbar,
     Tab,
     Tabs,
-    TextField,
     Typography,
+    Dialog,
+    DialogContent,
 } from "@mui/material";
-import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import moment from "moment";
+import AddIcon from "@mui/icons-material/Add";
+import SearchIcon from '@mui/icons-material/Search';
 import { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 // import defaultImage from "../assets/default.jpg";
-import { toTitleCase } from "../calendars/CalendarCard";
-import ImageUpload from "../events/ImageUpload";
-import useRoleData from "../events/useRoleData";
-import { handleImageFileChanged } from "../events/utils";
 import firebase from "../../config";
-import e from "cors";
+import useEvents from "../events/useEvents";
+import AddEvent from "../events/AddEvent";
+import Search from "../events/Search";
 
 const ManageCalendar = () => {
     const { calendarId } = useParams();
@@ -36,19 +26,12 @@ const ManageCalendar = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [tabValue, setTabValue] = useState(0);
     const [profile64, setProfile64] = useState(null);
-    const [currImage, setCurrImage] = useState(null);
-    const { databaseTags, groups } = useRoleData();
-    const history = useHistory();
+    const [isAddEventFormOpen, setIsAddEventFormOpen] = useState(false);
+    const [isSearchEventFormOpen, setIsSearchEventFormOpen] = useState(false);
+    const { refreshEvents } = useEvents();
 
     useEffect(() => {
         const fetchCalendar = async () => {
-            // const calendarRef = firebase.database.ref(`calendars/${calendarId}`);
-            // calendarRef.on("value", (snapshot) => {
-            //     const calendar = snapshot.val();
-            //     setCalendar(calendar);
-            //     setProfile64(calendar.profileUrl);
-            // });
-
             const calendarRef = firebase.database.ref(`calendars/${calendarId}`);
             const snapshot = await calendarRef.once("value");
             const calendar = snapshot.val();
@@ -61,9 +44,7 @@ const ManageCalendar = () => {
                 .child(`${calendar.profileId}.png`)
                 .getDownloadURL();
             setProfile64(profileUrl);
-            setCurrImage(profileUrl);
         }
-        // const profileRef = firebase.storage.ref(`Profiles/${calendarId.profileId}.png`);
 
 
         fetchCalendar();
@@ -90,6 +71,24 @@ const ManageCalendar = () => {
         return <Typography variant="body1">Loading...</Typography>;
     }
 
+    const handleAddEventClick = () => {
+        setIsAddEventFormOpen(true);
+    };
+
+    const handleAddEventFormClose = () => {
+        setIsAddEventFormOpen(false);
+        refreshEvents();
+    };
+    
+    const handleSearchEventClick = () => {
+        setIsSearchEventFormOpen(true);
+    }
+    
+    const handleSearchEventFormClose = () => {
+        setIsSearchEventFormOpen(false);
+        refreshEvents();
+    }
+
     return (
         <Container maxWidth="md">
             <Typography variant="h3" align="center">
@@ -105,9 +104,28 @@ const ManageCalendar = () => {
                 <Tab label="Settings" />
             </Tabs>
             <Divider />
-            <Box sx={{ mt: 4}}>
+            <Box sx={{ mt: 4 }}>
                 {tabValue === 0 && (
-                    <Typography variant="h5">Events</Typography>
+                    <div style={{ display: "flex" }}>
+                        {/* <Typography variant="h5">Events</Typography> */}
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<SearchIcon />}
+                            onClick={handleSearchEventClick}
+                        >
+                            Search Available Events
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<AddIcon />}
+                            // onClick={() => history.push(`/calendars/${calendarId}/events/add`)}
+                            onClick={handleAddEventClick}
+                        >
+                            Add Event
+                        </Button>
+                    </div>
                 )}
                 {tabValue === 1 && (
                     <Typography variant="h5">Subscribers</Typography>
@@ -119,8 +137,27 @@ const ManageCalendar = () => {
                     <Typography variant="h5">Settings</Typography>
                 )}
             </Box>
+            <Dialog
+                open={isAddEventFormOpen}
+                onClose={handleAddEventFormClose}
+                fullWidth
+                maxWidth="md"
+            >
+                <DialogContent>
+                    <AddEvent />
+                </DialogContent>
+            </Dialog>
+            <Dialog
+                open={isSearchEventFormOpen}
+                onClose={handleSearchEventFormClose}
+                fullWidth
+                maxWidth="md"
+            >
+                <DialogContent>
+                    <Search />
+                </DialogContent>
+            </Dialog>
         </Container>
-            
     )
 }
 

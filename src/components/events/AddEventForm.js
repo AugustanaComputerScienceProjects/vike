@@ -6,6 +6,7 @@ import React from "react";
 const AddEventForm = ({
   formData,
   groups,
+  calendars,
   databaseTags,
   handleInputChange,
   handleDateChange,
@@ -68,6 +69,24 @@ const AddEventForm = ({
           )}
         />
       </FormControl>
+      {/* <FormControl margin="dense" fullWidth>
+        <Autocomplete
+          margin="dense"
+          fullWidth
+          options={calendars}
+          getOptionLabel={(option) => option}
+          value={formData.calendar}
+          onChange={(event, newValue) => {
+            setFormData((prevFormData) => ({
+              ...prevFormData,
+              calendar: newValue,
+            }));
+          }}
+          renderInput={(params) => (
+            <TextField {...params} label="Calendar" required />
+          )}
+        />
+      </FormControl> */}
       <FormControl margin="dense" fullWidth>
         <Autocomplete
           multiple

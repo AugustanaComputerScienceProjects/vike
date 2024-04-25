@@ -5,9 +5,7 @@ import {
     Typography,
     Snackbar,
 } from "@mui/material";
-import moment from "moment";
 import React, { useState } from "react";
-import defaultImage from "../../assets/default.jpg";
 import vikeLogo from "../../assets/vike.png";
 import firebase from "../../config";
 import AddCalendarForm from "./AddCalendarForm";
@@ -24,15 +22,15 @@ const AddCalendar = () => {
         description: "",
         profileId: "vike",
         email: "",
-        admin: [],
+        admins: [],
         subscribers: [],
+        events: [],
     })
     const [profile64, setProfile64] = useState(vikeLogo);
     const [uploading, setUploading] = useState(false);
     const [message, setMessage] = useState("");
     const [openSnackbar, setOpenSnackbar] = useState(false);
-    const { adminSignedIn, leaderSignedIn, databaseTags, groups } = useRoleData();
-    const [currProfile, setCurrProfile] = useState(null);
+    const { groups } = useRoleData();
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;

@@ -43,6 +43,7 @@ class Users extends Component {
     groupsForLeaders: [],
     leadersForGroups: [],
     groupLeaderRemoved: '',
+    calendars: [],
   };
 
   listeners = [];

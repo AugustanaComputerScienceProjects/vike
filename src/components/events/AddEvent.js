@@ -31,6 +31,7 @@ const AddEvent = () => {
     webLink: "",
     tags: [],
     email: "",
+    calendar: "",
   });
   const [image64, setImage64] = useState(defaultImage);
   const [uploading, setUploading] = useState(false);

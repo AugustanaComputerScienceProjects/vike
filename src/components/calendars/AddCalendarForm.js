@@ -1,16 +1,11 @@
-import { Autocomplete, FormControl, TextField, Box } from "@mui/material";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { Autocomplete, FormControl, TextField } from "@mui/material";
 import React from "react";
 
 const AddCalendarForm = ({
     formData,
     groups,
-    databaseTags,
     handleInputChange,
-    handleDateChange,
     setFormData,
-
 }) => {
     return (
         <>

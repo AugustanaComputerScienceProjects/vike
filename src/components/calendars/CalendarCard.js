@@ -1,18 +1,14 @@
 import {
     Box,
-    Button,
     Card,
     CardActionArea,
     CardContent,
     CardMedia,
-    Dialog,
     Grid,
     Typography,
 } from "@mui/material";
-import { format } from "date-fns";
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import CalendarView from "./CalendarView";
 
 export const toTitleCase = (str) => {
     return str.replace(/_/g, " ").replace(/\w\S*/g, (txt) => {
