@@ -2,7 +2,7 @@
   "expo": {
     "name": "Vike",
     "slug": "vike",
-    "version": "1.4.2",
+    "version": "1.4.3",
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -69,11 +69,11 @@
       },
       "googleServicesFile": "./google-services.json",
       "package": "edu.augustana.osleventsandroid",
-      "versionCode": 17
+      "versionCode": 19
     },
     "ios": {
       "appStoreUrl": "https://apps.apple.com/us/app/vike/id1473326895",
-      "buildNumber": "21",
+      "buildNumber": "22",
       "supportsTablet": true,
       "config": {
         "googleMapsApiKey": "AIzaSyBr8_x3nXHBPJMJ4EBg5w2clq5t_S1s05o"
