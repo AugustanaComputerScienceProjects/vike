@@ -168,7 +168,7 @@ const AddEvent = () => {
   };
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="lg">
       <Box sx={{ mt: 4 }}>
         <Typography variant="h4" gutterBottom>
           Add Event

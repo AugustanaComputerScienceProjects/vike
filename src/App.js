@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import React from "react";
 import { Route } from "react-router-dom";
 import "./App.css";
@@ -12,12 +13,8 @@ import PastEvents from "./views/PastEvents";
 import PendingEvents from "./views/PendingEvents";
 import Tags from "./views/Tags";
 import Users from "./views/Users";
-import Groups from "./views/Groups";
-import AddCalendarView from "./components/calendars/AddCalendarView";
-import CalendarsView from "./components/calendars/CalendarView";
-import ManageCalendar from "./components/calendars/ManageCalendar";
 
-// Main application file that manages all the different views
+const SentryRoute = Sentry.withSentryRouting(Route);
 
 const App = () => {
   const onNavChanged = () => {};
@@ -35,20 +32,16 @@ const App = () => {
             marginBottom: 20,
           }}
         >
-          <Route exact path="/" component={Home} />
-          <Route path="/add-event" component={AddEventView} />
-          <Route path="/pending-events" component={PendingEvents} />
-          <Route path="/events" component={CurrentEvents} />
-          <Route path="/past-events" component={PastEvents} />
-          <Route path="/event" component={Event} />
-          <Route path="/manage/:eventId" component={ManageEvent} />
-          <Route path="/check-in/:eventId" component={CheckInPage} />
-          <Route path="/tags" component={Tags} />
-          <Route path="/users" component={Users} />
-          <Route path="/groups" component={Groups} />
-          <Route path="/calendars" component={AddCalendarView} />
-          <Route path="/calendar-view" component={CalendarsView}/>
-          <Route path="/calendar-manage/:calendarId" component={ManageCalendar}/>
+          <SentryRoute exact path="/" component={Home} />
+          <SentryRoute path="/add-event" component={AddEventView} />
+          <SentryRoute path="/pending-events" component={PendingEvents} />
+          <SentryRoute path="/events" component={CurrentEvents} />
+          <SentryRoute path="/past-events" component={PastEvents} />
+          <SentryRoute path="/event" component={Event} />
+          <SentryRoute path="/manage/:eventId" component={ManageEvent} />
+          <SentryRoute path="/check-in/:eventId" component={CheckInPage} />
+          <SentryRoute path="/tags" component={Tags} />
+          <SentryRoute path="/users" component={Users} />
         </div>
       </div>
     </div>
