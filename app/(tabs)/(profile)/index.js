@@ -1,6 +1,7 @@
 import {useActionSheet} from '@expo/react-native-action-sheet';
 import Icon from '@expo/vector-icons/Feather';
 import auth from '@react-native-firebase/auth';
+import * as Application from 'expo-application';
 import {router} from 'expo-router';
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
@@ -8,6 +9,7 @@ import {Avatar} from 'react-native-elements';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {COLORS} from '../../../constants/theme';
+import useStoreReview from '../../../hooks/useStoreReview';
 
 const getInitials = fullName => {
   const allNames = fullName.trim().split(' ');
@@ -16,6 +18,7 @@ const getInitials = fullName => {
 
 export default function Profile() {
   const {showActionSheetWithOptions} = useActionSheet();
+  const {requestReview} = useStoreReview();
   const settingsOptions = [
     {
       title: 'About Vike',
@@ -27,12 +30,13 @@ export default function Profile() {
       href: '/feedback',
       icon: 'edit-2',
     },
-    // {
-    //   title: 'Share Vike',
-    //   icon: 'share',
-    //   subTitle: null,
-    //   onPress: () => {},
-    // },
+    {
+      title: 'Rate this app',
+      icon: 'star',
+      onPress: () => {
+        requestReview();
+      },
+    },
   ];
 
   const onLogout = () => {
@@ -87,10 +91,16 @@ export default function Profile() {
             Settings
           </Text>
           <View>
-            {settingsOptions.map(({title, icon, href}) => (
+            {settingsOptions.map(({title, icon, href, onPress}) => (
               <TouchableOpacity
                 key={title}
-                onPress={() => router.navigate(href)} // Assuming you have access to the navigation prop
+                onPress={() => {
+                  if (href) {
+                    router.navigate(href);
+                  } else if (onPress) {
+                    onPress();
+                  }
+                }} // Assuming you have access to the navigation prop
                 style={{flex: 1}}>
                 <View style={styles.menuItem}>
                   <Icon color={COLORS.text} size={18} name={icon} />
@@ -110,9 +120,20 @@ export default function Profile() {
             ))}
           </View>
         </View>
-
-        <TouchableOpacity onPress={onLogout}>
-          <View style={{marginTop: 48, paddingBottom: 10}}>
+        <View style={{marginTop: 32, paddingBottom: 10}}>
+          <View
+            style={{
+              marginBottom: 4,
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <Text style={{fontSize: 14}}>Version: </Text>
+            <Text style={{fontSize: 14, color: COLORS.gray}}>
+              {Application.nativeApplicationVersion} (
+              {Application.nativeBuildVersion})
+            </Text>
+          </View>
+          <TouchableOpacity onPress={onLogout}>
             <Text
               style={{
                 fontSize: 14,
@@ -120,8 +141,8 @@ export default function Profile() {
               }}>
               Log out
             </Text>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

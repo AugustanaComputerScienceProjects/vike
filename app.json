@@ -53,6 +53,7 @@
       "backgroundColor": "#fff"
     },
     "android": {
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=edu.augustana.osleventsandroid",
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyB9PvtuwDFWCzUFFVf9kijCSS8on9y3t48"
@@ -71,6 +72,7 @@
       "versionCode": 17
     },
     "ios": {
+      "appStoreUrl": "https://apps.apple.com/us/app/vike/id1473326895",
       "buildNumber": "21",
       "supportsTablet": true,
       "config": {
