@@ -105,22 +105,6 @@ const NavDrawer = (props) => {
           </ListItemButton>
           <ListItemButton
             component={Link}
-            to="/groups"
-            name="Groups"
-            disabled={!adminSignedIn && !leaderSignedIn}
-          >
-            Groups New
-          </ListItemButton>
-          <ListItemButton
-            component={Link}
-            to="/calendars"
-            name="Calendars"
-            disabled={!adminSignedIn && !leaderSignedIn}
-          >
-            Calendars/Subscriptions
-          </ListItemButton>
-          <ListItemButton
-            component={Link}
             to="/calendar-view"
             name="Calendars View"
             disabled={!adminSignedIn && !leaderSignedIn}

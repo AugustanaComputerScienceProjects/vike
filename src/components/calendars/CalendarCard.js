@@ -24,15 +24,6 @@ const CalendarCard = ({ calendar }) => {
         history.push(path);
     }
 
-    const togglePreview = () => {
-        setOpenPreview(!openPreview);
-    }
-
-    // const handleCardClick = () => {
-    //     history.push(`/calendar-manage/${calendar.id}`);
-    // };
-
-
     return (
         <>
             <Card sx={{ mt: 2, mb: 2 }} onClick={() => navigateTo(`/calendar-manage/${calendar.key}`)}>
@@ -44,7 +35,7 @@ const CalendarCard = ({ calendar }) => {
                                     {calendar.name}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                    {calendar.subcriber || "No Subcriber"}
+                                    {calendar.subcribers || "No Subcriber"}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
                                     Created by: {calendar.email}
@@ -66,11 +57,7 @@ const CalendarCard = ({ calendar }) => {
                         </Grid>
                     </Grid>
                 </CardActionArea>
-            </Card>
-
-            {/* <Dialog open={openPreview} onClose={togglePreview}>
-                <CalendarView event={calendar} />
-            </Dialog> */}
+            </Card> 
         </>
     )
 }

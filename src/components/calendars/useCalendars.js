@@ -6,7 +6,7 @@ const readCalendars = async () => {
     const reference = firebase.database.ref(calendarType).orderByChild("name");
     const snapshot = await reference.once("value");
     const calendars = [];
-    const promises = [];
+    const promises = [];  
 
     snapshot.forEach((childSnapshot) => {
         const calendar = childSnapshot.val();

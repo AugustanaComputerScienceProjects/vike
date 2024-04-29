@@ -3,8 +3,7 @@ import {
   Button,
   Container,
   Dialog,
-  DialogContent,
-  Grid,
+  DialogContent, 
   Skeleton,
   Stack,
   Typography,
@@ -21,11 +20,11 @@ const CalendarsView = () => {
 
     const renderCalendarSection = (calendars) => {
         return (
-            <Grid container spacing={2} sx={{ mt: 2 }}>
+            <Container sx={{ display: 'flex', flexWrap: 'wrap', mt: 2, justifyContent: 'space-between', alignItems: 'center', margin: '0 auto', padding: '50px' }}>
                 {calendars.map((calendar) => (
                     <CalendarCard key={calendar.key} calendar={calendar} />
                 ))}
-            </Grid>
+            </Container>
         );
     }
 
@@ -71,7 +70,8 @@ const CalendarsView = () => {
                 maxWidth="md"
             >
                 <DialogContent>
-                    <AddCalendar onClose={handleAddCalendarFormClose} />
+                    <AddCalendar 
+                    onClose={handleAddCalendarFormClose} />
                 </DialogContent>
             </Dialog>
         </Container>

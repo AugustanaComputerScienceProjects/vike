@@ -14,7 +14,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import EventPreview from "./EventPreview";
 
-export const STATUS = {
+export const EVENT_STATUS = {
   GOING: "GOING",
   CHECKED_IN: "CHECKED_IN",
   INVITED: "INVITED",

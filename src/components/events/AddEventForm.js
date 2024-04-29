@@ -69,12 +69,12 @@ const AddEventForm = ({
           )}
         />
       </FormControl>
-      {/* <FormControl margin="dense" fullWidth>
+      <FormControl margin="dense" fullWidth>
         <Autocomplete
           margin="dense"
           fullWidth
           options={calendars}
-          getOptionLabel={(option) => option}
+          getOptionLabel={(option) => option || ''}
           value={formData.calendar}
           onChange={(event, newValue) => {
             setFormData((prevFormData) => ({
@@ -86,7 +86,7 @@ const AddEventForm = ({
             <TextField {...params} label="Calendar" required />
           )}
         />
-      </FormControl> */}
+      </FormControl>
       <FormControl margin="dense" fullWidth>
         <Autocomplete
           multiple

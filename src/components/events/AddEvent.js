@@ -17,7 +17,7 @@ import {
   addHours,
   handleImageFileChanged,
   roundToNearestHalfHour,
-} from "./utils";
+} from "./utils"; 
 
 const AddEvent = () => {
   const [formData, setFormData] = useState({
@@ -37,7 +37,7 @@ const AddEvent = () => {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const { adminSignedIn, leaderSignedIn, databaseTags, groups } = useRoleData();
+  const { adminSignedIn, leaderSignedIn, databaseTags, groups, calendars } = useRoleData();
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -122,18 +122,17 @@ const AddEvent = () => {
     };
     console.log(eventData);
 
-    firebase.database
-      .ref("/current-events")
-      .push(eventData)
-      .then(() => {
-        setUploading(false);
-        displayMessage("Event Added");
-        resetForm();
-      })
-      .catch((error) => {
+    try {
+      const newEventRef = firebase.database.ref("/current-events").push(eventData);
+      setUploading(false);
+      updateEventCalendar( newEventRef.key, eventData.name, eventData.calendar); 
+      console.log("Event Added to Calendar!");
+      displayMessage("Event Added");
+      resetForm();
+    } catch (error) {
         console.log(error);
         displayMessage("Error Adding Event");
-      });
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -145,11 +144,28 @@ const AddEvent = () => {
       formData.organization !== ""
     ) {
       console.log("Image64", image64);
-      saveImage("Images", image64);
+      saveImage("Images", image64); 
     } else {
       displayMessage("Required fields are not filled in.");
     }
   };
+
+  const updateEventCalendar = async (eventId, name, calendar) => { 
+    const calendarRef = firebase.database.ref(`/calendars`).orderByChild("name");
+    const snapshot = await calendarRef.once("value");
+    const calendars = snapshot.val();
+     
+    for(const [key, value] of Object.entries(calendars)) {
+      if (value.name === calendar) {
+        const events = value.events || [];
+        // events.push(eventId);
+        events.push({ id: eventId, name: name });
+        await firebase.database.ref(`/calendars/${key}`).update({ events });
+        return;
+      }
+    }
+    console.error(`Calendar ${calendar} does not exist.`);
+  }
 
   const resetForm = () => {
     setFormData({
@@ -163,6 +179,7 @@ const AddEvent = () => {
       webLink: "",
       tags: [],
       email: "",
+      calendar: "",
     });
     setImage64(defaultImage);
   };
@@ -186,6 +203,7 @@ const AddEvent = () => {
               <AddEventForm
                 formData={formData}
                 groups={groups}
+                calendars={calendars}
                 databaseTags={databaseTags}
                 handleInputChange={handleInputChange}
                 handleDateChange={handleDateChange}

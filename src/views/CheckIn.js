@@ -17,7 +17,7 @@ import { Scanner } from "@yudiel/react-qr-scanner";
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { STATUS, toTitleCase } from "../components/events/EventCard";
+import { EVENT_STATUS, toTitleCase } from "../components/events/EventCard";
 import firebase from "../config";
 
 const CheckInPage = () => {
@@ -57,9 +57,9 @@ const CheckInPage = () => {
   const handleManualCheckIn = async () => {
     if (selectedGuest.userHandle) {
       const newStatus =
-        selectedGuest.status === STATUS.CHECKED_IN
-          ? STATUS.GOING
-          : STATUS.CHECKED_IN;
+        selectedGuest.status === EVENT_STATUS.CHECKED_IN
+          ? EVENT_STATUS.GOING
+          : EVENT_STATUS.CHECKED_IN;
       await firebase.database
         .ref(
           `/current-events/${eventId}/guests/${selectedGuest.userHandle}/status`
@@ -93,7 +93,7 @@ const CheckInPage = () => {
         if (guest.userHandle) {
           await firebase.database
             .ref(`/current-events/${eventId}/guests/${guest.userHandle}/status`)
-            .set(STATUS.CHECKED_IN);
+            .set(EVENT_STATUS.CHECKED_IN);
           const eventRef = firebase.database.ref(`/current-events/${eventId}`);
           const snapshot = await eventRef.once("value");
           const fetchedEvent = snapshot.val();
@@ -196,14 +196,14 @@ const CheckInPage = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleManualCheckIn} variant="contained">
-            {selectedGuest.status === STATUS.CHECKED_IN
+            {selectedGuest.status === EVENT_STATUS.CHECKED_IN
               ? "Undo Check In"
               : "Check In"}
           </Button>
         </DialogActions>
       </Dialog>
       <Dialog
-        fullWidth
+        fullWidth 
         maxWidth="md"
         open={openQRScanner}
         onClose={() => setOpenQRScanner(false)}

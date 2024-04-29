@@ -11,8 +11,7 @@ import NavBar from "./views/NavBar";
 import PastEvents from "./views/PastEvents";
 import PendingEvents from "./views/PendingEvents";
 import Tags from "./views/Tags";
-import Users from "./views/Users";
-import Groups from "./views/Groups";
+import Users from "./views/Users"; 
 import AddCalendarView from "./components/calendars/AddCalendarView";
 import CalendarsView from "./components/calendars/CalendarView";
 import ManageCalendar from "./components/calendars/ManageCalendar";
@@ -44,8 +43,7 @@ const App = () => {
           <Route path="/manage/:eventId" component={ManageEvent} />
           <Route path="/check-in/:eventId" component={CheckInPage} />
           <Route path="/tags" component={Tags} />
-          <Route path="/users" component={Users} />
-          <Route path="/groups" component={Groups} />
+          <Route path="/users" component={Users} /> 
           <Route path="/calendars" component={AddCalendarView} />
           <Route path="/calendar-view" component={CalendarsView}/>
           <Route path="/calendar-manage/:calendarId" component={ManageCalendar}/>

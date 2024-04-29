@@ -8,6 +8,7 @@ import {
     Typography,
     Dialog,
     DialogContent,
+    TextField,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from '@mui/icons-material/Search';
@@ -17,7 +18,7 @@ import { useParams } from "react-router-dom";
 import firebase from "../../config";
 import useEvents from "../events/useEvents";
 import AddEvent from "../events/AddEvent";
-import Search from "../events/Search";
+import Search from "./Search";
 
 const ManageCalendar = () => {
     const { calendarId } = useParams();
@@ -26,8 +27,7 @@ const ManageCalendar = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [tabValue, setTabValue] = useState(0);
     const [profile64, setProfile64] = useState(null);
-    const [isAddEventFormOpen, setIsAddEventFormOpen] = useState(false);
-    const [isSearchEventFormOpen, setIsSearchEventFormOpen] = useState(false);
+    const [isAddEventFormOpen, setIsAddEventFormOpen] = useState(false); 
     const { refreshEvents } = useEvents();
 
     useEffect(() => {
@@ -78,16 +78,7 @@ const ManageCalendar = () => {
     const handleAddEventFormClose = () => {
         setIsAddEventFormOpen(false);
         refreshEvents();
-    };
-    
-    const handleSearchEventClick = () => {
-        setIsSearchEventFormOpen(true);
-    }
-    
-    const handleSearchEventFormClose = () => {
-        setIsSearchEventFormOpen(false);
-        refreshEvents();
-    }
+    }; 
 
     return (
         <Container maxWidth="md">
@@ -105,26 +96,19 @@ const ManageCalendar = () => {
             </Tabs>
             <Divider />
             <Box sx={{ mt: 4 }}>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<AddIcon />}
+                    // onClick={() => history.push(`/calendars/${calendarId}/events/add`)}
+                    onClick={handleAddEventClick}
+                >
+                    Add Event
+                </Button>
                 {tabValue === 0 && (
-                    <div style={{ display: "flex" }}>
+                    <div style={{ display: "flex" }}> 
                         {/* <Typography variant="h5">Events</Typography> */}
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            startIcon={<SearchIcon />}
-                            onClick={handleSearchEventClick}
-                        >
-                            Search Available Events
-                        </Button>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            startIcon={<AddIcon />}
-                            // onClick={() => history.push(`/calendars/${calendarId}/events/add`)}
-                            onClick={handleAddEventClick}
-                        >
-                            Add Event
-                        </Button>
+                            <Search /> 
                     </div>
                 )}
                 {tabValue === 1 && (
@@ -145,16 +129,6 @@ const ManageCalendar = () => {
             >
                 <DialogContent>
                     <AddEvent />
-                </DialogContent>
-            </Dialog>
-            <Dialog
-                open={isSearchEventFormOpen}
-                onClose={handleSearchEventFormClose}
-                fullWidth
-                maxWidth="md"
-            >
-                <DialogContent>
-                    <Search />
                 </DialogContent>
             </Dialog>
         </Container>

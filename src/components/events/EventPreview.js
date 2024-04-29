@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from "@mui/material";
 import { format } from "date-fns";
 import firebase from "../../config";
-import { STATUS } from "./EventCard";
+import { EVENT_STATUS } from "./EventCard";
 import { generateUniqueTicketId } from "./utils";
 
 const EventGuestActions = ({
@@ -20,7 +20,7 @@ const EventGuestActions = ({
         ...event.guests,
         [currentUserHandle]: {
           ticketId,
-          status: STATUS.GOING,
+          status: EVENT_STATUS.GOING,
         },
       },
     };
@@ -64,7 +64,7 @@ const EventGuestActions = ({
     );
 
     try {
-      await eventRef.update({ status: STATUS.NOT_GOING });
+      await eventRef.update({ status: EVENT_STATUS.NOT_GOING });
       alert("Registration cancelled successfully.");
     } catch (error) {
       console.error("Error cancelling registration: ", error);
@@ -72,7 +72,7 @@ const EventGuestActions = ({
     }
   };
 
-  if (status === STATUS.GOING || status === STATUS.CHECKED_IN) {
+  if (status === EVENT_STATUS.GOING || status === EVENT_STATUS.CHECKED_IN) {
     return (
       <Box>
         <h2>You're In!</h2>
@@ -101,7 +101,7 @@ const EventGuestActions = ({
         </Box>
       </Box>
     );
-  } else if (status === STATUS.NOT_GOING) {
+  } else if (status === EVENT_STATUS.NOT_GOING) {
     return (
       <Box>
         <h2>You're Not Going.</h2>

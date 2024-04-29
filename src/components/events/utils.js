@@ -29,11 +29,14 @@ export const generateUniqueTicketId = (userHandle, eventId) => {
   return `${userHandle}-${eventId}-${timestamp}`;
 };
 
-export const STATUS = {
+export const EVENT_STATUS = {
   GOING: "GOING",
   CHECKED_IN: "CHECKED_IN",
   INVITED: "INVITED",
   NOT_GOING: "NOT_GOING",
+};
+
+export const CALENDAR_STATUS = {
   SUBSCRIBED: "SUBSCRIBED",
   NOT_SUBSCRIBED: "NOT_SUBSCRIBED",
-};
+}
