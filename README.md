@@ -1,68 +1,61 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Vike Web App
 
-## Available Scripts
+## Getting Started
 
-In the project directory, you can run:
+1. Before you begin, ensure you have met the following requirements:
 
-### `npm start`
+- [Node.js](https://nodejs.org/)
+- [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable) as main package manager
 
-Runs the app in the development mode.<br>
+2. Install dependencies
+
+```bash
+yarn install
+```
+
+3. Runs the app in the development mode.
+
+```bash
+yarn start
+```
+
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
+You will also see any logs, warnings, errors in the console.
 
 Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+
+```bash
+yarn build
+```
+
+It bundles React in production mode and optimizes the build for the best performance.
 
 The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Features
 
-### `npm run eject`
+- React: Main frontend framework with create-react-app
+- Firebase: Using authentication, real-time database, and cloud functions.
+- ESLint and Prettier: Maintain code quality and consistency.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Set up Firebase
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+https://console.firebase.google.com/
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+- Log in with your Google account.
+- Create new project.
+- In project root, create a file and name it .env with content below or copy from .env_example
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```.env
+SENTRY_AUTH_TOKEN=sentrytoken # optional
+REACT_APP_FIREBASE_API_KEY=myapikey
+REACT_APP_FIREBASE_AUTH_DOMAIN=myauthdomain
+REACT_APP_FIREBASE_DATABASE_URL=mydatabaseurl
+REACT_APP_FIREBASE_PROJECT_ID=myprojectid
+REACT_APP_FIREBASE_STORAGE_BUCKET=mystoragebucket
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=mymessagingsenderid
+```
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+You should now be setup to use Firebase.
