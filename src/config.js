@@ -1,19 +1,17 @@
-import fire from 'firebase';
-import app from 'firebase/app';
-import 'firebase/database';
-import 'firebase/storage';
-import 'firebase/auth';
-
-// Config file for Firebase
+import fire from "firebase";
+import app from "firebase/app";
+import "firebase/auth";
+import "firebase/database";
+import "firebase/storage";
 
 // Config to initialize Firebase
 let config = {
-  apiKey: 'AIzaSyBFTh3ZprCrzReAlVDeGcNN8WzijuDU6DI',
-  authDomain: 'osl-events-app.firebaseapp.com',
-  databaseURL: 'https://osl-events-app.firebaseio.com',
-  projectId: 'osl-events-app',
-  storageBucket: 'osl-events-app.appspot.com',
-  messagingSenderId: '559059413195',
+  apiKey: "AIzaSyBFTh3ZprCrzReAlVDeGcNN8WzijuDU6DI",
+  authDomain: "osl-events-app.firebaseapp.com",
+  databaseURL: "https://osl-events-app.firebaseio.com",
+  projectId: "osl-events-app",
+  storageBucket: "osl-events-app.appspot.com",
+  messagingSenderId: "559059413195",
 };
 
 class Firebase {
@@ -41,7 +39,7 @@ class Firebase {
         var errorMessage = error.message;
         var email = error.email;
         var credential = error.credential;
-        console.log('Error Signing in...');
+        console.log("Error Signing in...");
         console.log(errorCode);
         console.log(errorMessage);
         console.log(email);
