@@ -4,16 +4,14 @@ import "firebase/auth";
 import "firebase/database";
 import "firebase/storage";
 
-// Config file for Firebase
-
 // Config to initialize Firebase
 let config = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  apiKey: "AIzaSyBFTh3ZprCrzReAlVDeGcNN8WzijuDU6DI",
+  authDomain: "osl-events-app.firebaseapp.com",
+  databaseURL: "https://osl-events-app.firebaseio.com",
+  projectId: "osl-events-app",
+  storageBucket: "osl-events-app.appspot.com",
+  messagingSenderId: "559059413195",
 };
 
 class Firebase {

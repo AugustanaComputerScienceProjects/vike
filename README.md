@@ -46,16 +46,6 @@ https://console.firebase.google.com/
 
 - Log in with your Google account.
 - Create new project.
-- In project root, create a file and name it .env with content below or copy from .env_example
+- Add your own firebase config to `./config.js`.
 
-```.env
-SENTRY_AUTH_TOKEN=sentrytoken # optional
-REACT_APP_FIREBASE_API_KEY=myapikey
-REACT_APP_FIREBASE_AUTH_DOMAIN=myauthdomain
-REACT_APP_FIREBASE_DATABASE_URL=mydatabaseurl
-REACT_APP_FIREBASE_PROJECT_ID=myprojectid
-REACT_APP_FIREBASE_STORAGE_BUCKET=mystoragebucket
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID=mymessagingsenderid
-```
-
-You should now be setup to use Firebase.
+You should now be ready to use Firebase.
