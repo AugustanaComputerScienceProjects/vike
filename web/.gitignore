@@ -31,6 +31,11 @@ yarn-error.log*
 # vercel
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+#firebase
+/.firebase
+firebase-debug.log
+osl-event-app-service-account.json
+functions/.runtimeconfig.json
+
+# Sentry Config File
+.sentryclirc
