@@ -125,7 +125,7 @@ const AddEvent = () => {
     try {
       const newEventRef = firebase.database.ref("/current-events").push(eventData);
       setUploading(false);
-      updateEventCalendar( newEventRef.key, eventData.name, eventData.calendar); 
+      updateEventCalendar( newEventRef.key, eventData, eventData.calendar); 
       console.log("Event Added to Calendar!");
       displayMessage("Event Added");
       resetForm();
@@ -150,22 +150,23 @@ const AddEvent = () => {
     }
   };
 
-  const updateEventCalendar = async (eventId, name, calendar) => { 
+  const updateEventCalendar = async (eventId, eventData, calendar) => { 
     const calendarRef = firebase.database.ref(`/calendars`).orderByChild("name");
     const snapshot = await calendarRef.once("value");
     const calendars = snapshot.val();
-     
+    
     for(const [key, value] of Object.entries(calendars)) {
       if (value.name === calendar) {
-        const events = value.events || [];
-        // events.push(eventId);
-        events.push({ id: eventId, name: name });
-        await firebase.database.ref(`/calendars/${key}`).update({ events });
+        let eventsCalendar = value.eventsCalendar || {}; 
+        eventsCalendar[eventId] = eventData; 
+        await firebase.database.ref(`/calendars/${key}`).update({ eventsCalendar });
         return;
       }
     }
+     
     console.error(`Calendar ${calendar} does not exist.`);
   }
+ 
 
   const resetForm = () => {
     setFormData({

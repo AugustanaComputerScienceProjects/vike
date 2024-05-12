@@ -7,8 +7,8 @@ import {
     Tabs,
     Typography,
     Dialog,
-    DialogContent,
-    TextField,
+    DialogContent,  
+    Grid, 
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from '@mui/icons-material/Search';
@@ -18,7 +18,10 @@ import { useParams } from "react-router-dom";
 import firebase from "../../config";
 import useEvents from "../events/useEvents";
 import AddEvent from "../events/AddEvent";
-import Search from "./Search";
+import Search from "./Search"; 
+import EventCard from "../events/EventCard";
+import { format } from "date-fns";
+import { groupEventsByDate } from "../events/utils";
 
 const ManageCalendar = () => {
     const { calendarId } = useParams();
@@ -28,27 +31,74 @@ const ManageCalendar = () => {
     const [tabValue, setTabValue] = useState(0);
     const [profile64, setProfile64] = useState(null);
     const [isAddEventFormOpen, setIsAddEventFormOpen] = useState(false); 
-    const { refreshEvents } = useEvents();
+    const [isSearchEventFormOpen, setIsSearchEventFormOpen] = useState(false); 
+    const { loading } = useEvents(); 
+    const [eventsCalendar, setEventsCalendar] = useState([]); 
+
+    const fetchCalendarData = async (calendarId) => {
+        const calendarRef = firebase.database.ref(`/calendars/${calendarId}`);
+        const snapshot = await calendarRef.once("value");
+        return snapshot.val();
+    };
 
     useEffect(() => {
-        const fetchCalendar = async () => {
-            const calendarRef = firebase.database.ref(`calendars/${calendarId}`);
-            const snapshot = await calendarRef.once("value");
-            const calendar = snapshot.val();
+        const fetchCalendar = async () => { 
+            const calendar = await fetchCalendarData(calendarId);
             setCalendar({
                 ...calendar,
-                key: snapshot.key,
+                key: calendar.key,
             });
             const profileUrl = await firebase.storage
                 .ref("Profiles")
                 .child(`${calendar.profileId}.png`)
                 .getDownloadURL();
             setProfile64(profileUrl);
+
+            const eventsRef = firebase.database.ref(`/calendars/${calendarId}/eventsCalendar`);
+            const eventsSnapshot = await eventsRef.once("value");
+            const events = eventsSnapshot.val();
+            const eventsArray = Object.entries(events || {}).map(([id, data]) => ({ id, ...data }));
+            setEventsCalendar(eventsArray);
         }
-
-
         fetchCalendar();
-    }, [calendarId]);
+    }, [calendarId]); 
+
+    const renderEventSection = (date, eventsCalendar) => {
+        const eventDate = new Date(date);
+        eventDate.setMinutes(
+          eventDate.getMinutes() + eventDate.getTimezoneOffset()
+        );  
+        return (
+          <Grid container spacing={2} key={date} sx={{ mt: 2 }}>
+            <Grid item xs={3}>
+              <Typography variant="h6">{format(eventDate, "MMM d")}</Typography>
+              <Typography variant="body1">{format(eventDate, "EEEE")}</Typography>
+            </Grid>
+            <Grid item xs={9}>
+              {eventsCalendar.map((event) => (
+                // <EventCard key={event.key} event={event} />
+                <Box key={event.key}>
+                    <EventCard event={event} />
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleDeleteClick(event)}
+                    >
+                        Remove
+                    </Button>
+                </Box>
+            ))}
+            </Grid>
+          </Grid>
+        );
+      };
+
+    const handleDeleteClick = async (e) => {
+        const updatedEvents = eventsCalendar.filter(event => event.id !== e.id);
+        setEventsCalendar(updatedEvents);
+        const eventsRef = firebase.database.ref(`/calendars/${calendarId}/eventsCalendar`);
+        await eventsRef.set(Object.fromEntries(updatedEvents.map(event => [event.id, event])));
+    } 
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
@@ -66,19 +116,35 @@ const ManageCalendar = () => {
         setOpenSnackbar(false);
     };
 
-    if (!calendar) {
-        // fetchCalendar();
-        return <Typography variant="body1">Loading...</Typography>;
-    }
-
     const handleAddEventClick = () => {
         setIsAddEventFormOpen(true);
     };
 
     const handleAddEventFormClose = () => {
         setIsAddEventFormOpen(false);
-        refreshEvents();
+        refreshEventsCalendar();
     }; 
+
+    const handleSearchEventClick = () => {
+        setIsSearchEventFormOpen(true);
+    };
+
+    const handleSearchEventFormClose = () => {
+        setIsSearchEventFormOpen(false);
+        refreshEventsCalendar();
+    }; 
+
+    if (!calendar) {
+        return <Typography variant="body1">Loading...</Typography>;
+    }
+
+    const refreshEventsCalendar = async () => { 
+        const eventsRef = firebase.database.ref(`/calendars/${calendarId}/eventsCalendar`);
+        const eventsSnapshot = await eventsRef.once("value");
+        const events = eventsSnapshot.val();
+        const eventsArray = Object.entries(events || {}).map(([id, data]) => ({ id, ...data }));
+        setEventsCalendar(eventsArray);
+    }
 
     return (
         <Container maxWidth="md">
@@ -96,20 +162,30 @@ const ManageCalendar = () => {
             </Tabs>
             <Divider />
             <Box sx={{ mt: 4 }}>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<AddIcon />}
-                    // onClick={() => history.push(`/calendars/${calendarId}/events/add`)}
-                    onClick={handleAddEventClick}
-                >
-                    Add Event
-                </Button>
                 {tabValue === 0 && (
-                    <div style={{ display: "flex" }}> 
-                        {/* <Typography variant="h5">Events</Typography> */}
-                            <Search /> 
-                    </div>
+                    <Container style={{ display: "flex", flexDirection: "column"}}> 
+                        <Box style={{display: "flex", justifyContent: "space-between"}}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                startIcon={<AddIcon />}
+                                onClick={handleAddEventClick}
+                            >
+                                Add New Event
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                startIcon={<SearchIcon />}
+                                onClick={handleSearchEventClick}
+                            >
+                                Search Available Events
+                            </Button>
+                        </Box>
+                        {Object.entries(groupEventsByDate(eventsCalendar))
+                            .sort((a, b) => new Date(a[0]) - new Date(b[0]))
+                            .map(([date, eventsCalendar]) => renderEventSection(date, eventsCalendar))}
+                    </Container>
                 )}
                 {tabValue === 1 && (
                     <Typography variant="h5">Subscribers</Typography>
@@ -129,6 +205,16 @@ const ManageCalendar = () => {
             >
                 <DialogContent>
                     <AddEvent />
+                </DialogContent>
+            </Dialog>
+            <Dialog
+                open={isSearchEventFormOpen}
+                onClose={handleSearchEventFormClose}
+                fullWidth
+                maxWidth="md"
+            >
+                <DialogContent>
+                    <Search /> 
                 </DialogContent>
             </Dialog>
         </Container>

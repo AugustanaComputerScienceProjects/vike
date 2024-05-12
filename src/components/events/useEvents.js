@@ -23,7 +23,7 @@ const readEvents = async () => {
   await Promise.all(promises);
 
   return events;
-};
+}; 
 
 // Retrieves a single image from Firebase storage
 const getImage = async (imageId) => {
@@ -40,7 +40,7 @@ const getImage = async (imageId) => {
 };
 
 const useEvents = () => {
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState([]); 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const useEvents = () => {
       setLoading(false);
     };
 
-    fetchEvents();
+    fetchEvents(); 
   }, []);
 
   const refreshEvents = async () => {
@@ -58,7 +58,7 @@ const useEvents = () => {
     const events = await readEvents();
     setEvents(events);
     setLoading(false);
-  };
+  }; 
 
   return { events, loading, refreshEvents };
 };

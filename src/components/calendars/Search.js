@@ -1,41 +1,54 @@
 import React, { useEffect, useState } from 'react';
-import { TextField, List, ListItem, ListItemText } from '@material-ui/core';
-import { Container } from '@mui/material';
+import { TextField, List, ListItem, Button } from '@material-ui/core';
+import { Box, Container } from '@mui/material';
 import firebase from "../../config";
-import { useParams } from "react-router-dom";
-import EventsView from '../events/EventsViewNew';
+import { useParams } from "react-router-dom"; 
 
 const Search = () => {
     const { calendarId } = useParams();
-    const [searchTerm, setSearchTerm] = useState('');
-    const [calendar, setCalendar] = useState([]);
-    const [events, setEvents] = useState([]); 
- 
-    useEffect(() => {
-        const fetchCalendars = async () => {
-            const calendarRef = firebase.database.ref(`/calendars/${calendarId}`);  
-            const snapshot = await calendarRef.once("value");
-            const fetchCalendar = snapshot.val();
-            if (fetchCalendar) setCalendar(fetchCalendar);
+    const [searchTerm, setSearchTerm] = useState(''); 
+    const [eventsCalendar, setEventsCalendar] = useState([]); 
+    const [addedEvents, setAddedEvents] = useState({});
 
-            if (fetchCalendar.events)
-                setEvents(
-                    Object.entries(fetchCalendar.events).map(([eventId, eventData]) => ({ id: eventId, ...eventData }))
-                );    
+    // Search for events that haven't been added to any calendar 
+    useEffect(() => {
+        const fetchEvents = async () => {
+            const eventsRef = firebase.database.ref('/current-events');
+            const snapshot = await eventsRef.once('value');
+            const events = snapshot.val();
+            const eventsArray = Object.entries(events || {}).map(([id, data]) => ({ id, ...data }));
+            const calendarRef = firebase.database.ref(`/calendars/${calendarId}`);  
+            const calendarSnapshot = await calendarRef.once("value");
+            const fetchCalendar = calendarSnapshot.val();
+            if (fetchCalendar && fetchCalendar.eventsCalendar) {
+                const filteredEventsArray = eventsArray.filter(event => !fetchCalendar.eventsCalendar[event.id]);
+                setEventsCalendar(filteredEventsArray);
+            }
         }
-        fetchCalendars();
+        fetchEvents();
     }, [calendarId]);
 
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
     }; 
 
-    const filteredEvents = events
-  ? events.filter((event) =>
+    const filteredEvents = eventsCalendar
+  ? eventsCalendar.filter((event) =>
       event.name && event.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
-  : [];
- 
+  : []; 
+
+const handleAddClick = async (selectedEvent) => {
+    const calendarRef = firebase.database.ref(`/calendars/${calendarId}`);
+    const snapshot = await calendarRef.once("value");
+    const fetchedCalendar = snapshot.val();
+    if (fetchedCalendar && fetchedCalendar.eventsCalendar) {
+            const eventsCalendar = fetchedCalendar.eventsCalendar;
+            eventsCalendar[selectedEvent.id] = selectedEvent;
+            calendarRef.update({ eventsCalendar });
+    }
+    setAddedEvents(prevState => ({ ...prevState, [selectedEvent.id]: true }));
+}
 
     return (
         <Container >
@@ -49,12 +62,27 @@ const Search = () => {
             />
             <List>
                 {filteredEvents.map((event) => (
-                    <ListItem key={event.id}>
-                        <ListItemText primary={event.name} />
-                        {/* <EventsView event={event} /> */}
+                    <ListItem 
+                        key={event.id} 
+                        style={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                        <Box style={{ margin: -10}}>
+                            <h3 style={{ marginBottom: 5 }}>{event?.name}</h3>
+                            <p>{event?.startDate}</p>
+                        </Box> 
+                        <Button
+                            variant="contained"
+                            sx={{
+                                height: "100%",
+                            }}
+                            color={addedEvents[event.id] ? "default" : "primary"}
+                            onClick={() => handleAddClick(event)}
+                            >
+                            {addedEvents[event.id] ? "Added" : "Add"}
+                        </Button>
                     </ListItem>
                 ))}
-            </List>
+            </List> 
         </Container>
     );
 };
