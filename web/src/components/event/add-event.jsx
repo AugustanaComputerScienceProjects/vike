@@ -58,7 +58,7 @@ const AddEvent = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 max-w-[59rem]">
       <h4 className="text-2xl font-bold mb-4">Add Event</h4>
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

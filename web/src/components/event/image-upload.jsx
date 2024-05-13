@@ -1,4 +1,5 @@
-import { Image } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
 
 const ImageUpload = ({ image64, onImageUpload, onImageDrop }) => {
   return (
@@ -8,10 +9,12 @@ const ImageUpload = ({ image64, onImageUpload, onImageDrop }) => {
       onDragOver={(event) => event.preventDefault()}
     >
       {image64 ? (
-        <img
+        <Image
           src={image64}
           alt="Event"
-          className="max-w-full max-h-full object-contain"
+          layout="fill"
+          objectFit="contain"
+          className="object-cover"
         />
       ) : (
         <p className="text-center">
@@ -19,7 +22,7 @@ const ImageUpload = ({ image64, onImageUpload, onImageDrop }) => {
         </p>
       )}
       <label className="absolute bottom-2 right-2 bg-blue-500 hover:bg-blue-700 text-white p-2 cursor-pointer">
-        <Image className="h-6 w-6" />
+        <ImageIcon className="h-6 w-6" />
         <input type="file" accept="image/*" hidden onChange={onImageUpload} />
       </label>
     </div>

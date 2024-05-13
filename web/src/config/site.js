@@ -7,23 +7,15 @@ export const siteConfig = {
       href: "/events",
     },
     {
-      title: "About",
-      href: "/about",
+      title: "Users",
+      href: "/users",
     },
     {
-      user: "User",
-      href: "/user",
-    },
-    {
-      tags: "Tags",
+      title: "Tags",
       href: "/tags",
     },
     {
-      tags: "Tags",
-      href: "/tags",
-    },
-    {
-      groups: "Groups",
+      title: "Groups",
       href: "/groups",
     },
   ],
