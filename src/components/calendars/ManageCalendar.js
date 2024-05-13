@@ -19,20 +19,15 @@ import { format } from "date-fns";
 import firebase from "../../config";
 import AddEvent from "../events/AddEvent";
 import EventCard from "../events/EventCard";
-import useEvents from "../events/useEvents";
 import { groupEventsByDate } from "../events/utils";
 import Search from "./Search";
 
 const ManageCalendar = () => {
     const { calendarId } = useParams();
     const [calendar, setCalendar] = useState(null);
-    const [message, setMessage] = useState("");
-    const [openSnackbar, setOpenSnackbar] = useState(false);
     const [tabValue, setTabValue] = useState(0);
-    const [profile64, setProfile64] = useState(null);
     const [isAddEventFormOpen, setIsAddEventFormOpen] = useState(false);
     const [isSearchEventFormOpen, setIsSearchEventFormOpen] = useState(false);
-    const { loading } = useEvents();
     const [eventsCalendar, setEventsCalendar] = useState([]);
 
     const fetchCalendarData = async (calendarId) => {
@@ -48,11 +43,6 @@ const ManageCalendar = () => {
                 ...calendar,
                 key: calendar.key,
             });
-            const profileUrl = await firebase.storage
-                .ref("Profiles")
-                .child(`${calendar.profileId}.png`)
-                .getDownloadURL();
-            setProfile64(profileUrl);
 
             const eventsRef = firebase.database.ref(
                 `/calendars/${calendarId}/eventsCalendar`
@@ -120,18 +110,6 @@ const ManageCalendar = () => {
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
-    };
-
-    const displayMessage = (message) => {
-        setMessage(message);
-        setOpenSnackbar(true);
-    };
-
-    const handleSnackbarClose = (event, reason) => {
-        if (reason === "clickaway") {
-            return;
-        }
-        setOpenSnackbar(false);
     };
 
     const handleAddEventClick = () => {
