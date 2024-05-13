@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import firebase from "../../config";
+import firebase from "../../config"; 
 
 const decodeGroup = (codedGroup) => {
   let group = codedGroup;
@@ -14,11 +14,12 @@ const decodeGroup = (codedGroup) => {
   return group;
 };
 
-const useRoleData = () => {
+const useRoleData = () => { 
   const [adminSignedIn, setAdminSignedIn] = useState(false);
   const [leaderSignedIn, setLeaderSignedIn] = useState(false);
   const [databaseTags, setDatabaseTags] = useState([]);
   const [groups, setGroups] = useState([]);
+  const [calendars, setCalendars] = useState([]);
 
   useEffect(() => {
     readTags();
@@ -42,6 +43,7 @@ const useRoleData = () => {
           if (role === "admin") {
             setAdminSignedIn(true);
             readAllGroups();
+            readAllCalendars();
           } else if (role === "leaders" && !adminSignedIn) {
             setLeaderSignedIn(true);
             readLeaderGroups();
@@ -64,6 +66,19 @@ const useRoleData = () => {
       });
       setGroups(myGroups);
     });
+  };
+
+  const readAllCalendars = async () => {
+    let calendarRef = firebase.database.ref("/calendars").orderByChild("name");
+    const snapshot = await calendarRef.once("value"); 
+    const calendarList = [];
+
+    snapshot.forEach((childSnapshot) => {
+      const calendar = childSnapshot.val();
+      calendar.key = childSnapshot.key;
+      calendarList.push(calendar.name);
+    });
+    setCalendars(calendarList);
   };
 
   const readTags = () => {
@@ -89,7 +104,8 @@ const useRoleData = () => {
     });
   };
 
-  return { adminSignedIn, leaderSignedIn, databaseTags, groups };
+
+  return { adminSignedIn, leaderSignedIn, databaseTags, groups, calendars };
 };
 
 export default useRoleData;

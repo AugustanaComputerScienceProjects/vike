@@ -42,7 +42,7 @@ class Users extends Component {
     groupLeaders: new Map(),
     groupsForLeaders: [],
     leadersForGroups: [],
-    groupLeaderRemoved: '',
+    groupLeaderRemoved: '', 
   };
 
   listeners = [];

@@ -7,12 +7,13 @@ const ImageUpload = ({ image64, onImageUpload, onImageDrop }) => {
     <Box
       sx={{
         width: "100%",
+        height: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         position: "relative",
-        mt: 1,
-        mb: 2,
+        // mt: 1,
+        // mb: 2,
       }}
       onDrop={onImageDrop}
       onDragOver={(event) => event.preventDefault()}
@@ -32,8 +33,8 @@ const ImageUpload = ({ image64, onImageUpload, onImageDrop }) => {
         component="label"
         sx={{
           position: "absolute",
-          bottom: "8px",
-          right: "8px",
+          bottom: "5px",
+          right: "5px",
           backgroundColor: "primary.main",
           color: "white",
           "&:hover": {

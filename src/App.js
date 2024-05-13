@@ -12,7 +12,11 @@ import NavBar from "./views/NavBar";
 import PastEvents from "./views/PastEvents";
 import PendingEvents from "./views/PendingEvents";
 import Tags from "./views/Tags";
-import Users from "./views/Users";
+import Users from "./views/Users"; 
+import AddCalendarView from "./components/calendars/AddCalendarView";
+import CalendarsView from "./components/calendars/CalendarView";
+import ManageCalendar from "./components/calendars/ManageCalendar";
+
 
 const SentryRoute = Sentry.withSentryRouting(Route);
 
@@ -42,6 +46,9 @@ const App = () => {
           <SentryRoute path="/check-in/:eventId" component={CheckInPage} />
           <SentryRoute path="/tags" component={Tags} />
           <SentryRoute path="/users" component={Users} />
+          <SentryRoute path="/calendars" component={AddCalendarView} />
+          <SentryRoute path="/calendar-view" component={CalendarsView}/>
+          <SentryRoute path="/calendar-manage/:calendarId" component={ManageCalendar}/>
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import Editor from "../editor/Editor";
 const AddEventForm = ({
   formData,
   groups,
+  calendars,
   databaseTags,
   handleInputChange,
   handleDateChange,
@@ -66,6 +67,24 @@ const AddEventForm = ({
           }}
           renderInput={(params) => (
             <TextField {...params} label="Organization" required />
+          )}
+        />
+      </FormControl>
+      <FormControl margin="dense" fullWidth>
+        <Autocomplete
+          margin="dense"
+          fullWidth
+          options={calendars}
+          getOptionLabel={(option) => option || ''}
+          value={formData.calendar}
+          onChange={(event, newValue) => {
+            setFormData((prevFormData) => ({
+              ...prevFormData,
+              calendar: newValue,
+            }));
+          }}
+          renderInput={(params) => (
+            <TextField {...params} label="Calendar" required />
           )}
         />
       </FormControl>

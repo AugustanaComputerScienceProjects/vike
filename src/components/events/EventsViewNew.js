@@ -53,6 +53,7 @@ const EventsView = () => {
       </Grid>
     );
   };
+  
   const handleAddEventClick = () => {
     setIsAddEventFormOpen(true);
   };

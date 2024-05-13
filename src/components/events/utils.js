@@ -1,4 +1,5 @@
 import Resizer from "react-image-file-resizer";
+import { format } from "date-fns";
 
 export const roundToNearestHalfHour = (date) => {
   const roundedMinutes = Math.round(date.getMinutes() / 30) * 30;
@@ -27,4 +28,29 @@ export const handleImageFileChanged = (theFile, onFinish) => {
 export const generateUniqueTicketId = (userHandle, eventId) => {
   const timestamp = Date.now().toString();
   return `${userHandle}-${eventId}-${timestamp}`;
+};
+
+export const EVENT_STATUS = {
+  GOING: "GOING",
+  CHECKED_IN: "CHECKED_IN",
+  INVITED: "INVITED",
+  NOT_GOING: "NOT_GOING",
+};
+
+export const CALENDAR_STATUS = {
+  SUBSCRIBED: "SUBSCRIBED",
+  NOT_SUBSCRIBED: "NOT_SUBSCRIBED",
+}
+
+export const groupEventsByDate = (events) => {
+  const groupedEvents = {};
+  events.forEach((event) => {
+    const eventDate = new Date(event.startDate);
+    const dateKey = format(eventDate, "yyyy-MM-dd");
+    if (!groupedEvents[dateKey]) {
+      groupedEvents[dateKey] = [];
+    }
+    groupedEvents[dateKey].push(event);
+  });
+  return groupedEvents;
 };
