@@ -45,12 +45,12 @@ const EventCard = ({ event }) => {
         </div>
       </div>
       <div className="flex items-center px-4 py-2 gap-2">
-        <Button onClick={() => navigateTo(`/check-in/${event.key}`)}>
+        <Button onClick={() => navigateTo(`/event/check-in/${event.key}`)}>
           Check In
         </Button>
         <Button
           variant="outline"
-          onClick={() => navigateTo(`/manage/${event.key}`)}
+          onClick={() => navigateTo(`event/manage/${event.key}`)}
         >
           Manage
         </Button>
