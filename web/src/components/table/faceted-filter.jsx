@@ -23,7 +23,6 @@ import { Separator } from "../ui/separator";
 export function DataTableFacetedFilter({ column, title, options }) {
   const facets = column?.getFacetedUniqueValues();
   const selectedValues = new Set(column?.getFilterValue());
-  console.log("column", column.getFilterValue());
 
   return (
     <Popover>

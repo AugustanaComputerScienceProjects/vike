@@ -28,7 +28,6 @@ const AddEvent = () => {
   const [message, setMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const { adminSignedIn, leaderSignedIn, databaseTags, groups } = useRoleData();
-  console.log("formData", formData);
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({
