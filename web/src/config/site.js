@@ -7,16 +7,20 @@ export const siteConfig = {
       href: "/events",
     },
     {
+      title: "Calendar",
+      href: "/calendar",
+    },
+    {
       title: "Users",
       href: "/users",
     },
     {
-      title: "Tags",
-      href: "/tags",
-    },
-    {
       title: "Groups",
       href: "/groups",
+    },
+    {
+      title: "Tags",
+      href: "/tags",
     },
   ],
 };
