@@ -1,5 +1,5 @@
 "use client";
-import { Badge, List, ListItem, Text } from "@/components/ui";
+import { Badge } from "@/components/ui";
 import React from "react";
 import { toTitleCase } from "./util";
 
@@ -8,21 +8,21 @@ const Guests = ({ event }) => {
     <>
       <div className="text-lg font-semibold">Guest List</div>
       {event?.guests ? (
-        <List>
+        <div>
           {Object.entries(event.guests).map(([userHandle, userDetails]) => (
-            <ListItem
+            <div
               key={userHandle}
               className="flex justify-between items-center border-b border-gray-200 py-2"
             >
-              <Text>{userHandle}</Text>
+              <div className="text-sm">{userHandle}</div>
               <Badge
                 label={toTitleCase(userDetails.status)}
                 color="green"
                 variant="outlined"
               />
-            </ListItem>
+            </div>
           ))}
-        </List>
+        </div>
       ) : (
         <div className="text-base">No guests yet.</div>
       )}

@@ -47,11 +47,11 @@ const Events = () => {
       <div className="flex justify-between items-center mb-8">
         <h4 className="text-2xl">Events</h4>
 
-        <Dialog className="max-w-4xl mx-auto">
+        <Dialog>
           <DialogTrigger className="font-bold py-2 px-4">
             Add Event
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-[960px] mx-auto">
             <AddEvent />
           </DialogContent>
         </Dialog>
