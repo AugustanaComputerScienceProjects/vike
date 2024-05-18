@@ -19,7 +19,7 @@ const Editor = ({ content, onUpdate }) => {
   }, [editor]);
 
   return (
-    <div className="border border-gray-300 p-2.5 rounded-md">
+    <div className="border border-gray-300 p-2.5 rounded-md ">
       <div className="outline-none bg-transparent">
         {editor && <MenuBar editor={editor} />}
         <EditorContent editor={editor} />

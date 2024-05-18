@@ -57,30 +57,28 @@ const AddEvent = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-[59rem]">
+    <div className="p-4">
       <h4 className="text-2xl font-bold mb-4">Add Event</h4>
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <ImageUpload image64={image64} onImageUpload={handleImageUpload} />
-          <AddEventForm
-            formData={formData}
-            groups={groups}
-            databaseTags={databaseTags}
-            handleInputChange={handleInputChange}
-          />
-          <div className="mt-4">
-            <Button onClick={handleSubmit} disabled={uploading}>
+          <div>
+            <AddEventForm
+              formData={formData}
+              groups={groups}
+              databaseTags={databaseTags}
+              handleInputChange={handleInputChange}
+            />
+            <Button
+              className="mt-4 w-full"
+              onClick={handleSubmit}
+              disabled={uploading}
+            >
               {adminSignedIn || leaderSignedIn ? "Add Event" : "Request Event"}
             </Button>
           </div>
         </div>
       </form>
-      {openSnackbar && (
-        <div className="fixed bottom-0 left-0 mb-4 ml-4 bg-white rounded px-4 py-2 shadow">
-          <p>{message}</p>
-          <Button onClick={handleSnackbarClose}>Close</Button>
-        </div>
-      )}
     </div>
   );
 };

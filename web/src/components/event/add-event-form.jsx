@@ -23,6 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import LocationField from "../form/location-field";
 import { Button } from "../ui/button";
 import MultiSelector from "../ui/multi-selector";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -166,18 +167,12 @@ const AddEventForm = ({
             </FormItem>
           )}
         />
-        <FormField
+        <LocationField
+          form={form}
           control={form.control}
           name="location"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Location</FormLabel>
-              <FormControl>
-                <Input type="text" {...field} className="w-full" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="Location"
+          placeholder="Enter location"
         />
         <FormField
           control={form.control}
@@ -229,18 +224,13 @@ const AddEventForm = ({
             </FormItem>
           )}
         />
-        <Input
-          className="input input-bordered w-full max-w-xs"
-          name="webLink"
-          placeholder="Web Link"
-        />
 
         <FormField
           control={form.control}
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Bio</FormLabel>
+              <FormLabel>Description</FormLabel>
               <FormControl>
                 <Editor
                   {...field}

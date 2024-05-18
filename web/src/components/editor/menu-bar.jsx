@@ -13,7 +13,7 @@ import MenuItem from "./menu-item";
 const MenuBar = ({ editor }) => {
   const headingItems = [
     {
-      icon: <span className="font-bold text-xl">H1</span>,
+      icon: <span className="font-bold text-sm">H1</span>,
       title: "Heading 1",
       action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
       isActive: editor.isActive("heading", { level: 1 }),
@@ -21,7 +21,7 @@ const MenuBar = ({ editor }) => {
       ariaLabel: "Toggle Heading 1",
     },
     {
-      icon: <span className="font-bold text-lg">H2</span>,
+      icon: <span className="font-bold text-sm">H2</span>,
       title: "Heading 2",
       action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
       isActive: editor.isActive("heading", { level: 2 }),
@@ -29,7 +29,7 @@ const MenuBar = ({ editor }) => {
       ariaLabel: "Toggle Heading 2",
     },
     {
-      icon: <span className="font-bold text-base">H3</span>,
+      icon: <span className="font-bold text-sm">H3</span>,
       title: "Heading 3",
       action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
       isActive: editor.isActive("heading", { level: 3 }),
@@ -40,7 +40,7 @@ const MenuBar = ({ editor }) => {
 
   const items = [
     {
-      icon: <Bold />,
+      icon: <Bold className="h-4 w-4 shrink-0" />,
       title: "Bold",
       action: () => editor.chain().focus().toggleBold().run(),
       isActive: editor.isActive("bold"),
@@ -48,7 +48,7 @@ const MenuBar = ({ editor }) => {
       ariaLabel: "Toggle Bold",
     },
     {
-      icon: <Italic />,
+      icon: <Italic className="h-4 w-4 shrink-0" />,
       title: "Italic",
       action: () => editor.chain().focus().toggleItalic().run(),
       isActive: editor.isActive("italic"),
@@ -56,7 +56,7 @@ const MenuBar = ({ editor }) => {
       ariaLabel: "Toggle Italic",
     },
     {
-      icon: <List />,
+      icon: <List className="h-4 w-4 shrink-0" />,
       title: "Bullet List",
       action: () => editor.chain().focus().toggleBulletList().run(),
       isActive: editor.isActive("bulletList"),
@@ -64,7 +64,7 @@ const MenuBar = ({ editor }) => {
       ariaLabel: "Toggle Bullet List",
     },
     {
-      icon: <ListOrdered />,
+      icon: <ListOrdered className="h-4 w-4 shrink-0" />,
       title: "Ordered List",
       action: () => editor.chain().focus().toggleOrderedList().run(),
       isActive: editor.isActive("orderedList"),
@@ -72,7 +72,7 @@ const MenuBar = ({ editor }) => {
       ariaLabel: "Toggle Ordered List",
     },
     {
-      icon: <Quote />,
+      icon: <Quote className="h-4 w-4 shrink-0" />,
       title: "Blockquote",
       action: () => editor.chain().focus().toggleBlockquote().run(),
       isActive: editor.isActive("blockquote"),
@@ -80,14 +80,14 @@ const MenuBar = ({ editor }) => {
       ariaLabel: "Toggle Blockquote",
     },
     {
-      icon: <Undo />,
+      icon: <Undo className="h-4 w-4 shrink-0" />,
       title: "Undo",
       action: () => editor.chain().focus().undo().run(),
       value: "undo",
       ariaLabel: "Undo",
     },
     {
-      icon: <Redo />,
+      icon: <Redo className="h-4 w-4 shrink-0" />,
       title: "Redo",
       action: () => editor.chain().focus().redo().run(),
       value: "redo",
@@ -96,7 +96,7 @@ const MenuBar = ({ editor }) => {
   ];
 
   return (
-    <div className="flex flex-wrap">
+    <div className="flex flex-wrap gap-1">
       {headingItems.map((item, index) => (
         <MenuItem key={index} {...item} />
       ))}
