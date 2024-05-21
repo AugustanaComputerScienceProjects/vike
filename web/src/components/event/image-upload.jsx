@@ -9,13 +9,7 @@ const ImageUpload = ({ image64, onImageUpload, onImageDrop }) => {
       onDragOver={(event) => event.preventDefault()}
     >
       {image64 ? (
-        <Image
-          src={image64}
-          alt="Event"
-          layout="fill"
-          objectFit="contain"
-          className="object-cover"
-        />
+        <Image src={image64} alt="Event" className="object-cover" />
       ) : (
         <p className="text-center">
           Drag and drop an image here or click the button below to upload

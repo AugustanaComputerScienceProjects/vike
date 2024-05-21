@@ -13,7 +13,10 @@ export default function Home() {
             className="rounded-xl"
             alt="Event Preview"
             priority
-          />
+            style={{
+              maxWidth: "100%",
+              height: "auto"
+            }} />
         </div>
         <h1 className="text-6xl font-">Discover events at Augie!</h1>
         <p className="mt-4 text-xl ">

@@ -38,7 +38,7 @@ const EventCard = ({ event }) => {
                 className="rounded-lg object-cover"
                 src={event.imageUrl}
                 alt={event.name}
-                fill
+                layout="fill"
               />
             )}
           </div>
