@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Vike Web App
 
 ## Getting Started
@@ -49,3 +50,6 @@ https://console.firebase.google.com/
 - Add your own firebase config to `./config.js`.
 
 You should now be ready to use Firebase.
+=======
+# Vike
+>>>>>>> vike/main

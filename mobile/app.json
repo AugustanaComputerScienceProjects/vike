@@ -1,0 +1,93 @@
+{
+  "expo": {
+    "name": "Vike",
+    "slug": "vike",
+    "version": "1.4.3",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "scheme": "vike",
+    "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-google-signin/google-signin",
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "vike",
+          "project": "osl-vike"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
+      "expo-router",
+      [
+        "expo-barcode-scanner",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access camera."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ],
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "Allow $(PRODUCT_NAME) to access your calendar."
+        }
+      ],
+      "expo-localization"
+    ],
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#fff"
+    },
+    "android": {
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=edu.augustana.osleventsandroid",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyB9PvtuwDFWCzUFFVf9kijCSS8on9y3t48"
+        }
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#fff"
+      },
+      "googleServicesFile": "./google-services.json",
+      "package": "edu.augustana.osleventsandroid",
+      "versionCode": 19
+    },
+    "ios": {
+      "appStoreUrl": "https://apps.apple.com/us/app/vike/id1473326895",
+      "buildNumber": "22",
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyBr8_x3nXHBPJMJ4EBg5w2clq5t_S1s05o"
+      },
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "bundleIdentifier": "edu.augustana.OSL-Calendar-IOS-App"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "ae327b5e-168a-4d01-b35c-b07442ac04d9"
+      }
+    }
+  }
+}
