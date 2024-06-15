@@ -1,18 +1,18 @@
-import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
-import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import React, { Component } from 'react';
-import DispatchGroup from '../components/DispatchGroup';
-import firebase from '../config.js';
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import React, { Component } from "react";
+import DispatchGroup from "../components/DispatchGroup.js";
+import firebase from "../config.js";
 
 // File for manging the Groups/Tags screen
 
@@ -22,15 +22,15 @@ class Tags extends Component {
   state = {
     tags: [],
     groups: [],
-    key: '',
-    data: '',
+    key: "",
+    data: "",
     adding: false,
-    ref: '',
-    type: '',
+    ref: "",
+    type: "",
     deleting: false,
     adminSignedIn: false,
     leaderSignedIn: false,
-    hidden: 'visible',
+    hidden: "visible",
   };
 
   listeners = [];
@@ -41,12 +41,12 @@ class Tags extends Component {
     this.readGroups();
     let self = this;
     this.group.notify(function() {
-      self.setState({ hidden: 'hidden' });
+      self.setState({ hidden: "hidden" });
     });
     this.off = firebase.auth.onAuthStateChanged((user) => {
       if (user) {
-        this.checkRole(user, 'leader');
-        this.checkRole(user, 'admin');
+        this.checkRole(user, "leader");
+        this.checkRole(user, "admin");
       }
     });
   }
@@ -62,9 +62,9 @@ class Tags extends Component {
   readTags() {
     let token = this.group.enter();
     let self = this;
-    let ref = firebase.database.ref('/tags');
+    let ref = firebase.database.ref("/tags");
     this.listeners.push(ref);
-    ref.on('value', function(snapshot) {
+    ref.on("value", function(snapshot) {
       let tagsList = [];
       snapshot.forEach(function(child) {
         tagsList.push([child.key, child.val()]);
@@ -79,9 +79,9 @@ class Tags extends Component {
   readGroups() {
     let token = this.group.enter();
     let self = this;
-    let ref = firebase.database.ref('/groups');
+    let ref = firebase.database.ref("/groups");
     this.listeners.push(ref);
-    ref.on('value', function(snapshot) {
+    ref.on("value", function(snapshot) {
       let groupsList = [];
       snapshot.forEach(function(child) {
         groupsList.push([child.key, child.val()]);
@@ -110,7 +110,7 @@ class Tags extends Component {
 
   // Action for opening the add group/tag pop up
   addAction = (ref, type) => {
-    this.setState({ data: '', ref: ref, type: type });
+    this.setState({ data: "", ref: ref, type: type });
     this.handleOpen();
   };
 
@@ -140,7 +140,7 @@ class Tags extends Component {
 
   // Deletes the tag/group from Firebase once the confirm button is clicked
   deleteData = () => {
-    firebase.database.ref(this.state.ref + '/' + this.state.key).remove();
+    firebase.database.ref(this.state.ref + "/" + this.state.key).remove();
     this.handleDeleteClose();
   };
 
@@ -148,13 +148,13 @@ class Tags extends Component {
     let self = this;
     firebase.database
       .ref(role)
-      .once('value')
+      .once("value")
       .then(function(snapshot) {
-        if (snapshot.hasChild(user.email.replace('.', ','))) {
-          console.log('Snapshot: ' + snapshot);
-          if (role === 'admin') {
+        if (snapshot.hasChild(user.email.replace(".", ","))) {
+          console.log("Snapshot: " + snapshot);
+          if (role === "admin") {
             self.setState({ adminSignedIn: true });
-          } else if (role === 'leaders' && !self.state.adminSignedIn) {
+          } else if (role === "leaders" && !self.state.adminSignedIn) {
             self.setState({ leaderSignedIn: true });
           }
         }
@@ -164,11 +164,11 @@ class Tags extends Component {
   insertGroupsWidget(groupsChildren) {
     if (this.state.adminSignedIn) {
       return (
-        <Grid item style={{ width: '50%' }}>
+        <Grid item style={{ width: "50%" }}>
           <Paper style={{ padding: 20, marginRight: 20 }}>
             <ParentComponent
-              title={'Groups:'}
-              addAction={() => this.addAction('/groups/', 'Group')}
+              title={"Groups:"}
+              addAction={() => this.addAction("/groups/", "Group")}
             >
               {groupsChildren}
             </ParentComponent>
@@ -192,7 +192,7 @@ class Tags extends Component {
           key={index}
           data={tag[1]}
           removeAction={() =>
-            this.removeAction('/tags/', tag[1], tag[0], 'tag')
+            this.removeAction("/tags/", tag[1], tag[0], "tag")
           }
         ></ChildComponent>
       );
@@ -207,7 +207,7 @@ class Tags extends Component {
           key={index}
           data={group[1]}
           removeAction={() =>
-            this.removeAction('/groups/', group[1], group[0], 'group')
+            this.removeAction("/groups/", group[1], group[0], "group")
           }
         ></ChildComponent>
       );
@@ -217,13 +217,13 @@ class Tags extends Component {
       <div>
         <div
           style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            margintop: '-50px',
-            marginleft: '-50px',
-            width: '100px',
-            height: '100px',
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            margintop: "-50px",
+            marginleft: "-50px",
+            width: "100px",
+            height: "100px",
           }}
         >
           <CircularProgress
@@ -232,13 +232,13 @@ class Tags extends Component {
           ></CircularProgress>
         </div>
         <Grid container>
-          <Grid item container direction='row'>
+          <Grid item container direction="row">
             {this.insertGroupsWidget(groupsChildren)}
-            <Grid item style={{ width: '50%' }}>
+            <Grid item style={{ width: "50%" }}>
               <Paper style={{ padding: 20 }}>
                 <ParentComponent
-                  title={'Tags:'}
-                  addAction={() => this.addAction('/tags/', 'Tag')}
+                  title={"Tags:"}
+                  addAction={() => this.addAction("/tags/", "Tag")}
                 >
                   {tagsChildren}
                 </ParentComponent>
@@ -248,25 +248,25 @@ class Tags extends Component {
         </Grid>
         <Dialog
           onClose={this.handleClose}
-          aria-labelledby='customized-dialog-title'
+          aria-labelledby="customized-dialog-title"
           open={this.state.adding}
         >
           <DialogTitle
-            id='customized-dialog-title'
+            id="customized-dialog-title"
             onClose={this.handleCloseEdit}
           >
             Add {this.state.type}
           </DialogTitle>
           <DialogContent>
             <Grid container>
-              <Grid item container direction='column' spacing={0}>
+              <Grid item container direction="column" spacing={0}>
                 <Grid item>
                   <TextField
                     autoFocus={true}
                     style={{ width: 300 }}
                     label={this.state.type}
-                    id='data'
-                    margin='normal'
+                    id="data"
+                    margin="normal"
                     value={this.state.data}
                     onChange={this.handleChange}
                   />
@@ -274,11 +274,11 @@ class Tags extends Component {
               </Grid>
             </Grid>
           </DialogContent>
-          <DialogActions style={{ justifyContent: 'center' }}>
+          <DialogActions style={{ justifyContent: "center" }}>
             <Button
-              variant='contained'
+              variant="contained"
               onClick={this.handleSave}
-              color='primary'
+              color="primary"
             >
               Add
             </Button>
@@ -287,20 +287,20 @@ class Tags extends Component {
         <Dialog
           open={this.state.deleting}
           onClose={this.handleDeleteClose}
-          aria-labelledby='alert-dialog-title'
-          aria-describedby='alert-dialog-description'
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id='alert-dialog-title'>
-            {'Are you sure you want to remove this ' + this.state.type + '?'}
+          <DialogTitle id="alert-dialog-title">
+            {"Are you sure you want to remove this " + this.state.type + "?"}
           </DialogTitle>
           <DialogContent>
             <label>{this.state.data}</label>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.handleDeleteClose} color='primary'>
+            <Button onClick={this.handleDeleteClose} color="primary">
               Cancel
             </Button>
-            <Button onClick={this.deleteData} color='primary' autoFocus>
+            <Button onClick={this.deleteData} color="primary" autoFocus>
               Confirm
             </Button>
           </DialogActions>
@@ -313,14 +313,14 @@ class Tags extends Component {
 // Parent component for displaying a single group/tag
 const ParentComponent = (props) => (
   <div style={{ width: 1000 }}>
-    <Grid container id='children-pane' direction='column' spacing={1}>
+    <Grid container id="children-pane" direction="column" spacing={1}>
       <Grid item container>
-        <Typography variant='h5'>{props.title}</Typography>
+        <Typography variant="h5">{props.title}</Typography>
         <Button
           style={{ marginLeft: 10 }}
           onClick={props.addAction}
-          color='primary'
-          variant='outlined'
+          color="primary"
+          variant="outlined"
         >
           <AddIcon />
           Add
@@ -334,10 +334,10 @@ const ParentComponent = (props) => (
 // Child component for displaying a single group/tag
 const ChildComponent = (props) => (
   <Grid item container>
-    <Typography component='p' style={{ marginTop: 7 }}>
+    <Typography component="p" style={{ marginTop: 7 }}>
       {props.data}
     </Typography>
-    <Button color='primary' onClick={props.removeAction}>
+    <Button color="primary" onClick={props.removeAction}>
       <CloseIcon />
     </Button>
   </Grid>
