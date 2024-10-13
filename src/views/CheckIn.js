@@ -40,9 +40,12 @@ const CheckInPage = () => {
 
       if (fetchedEvent.guests)
         setGuests(
-          Object.entries(
-            fetchedEvent.guests
-          ).map(([userHandle, guestData]) => ({ userHandle, ...guestData }))
+          Object.entries(fetchedEvent.guests).map(
+            ([userHandle, guestData]) => ({
+              userHandle,
+              ...guestData,
+            })
+          )
         );
     };
 
@@ -65,17 +68,17 @@ const CheckInPage = () => {
           `/current-events/${eventId}/guests/${selectedGuest.userHandle}/status`
         )
         .set(newStatus);
+
+      // Update guest status locally instead of refetching
+      setGuests((prevGuests) =>
+        prevGuests.map((guest) =>
+          guest.userHandle === selectedGuest.userHandle
+            ? { ...guest, status: newStatus }
+            : guest
+        )
+      );
+
       setOpenDialog(false);
-      const eventRef = firebase.database.ref(`/current-events/${eventId}`);
-      const snapshot = await eventRef.once("value");
-      const fetchedEvent = snapshot.val();
-      if (fetchedEvent && fetchedEvent.guests) {
-        setGuests(
-          Object.entries(
-            fetchedEvent.guests
-          ).map(([userHandle, guestData]) => ({ userHandle, ...guestData }))
-        );
-      }
       setSnackbarMessage(
         `Status for ${selectedGuest.userHandle} updated successfully.`
       );
@@ -94,16 +97,16 @@ const CheckInPage = () => {
           await firebase.database
             .ref(`/current-events/${eventId}/guests/${guest.userHandle}/status`)
             .set(EVENT_STATUS.CHECKED_IN);
-          const eventRef = firebase.database.ref(`/current-events/${eventId}`);
-          const snapshot = await eventRef.once("value");
-          const fetchedEvent = snapshot.val();
-          if (fetchedEvent) {
-            setGuests(
-              Object.entries(
-                fetchedEvent.guests
-              ).map(([userHandle, guestData]) => ({ userHandle, ...guestData }))
-            );
-          }
+
+          // Update guest status locally without refetching
+          setGuests((prevGuests) =>
+            prevGuests.map((g) =>
+              g.userHandle === guest.userHandle
+                ? { ...g, status: EVENT_STATUS.CHECKED_IN }
+                : g
+            )
+          );
+
           setSnackbarMessage(`Checked in ${guest.userHandle} successfully!`);
           setSnackbarOpen(true);
         }
@@ -152,9 +155,7 @@ const CheckInPage = () => {
         </Box>
         <Button
           variant="contained"
-          sx={{
-            height: "100%",
-          }}
+          sx={{ height: "100%" }}
           onClick={() => setOpenQRScanner(true)}
         >
           Scan QR Code
@@ -203,16 +204,23 @@ const CheckInPage = () => {
         </DialogActions>
       </Dialog>
       <Dialog
-        fullWidth 
+        fullWidth
         maxWidth="md"
         open={openQRScanner}
         onClose={() => setOpenQRScanner(false)}
       >
         <DialogTitle>Scan QR Code</DialogTitle>
         <DialogContent>
-          <Scanner
+          <Scanner // customize the scanner
             onResult={handleQRScan}
             onError={(error) => console.log(error?.message)}
+            style={{ width: "100%", height: "100%" }}
+            options={{
+              delayBetweenScanSuccess: 200,
+              delayBetweenScanAttempts: 200,
+              facingMode: "environment",
+              autoFocusMode: true,
+            }}
           />
         </DialogContent>
       </Dialog>
