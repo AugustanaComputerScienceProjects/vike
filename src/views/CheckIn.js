@@ -40,10 +40,12 @@ const CheckInPage = () => {
 
       if (fetchedEvent.guests)
         setGuests(
-          Object.entries(fetchedEvent.guests).map(([userHandle, guestData]) => ({
-            userHandle,
-            ...guestData,
-          }))
+          Object.entries(fetchedEvent.guests).map(
+            ([userHandle, guestData]) => ({
+              userHandle,
+              ...guestData,
+            })
+          )
         );
     };
 
@@ -62,9 +64,11 @@ const CheckInPage = () => {
           ? EVENT_STATUS.GOING
           : EVENT_STATUS.CHECKED_IN;
       await firebase.database
-        .ref(`/current-events/${eventId}/guests/${selectedGuest.userHandle}/status`)
+        .ref(
+          `/current-events/${eventId}/guests/${selectedGuest.userHandle}/status`
+        )
         .set(newStatus);
-      
+
       // Update guest status locally instead of refetching
       setGuests((prevGuests) =>
         prevGuests.map((guest) =>
@@ -73,7 +77,7 @@ const CheckInPage = () => {
             : guest
         )
       );
-      
+
       setOpenDialog(false);
       setSnackbarMessage(
         `Status for ${selectedGuest.userHandle} updated successfully.`
@@ -85,13 +89,15 @@ const CheckInPage = () => {
   const handleQRScan = async (result) => {
     if (result) {
       const ticketUserHandle = result.split("-")[0];
-      const guest = guests.find(({ userHandle }) => userHandle === ticketUserHandle);
+      const guest = guests.find(
+        ({ userHandle }) => userHandle === ticketUserHandle
+      );
       if (guest) {
         if (guest.userHandle) {
           await firebase.database
             .ref(`/current-events/${eventId}/guests/${guest.userHandle}/status`)
             .set(EVENT_STATUS.CHECKED_IN);
-          
+
           // Update guest status locally without refetching
           setGuests((prevGuests) =>
             prevGuests.map((g) =>
@@ -100,7 +106,7 @@ const CheckInPage = () => {
                 : g
             )
           );
-          
+
           setSnackbarMessage(`Checked in ${guest.userHandle} successfully!`);
           setSnackbarOpen(true);
         }
@@ -185,7 +191,8 @@ const CheckInPage = () => {
         <DialogContent>
           <p>Registration Date: {formattedRegistrationDate}</p>
           <p>
-            Status: {selectedGuest.status ? toTitleCase(selectedGuest.status) : ""}
+            Status:{" "}
+            {selectedGuest.status ? toTitleCase(selectedGuest.status) : ""}
           </p>
         </DialogContent>
         <DialogActions>
@@ -204,20 +211,18 @@ const CheckInPage = () => {
       >
         <DialogTitle>Scan QR Code</DialogTitle>
         <DialogContent>
-        <Scanner
-  onResult={handleQRScan}
-  onError={(error) => console.log(error?.message)}
-  style={{ width: '100%', height: '100%' }}
-  options={{
-    delayBetweenScanSuccess: 200,
-    delayBetweenScanAttempts: 200,
-    facingMode: "environment",
-    autoFocusMode: true, 
-    flashMode: "torch",  // Enable flash
-  }}
-/>
-
-
+          <Scanner // customize the scanner
+            onResult={handleQRScan}
+            onError={(error) => console.log(error?.message)}
+            style={{ width: "100%", height: "100%" }}
+            options={{
+              delayBetweenScanSuccess: 200,
+              delayBetweenScanAttempts: 200,
+              facingMode: "environment",
+              autoFocusMode: true,
+              flashMode: "torch", // Enable flash
+            }}
+          />
         </DialogContent>
       </Dialog>
       <Snackbar
