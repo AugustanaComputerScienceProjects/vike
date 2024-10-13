@@ -220,7 +220,6 @@ const CheckInPage = () => {
               delayBetweenScanAttempts: 200,
               facingMode: "environment",
               autoFocusMode: true,
-              flashMode: "torch", // Enable flash
             }}
           />
         </DialogContent>
