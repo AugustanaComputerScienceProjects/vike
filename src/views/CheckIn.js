@@ -30,26 +30,30 @@ const CheckInPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [scanned, setScanned] = useState(false);
 
   useEffect(() => {
-    const fetchEvent = async () => {
-      const eventRef = firebase.database.ref(`/current-events/${eventId}`);
-      const snapshot = await eventRef.once("value");
+    const eventRef = firebase.database.ref(`/current-events/${eventId}`);
+    
+    const handleDataChange = (snapshot) => {
       const fetchedEvent = snapshot.val();
       if (fetchedEvent) setEvent(fetchedEvent);
 
-      if (fetchedEvent.guests)
+      if (fetchedEvent && fetchedEvent.guests) {
         setGuests(
-          Object.entries(fetchedEvent.guests).map(
-            ([userHandle, guestData]) => ({
-              userHandle,
-              ...guestData,
-            })
-          )
+          Object.entries(
+            fetchedEvent.guests
+          ).map(([userHandle, guestData]) => ({ userHandle, ...guestData }))
         );
+      }
     };
 
-    fetchEvent();
+    eventRef.on("value", handleDataChange);
+
+    // Cleanup listener on component unmount
+    return () => {
+      eventRef.off("value", handleDataChange);
+    };
   }, [eventId]);
 
   const handleGuestClick = (guest) => {
@@ -68,16 +72,6 @@ const CheckInPage = () => {
           `/current-events/${eventId}/guests/${selectedGuest.userHandle}/status`
         )
         .set(newStatus);
-
-      // Update guest status locally instead of refetching
-      setGuests((prevGuests) =>
-        prevGuests.map((guest) =>
-          guest.userHandle === selectedGuest.userHandle
-            ? { ...guest, status: newStatus }
-            : guest
-        )
-      );
-
       setOpenDialog(false);
       setSnackbarMessage(
         `Status for ${selectedGuest.userHandle} updated successfully.`
@@ -87,7 +81,8 @@ const CheckInPage = () => {
   };
 
   const handleQRScan = async (result) => {
-    if (result) {
+    if (result && !scanned) {
+      setScanned(true);
       const ticketUserHandle = result.split("-")[0];
       const guest = guests.find(
         ({ userHandle }) => userHandle === ticketUserHandle
@@ -97,20 +92,11 @@ const CheckInPage = () => {
           await firebase.database
             .ref(`/current-events/${eventId}/guests/${guest.userHandle}/status`)
             .set(EVENT_STATUS.CHECKED_IN);
-
-          // Update guest status locally without refetching
-          setGuests((prevGuests) =>
-            prevGuests.map((g) =>
-              g.userHandle === guest.userHandle
-                ? { ...g, status: EVENT_STATUS.CHECKED_IN }
-                : g
-            )
-          );
-
           setSnackbarMessage(`Checked in ${guest.userHandle} successfully!`);
           setSnackbarOpen(true);
         }
       }
+      setTimeout(() => setScanned(false), 1000); // 1 second delay
     }
   };
 
@@ -155,7 +141,9 @@ const CheckInPage = () => {
         </Box>
         <Button
           variant="contained"
-          sx={{ height: "100%" }}
+          sx={{
+            height: "100%",
+          }}
           onClick={() => setOpenQRScanner(true)}
         >
           Scan QR Code
@@ -204,23 +192,17 @@ const CheckInPage = () => {
         </DialogActions>
       </Dialog>
       <Dialog
-        fullWidth
+        fullWidth 
         maxWidth="md"
         open={openQRScanner}
         onClose={() => setOpenQRScanner(false)}
       >
         <DialogTitle>Scan QR Code</DialogTitle>
         <DialogContent>
-          <Scanner // customize the scanner
+          <Scanner
             onResult={handleQRScan}
             onError={(error) => console.log(error?.message)}
-            style={{ width: "100%", height: "100%" }}
-            options={{
-              delayBetweenScanSuccess: 200,
-              delayBetweenScanAttempts: 200,
-              facingMode: "environment",
-              autoFocusMode: true,
-            }}
+            style={{ width: '100%' }}
           />
         </DialogContent>
       </Dialog>
