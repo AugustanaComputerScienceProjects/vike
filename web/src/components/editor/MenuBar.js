@@ -1,173 +1,130 @@
-import React from "react";
-
-import FormatBoldIcon from "@mui/icons-material/FormatBold";
-import FormatItalicIcon from "@mui/icons-material/FormatItalic";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
-import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
-import RedoIcon from "@mui/icons-material/Redo";
-import UndoIcon from "@mui/icons-material/Undo";
-import { Divider, Paper, Typography } from "@mui/material";
-import MenuItem from "./MenuItem";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import {
+  Bold,
+  Italic,
+  List,
+  ListOrdered,
+  Quote,
+  Redo,
+  Undo,
+} from "lucide-react";
 
 const MenuBar = ({ editor }) => {
   const headingItems = [
     {
-      icon: <Typography fontWeight={800}>H1</Typography>,
+      icon: <span className="font-bold text-sm">H1</span>,
       title: "Heading 1",
-      action: () =>
-        editor
-          .chain()
-          .focus()
-          .toggleHeading({ level: 1 })
-          .run(),
+      action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
       isActive: editor.isActive("heading", { level: 1 }),
       value: "heading1",
       ariaLabel: "Toggle Heading 1",
     },
     {
-      icon: <Typography fontWeight={800}>H2</Typography>,
+      icon: <span className="font-bold text-sm">H2</span>,
       title: "Heading 2",
-      action: () =>
-        editor
-          .chain()
-          .focus()
-          .toggleHeading({ level: 2 })
-          .run(),
+      action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
       isActive: editor.isActive("heading", { level: 2 }),
       value: "heading2",
       ariaLabel: "Toggle Heading 2",
     },
     {
-      icon: <Typography fontWeight={800}>H3</Typography>,
+      icon: <span className="font-bold text-sm">H3</span>,
       title: "Heading 3",
-      action: () =>
-        editor
-          .chain()
-          .focus()
-          .toggleHeading({ level: 3 })
-          .run(),
+      action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
       isActive: editor.isActive("heading", { level: 3 }),
       value: "heading3",
       ariaLabel: "Toggle Heading 3",
     },
   ];
+
   const items = [
     {
-      icon: <FormatBoldIcon />,
+      icon: <Bold className="h-4 w-4" />,
       title: "Bold",
-      action: () =>
-        editor
-          .chain()
-          .focus()
-          .toggleBold()
-          .run(),
+      action: () => editor.chain().focus().toggleBold().run(),
       isActive: editor.isActive("bold"),
       value: "bold",
       ariaLabel: "Toggle Bold",
     },
     {
-      icon: <FormatItalicIcon />,
+      icon: <Italic className="h-4 w-4" />,
       title: "Italic",
-      action: () =>
-        editor
-          .chain()
-          .focus()
-          .toggleItalic()
-          .run(),
+      action: () => editor.chain().focus().toggleItalic().run(),
       isActive: editor.isActive("italic"),
       value: "italic",
       ariaLabel: "Toggle Italic",
     },
-
     {
-      icon: <FormatListBulletedIcon />,
+      icon: <List className="h-4 w-4" />,
       title: "Bullet List",
-      action: () =>
-        editor
-          .chain()
-          .focus()
-          .toggleBulletList()
-          .run(),
+      action: () => editor.chain().focus().toggleBulletList().run(),
       isActive: editor.isActive("bulletList"),
       value: "bulletList",
       ariaLabel: "Toggle Bullet List",
     },
     {
-      icon: <FormatListNumberedIcon />,
+      icon: <ListOrdered className="h-4 w-4" />,
       title: "Ordered List",
-      action: () =>
-        editor
-          .chain()
-          .focus()
-          .toggleOrderedList()
-          .run(),
+      action: () => editor.chain().focus().toggleOrderedList().run(),
       isActive: editor.isActive("orderedList"),
       value: "orderedList",
       ariaLabel: "Toggle Ordered List",
     },
     {
-      icon: <FormatQuoteIcon />,
+      icon: <Quote className="h-4 w-4" />,
       title: "Blockquote",
-      action: () =>
-        editor
-          .chain()
-          .focus()
-          .toggleBlockquote()
-          .run(),
+      action: () => editor.chain().focus().toggleBlockquote().run(),
       isActive: editor.isActive("blockquote"),
       value: "blockquote",
       ariaLabel: "Toggle Blockquote",
     },
     {
-      icon: <UndoIcon />,
+      icon: <Undo className="h-4 w-4" />,
       title: "Undo",
-      action: () =>
-        editor
-          .chain()
-          .focus()
-          .undo()
-          .run(),
+      action: () => editor.chain().focus().undo().run(),
       value: "undo",
       ariaLabel: "Undo",
     },
     {
-      icon: <RedoIcon />,
+      icon: <Redo className="h-4 w-4" />,
       title: "Redo",
-      action: () =>
-        editor
-          .chain()
-          .focus()
-          .redo()
-          .run(),
+      action: () => editor.chain().focus().redo().run(),
       value: "redo",
       ariaLabel: "Redo",
     },
   ];
 
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-      }}
-    >
+    <div className="flex flex-wrap items-center gap-1 rounded-md border p-1">
       {headingItems.map((item, index) => (
-        <MenuItem key={index} {...item} />
+        <Button
+          key={index}
+          size="sm"
+          variant={item.isActive ? "secondary" : "ghost"}
+          onClick={item.action}
+          title={item.title}
+          aria-label={item.ariaLabel}
+        >
+          {item.icon}
+        </Button>
       ))}
-      <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
+      
+      <Separator orientation="vertical" className="mx-1 h-6" />
 
       {items.map((item, index) => (
-        <React.Fragment key={index}>
-          {item.type === "divider" ? (
-            <div className="divider" />
-          ) : (
-            <MenuItem {...item} />
-          )}
-        </React.Fragment>
+        <Button
+          key={index}
+          size="sm"
+          variant={item.isActive ? "secondary" : "ghost"}
+          onClick={item.action}
+          title={item.title}
+          aria-label={item.ariaLabel}
+        >
+          {item.icon}
+        </Button>
       ))}
-    </Paper>
+    </div>
   );
 };
 

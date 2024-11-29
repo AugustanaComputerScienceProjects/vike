@@ -2,8 +2,8 @@
 import { format } from "date-fns";
 import React from "react";
 
-import EventCard from "@/components/event-card";
 import AddEvent from "@/components/event/add-event";
+import EventCard from "@/components/event/event-card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import useEvents from "@/hooks/use-events";
 const Events = () => {

@@ -1,10 +1,11 @@
 "use client";
 
+import ImageUpload from "@/components/event/image-upload";
 import { addHours, roundToNearestHalfHour } from "@/components/event/utils";
-import ImageUpload from "@/components/image-upload";
 import firebase from "@/firebase/config";
 import useRoleData from "@/hooks/use-role";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { addMinutes, differenceInMinutes, format, parseISO } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -55,10 +56,7 @@ const Overview = () => {
       const fetchedEvent = snapshot.val();
       setEvent({
         ...fetchedEvent,
-        endDate: moment(fetchedEvent.startDate).add(
-          fetchedEvent.duration,
-          "minutes"
-        ),
+        endDate: addMinutes(parseISO(fetchedEvent.startDate), fetchedEvent.duration),
         tags: fetchedEvent.tags.split(","),
       });
 
@@ -73,6 +71,16 @@ const Overview = () => {
 
     fetchEvent();
   }, [eventId]);
+
+  const handleImageFileChanged = (file, callback) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        callback(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -89,7 +97,7 @@ const Overview = () => {
   const handleDateChange = (field, date) => {
     setEvent((prevEvent) => ({
       ...prevEvent,
-      [field]: date ? date.format("YYYY-MM-DD HH:mm") : null,
+      [field]: date ? format(date, "yyyy-MM-dd HH:mm") : null,
     }));
   };
 
@@ -136,14 +144,14 @@ const Overview = () => {
   };
 
   const submitEvent = (id = "default") => {
-    const startDate = moment(event.startDate);
-    const endDate = moment(event.endDate);
-    const duration = endDate.diff(startDate, "minutes");
+    const startDate = parseISO(event.startDate);
+    const endDate = parseISO(event.endDate);
+    const duration = differenceInMinutes(endDate, startDate);
 
     const eventData = {
       ...event,
-      startDate: startDate.format("YYYY-MM-DD HH:mm"),
-      endDate: endDate.format("YYYY-MM-DD HH:mm"),
+      startDate: format(startDate, "yyyy-MM-dd HH:mm"),
+      endDate: format(endDate, "yyyy-MM-dd HH:mm"),
       duration: duration,
       imgid: id,
       email: firebase.auth.currentUser.email,

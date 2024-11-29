@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Form } from "../ui/form";
-import AddEventForm from "./add-event-form"; // Assuming you extract form fields into a separate component
+import AddEventForm from "./add-event-form";
 import ImageUpload from "./image-upload";
 import {
   addHours,
