@@ -1,7 +1,4 @@
-name: Vercel Production Deployment
-env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+name: Vercel Deployment
 
 on:
   push:
@@ -12,7 +9,7 @@ on:
       - master
 
 jobs:
-  Deploy-Production:
+  Deploy:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -31,19 +28,14 @@ jobs:
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Install Vercel CLI
-        run: yarn global add vercel@latest
-
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build Project Artifacts
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy to Production
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy Preview
-        if: github.event_name == 'pull_request'
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: team_NMAs0PpXz0830ALH0kYmwkyT
+          vercel-project-id: prj_Ft4iEi7IETpwRPw46eTlXF84Dqv0
+          working-directory: web
+          vercel-args: ${{ github.event_name == 'push' && '--prod' || '' }}
+          scope: osleventsappaugustanaedus-projects
+          alias-domains: |
+            ${{ github.event_name == 'push' && 'www.vike.live' || format('{0}-{1}.vercel.app', github.event.pull_request.head.ref, github.sha) }}
