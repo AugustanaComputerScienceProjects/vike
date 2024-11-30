@@ -7,7 +7,8 @@ import firebase from "@/firebase/config";
 import useRoleData from "@/hooks/use-role";
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
+import { StaticImageData } from "next/image";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import AddCalendarForm from "./add-calendar-form";
@@ -36,13 +37,13 @@ const AddCalendar = ({ onClose }) => {
 
   const handleProfileUpload = (event) => {
     const file = event.target.files[0];
-    handleImageFileChanged(file, (uri) => setProfile64(uri));
+    handleImageFileChanged(file, (uri) => setProfile64(uri as unknown as StaticImageData));
   };
 
   const handleProfileDrop = (event) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
-    handleImageFileChanged(file, (uri) => setProfile64(uri));
+    handleImageFileChanged(file, (uri) => setProfile64(uri as unknown as StaticImageData));
   };
 
   const onSubmit = async (data) => {
@@ -109,7 +110,7 @@ const AddCalendar = ({ onClose }) => {
       <CardContent>
         <div className="flex flex-col items-center space-y-4">
           <ImageUpload
-            image64={profile64}
+            image64={profile64.src}
             onImageUpload={handleProfileUpload}
             onImageDrop={handleProfileDrop}
             className="w-24 h-24 rounded-full"
