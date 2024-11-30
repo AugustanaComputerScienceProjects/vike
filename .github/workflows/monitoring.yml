@@ -7,6 +7,9 @@ on:
 jobs:
   monitoring:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
     steps:
       - name: Setup Sentry CLI
         uses: mathieu-bour/setup-sentry-cli@v1
