@@ -3,14 +3,14 @@
 import { Button, Input } from "@/components/ui";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import firebase from "@/firebase/config";
 import { EventGuest } from "@/firebase/types";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { format } from "date-fns";
 import { Search } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { toTitleCase } from "../../manage/[eventId]/util";
 import { EVENT_STATUS } from "./utils";
@@ -23,6 +23,9 @@ const CheckInPage = () => {
   const [openQRScanner, setOpenQRScanner] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [scannerKey, setScannerKey] = useState(0);
+  const [lastScannedCode, setLastScannedCode] = useState<string | null>(null);
+  const [scannerEnabled, setScannerEnabled] = useState(true);
 
   const router = useRouter();
 
@@ -62,6 +65,34 @@ const CheckInPage = () => {
     fetchEvent();
   }, [eventId, router]);
 
+  useEffect(() => {
+    if (!eventId) return;
+
+    const guestsRef = firebase.database.ref(`/current-events/${eventId}/guests`);
+    
+    const handleGuestsUpdate = (snapshot) => {
+      const guestsData = snapshot.val();
+      if (guestsData) {
+        const updatedGuests = Object.entries(guestsData).map(
+          ([userHandle, guestData]: [string, EventGuest]) => ({
+            userHandle,
+            status: guestData.status || EVENT_STATUS.GOING,
+            ticketId: guestData.ticketId
+          })
+        );
+        setGuests(updatedGuests);
+      } else {
+        setGuests([]);
+      }
+    };
+
+    guestsRef.on("value", handleGuestsUpdate);
+
+    return () => {
+      guestsRef.off("value", handleGuestsUpdate);
+    };
+  }, [eventId]);
+
   const handleGuestClick = (guest) => {
     setSelectedGuest(guest);
   };
@@ -97,40 +128,69 @@ const CheckInPage = () => {
     }
   };
 
-  const handleQRScan = async (result) => {
-    if (!result) return;
-
+  const handleQRScan = useCallback(async (result) => {
+    if (!result || isLoading || !scannerEnabled) return;
+    
+    const code = result.text || result;
+    if (code === lastScannedCode) return; 
+    
     try {
+      setScannerEnabled(false); // Temporarily disable scanner
       setIsLoading(true);
-      const ticketUserHandle = result.split("-")[0];
-      const guest = guests.find(({ userHandle }) => userHandle === ticketUserHandle);
+      setLastScannedCode(code);
+      
+      const [ticketUserHandle] = code.split("-");
+      
+      const guestRef = firebase.database.ref(`/current-events/${eventId}/guests/${ticketUserHandle}`);
+      const guestSnapshot = await guestRef.once("value");
+      const guestData = guestSnapshot.val();
 
-      if (!guest) {
+      if (!guestData) {
         toast.error("Guest not found");
         return;
       }
 
-      await firebase.database
-        .ref(`/current-events/${eventId}/guests/${guest.userHandle}/status`)
-        .set(EVENT_STATUS.CHECKED_IN);
+      await guestRef.update({
+        status: EVENT_STATUS.CHECKED_IN
+      });
 
-      // Optimistic update
-      setGuests(prevGuests =>
-        prevGuests.map(g =>
-          g.userHandle === guest.userHandle
-            ? { ...g, status: EVENT_STATUS.CHECKED_IN }
-            : g
-        )
-      );
-
-      toast.success(`${guest.userHandle} checked in successfully!`);
-      setOpenQRScanner(false);
+      toast.success(`${ticketUserHandle} checked in successfully!`);
+      
+      // Reset scanner after successful scan
+      setTimeout(() => {
+        setLastScannedCode(null);
+        setScannerEnabled(true);
+      }, 2000); // 2 second cooldown between scans
+      
     } catch (error) {
       toast.error("Failed to process QR code");
       console.error(error);
     } finally {
       setIsLoading(false);
     }
+  }, [eventId, isLoading, lastScannedCode, scannerEnabled]);
+
+  const renderScanner = () => {
+    if (!openQRScanner) return null;
+    
+    return (
+      <Scanner
+        key={scannerKey}
+        onResult={handleQRScan}
+        onError={(error) => {
+          if (!error?.message?.includes('interrupted by a new load request')) {
+            console.error(error?.message);
+          }
+        }}
+        options={{
+          delayBetweenScanSuccess: 1000,
+          delayBetweenScanAttempts: 1000,
+          constraints: {
+            facingMode: "environment"
+          }
+        }}
+      />
+    );
   };
 
   const getStatusColor = (status) => {
@@ -156,6 +216,53 @@ const CheckInPage = () => {
     }
   };
 
+  const renderGuestDialog = (guest) => (
+    <Dialog key={guest.userHandle}>
+      <DialogTrigger asChild>
+        <Card className="p-4 hover:bg-gray-50 cursor-pointer transition-colors">
+          <div className="flex justify-between items-center">
+            <span className="font-medium">{guest.userHandle}</span>
+            <Badge variant="secondary" className={getStatusColor(guest.status)}>
+              {toTitleCase(guest.status)}
+            </Badge>
+          </div>
+        </Card>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{guest.userHandle}</DialogTitle>
+          <DialogDescription>
+            Manage guest check-in status
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          {guest.ticketId && (
+            <div className="text-sm text-gray-500">
+              Registered: {formatDate(parseInt(guest.ticketId.split("-").pop(), 10))}
+            </div>
+          )}
+          <div className="text-sm">
+            Current Status: <Badge variant="secondary" className={getStatusColor(guest.status)}>{toTitleCase(guest.status)}</Badge>
+          </div>
+          <Button 
+            onClick={() => {
+              handleGuestClick(guest);
+              handleManualCheckIn();
+            }}
+            disabled={isLoading}
+            className="w-full"
+          >
+            {isLoading 
+              ? "Processing..." 
+              : guest.status === EVENT_STATUS.CHECKED_IN 
+                ? "Undo Check In" 
+                : "Check In"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   return (
     <div className="container max-w-4xl mx-auto p-4 space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -163,7 +270,17 @@ const CheckInPage = () => {
           <h1 className="text-2xl font-bold">{event?.name || "Loading..."}</h1>
           <p className="text-gray-500">{event?.startDate && formatDate(event.startDate)}</p>
         </div>
-        <Dialog open={openQRScanner} onOpenChange={setOpenQRScanner}>
+        <Dialog 
+          open={openQRScanner} 
+          onOpenChange={(open) => {
+            setOpenQRScanner(open);
+            if (!open) {
+              setScannerKey(prev => prev + 1);
+              setLastScannedCode(null);
+              setScannerEnabled(true);
+            }
+          }}
+        >
           <DialogTrigger asChild>
             <Button disabled={isLoading}>
               {isLoading ? "Processing..." : "Scan QR Code"}
@@ -172,16 +289,12 @@ const CheckInPage = () => {
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Scan QR Code</DialogTitle>
+              <DialogDescription>
+                Hold the QR code steady in front of the camera
+              </DialogDescription>
             </DialogHeader>
-            <div className="aspect-square">
-              <Scanner
-                onResult={handleQRScan}
-                onError={(error) => console.error(error?.message)}
-                options={{
-                  delayBetweenScanSuccess: 1000,
-                  delayBetweenScanAttempts: 1000,
-                }}
-              />
+            <div className="aspect-square relative overflow-hidden rounded-md">
+              {renderScanner()}
             </div>
           </DialogContent>
         </Dialog>
@@ -198,49 +311,7 @@ const CheckInPage = () => {
       </div>
 
       <div className="space-y-3">
-        {filteredGuests.map((guest) => (
-          <Dialog key={guest.userHandle}>
-            <DialogTrigger asChild>
-              <Card className="p-4 hover:bg-gray-50 cursor-pointer transition-colors">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">{guest.userHandle}</span>
-                  <Badge className={getStatusColor(guest.status)}>
-                    {toTitleCase(guest.status)}
-                  </Badge>
-                </div>
-              </Card>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{guest.userHandle}</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                {guest.ticketId && (
-                  <p className="text-sm text-gray-500">
-                    Registered: {formatDate(parseInt(guest.ticketId.split("-").pop(), 10))}
-                  </p>
-                )}
-                <p className="text-sm">
-                  Current Status: <Badge className={getStatusColor(guest.status)}>{toTitleCase(guest.status)}</Badge>
-                </p>
-                <Button 
-                  onClick={() => {
-                    handleGuestClick(guest);
-                    handleManualCheckIn();
-                  }}
-                  disabled={isLoading}
-                  className="w-full"
-                >
-                  {isLoading 
-                    ? "Processing..." 
-                    : guest.status === EVENT_STATUS.CHECKED_IN 
-                      ? "Undo Check In" 
-                      : "Check In"}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        ))}
+        {filteredGuests.map((guest) => renderGuestDialog(guest))}
         
         {filteredGuests.length === 0 && (
           <div className="text-center py-8 text-gray-500">
