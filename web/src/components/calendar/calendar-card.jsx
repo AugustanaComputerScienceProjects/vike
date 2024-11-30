@@ -12,9 +12,12 @@ export const toTitleCase = (str) => {
   });
 };
 
-const CalendarCard = ({ calendar }) => {
+const CalendarCard = ({ calendar, onClick }) => {
   return (
-    <Card className="mt-2 mb-2 cursor-pointer">
+    <Card 
+      className="mt-2 mb-2 cursor-pointer hover:bg-accent transition-colors"
+      onClick={onClick}
+    >
       <div className="flex flex-col md:flex-row">
         <CardHeader>
           <CardTitle>{calendar.name}</CardTitle>

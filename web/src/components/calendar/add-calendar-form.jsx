@@ -1,72 +1,79 @@
 import {
-  FormControl,
-  FormLabel,
   Input,
   Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Textarea,
-} from "@/components/ui";
-import React, { useState } from "react";
+} from "@/components/ui/";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import React from "react";
+import { useFormContext } from "react-hook-form";
 
-const AddCalendarForm = ({
-  formData,
-  groups,
-  handleInputChange,
-  setFormData,
-}) => {
-  const [organization, setOrganization] = useState(formData.organization);
-
-  const handleOrganizationChange = (event) => {
-    const newValue = event.target.value;
-    setOrganization(newValue);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      organization: newValue,
-    }));
-  };
+const AddCalendarForm = ({ groups }) => {
+  const form = useFormContext();
 
   return (
     <>
-      {/* Calendar Name */}
-      <FormControl>
-        <FormLabel htmlFor="name">Calendar Name</FormLabel>
-        <Input
-          autoFocus
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleInputChange}
-          placeholder="Ex: Welcome Week"
-          required
-        />
-      </FormControl>
-      {/* Organization */}
-      <FormControl>
-        <FormLabel htmlFor="organization">Organization</FormLabel>
-        <Select
-          id="organization"
-          name="organization"
-          value={organization}
-          onChange={handleOrganizationChange}
-        >
-          {groups.map((group, index) => (
-            <option key={index} value={group}>
-              {group}
-            </option>
-          ))}
-        </Select>
-      </FormControl>
-      {/* Description */}
-      <FormControl>
-        <FormLabel htmlFor="description">Description</FormLabel>
-        <Textarea
-          id="description"
-          name="description"
-          value={formData.description}
-          onChange={handleInputChange}
-          rows={4}
-          required
-        />
-      </FormControl>
+      <FormField
+        control={form.control}
+        name="name"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Calendar Name</FormLabel>
+            <FormControl>
+              <Input placeholder="Ex: Welcome Week" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="organization"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Organization</FormLabel>
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an organization" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {groups.map((group) => (
+                  <SelectItem key={group} value={group}>
+                    {group}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="description"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Description</FormLabel>
+            <FormControl>
+              <Textarea rows={4} {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </>
   );
 };

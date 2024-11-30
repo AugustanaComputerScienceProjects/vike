@@ -34,7 +34,23 @@ import { generateUniqueTicketId } from "./utils";
 
 const TicketDialog = ({ showTicket, setShowTicket, event }) => {
   const currentUserHandle = firebase.auth.currentUser.email.split("@")[0];
-  const ticketInfo = event.guests[currentUserHandle];
+  const ticketInfo = event.guests?.[currentUserHandle];
+
+  if (!ticketInfo) {
+    return (
+      <Dialog open={showTicket} onOpenChange={setShowTicket}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>No Ticket Found</DialogTitle>
+            <DialogDescription>
+              You are not registered for this event
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={showTicket} onOpenChange={setShowTicket}>
       <DialogContent>

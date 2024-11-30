@@ -1,44 +1,38 @@
 import vikeLogo from "@/assets/vike.png";
-import { handleImageFileChanged } from "@/components/calendar/utils";
-import ImageUpload from "@/components/image-upload";
+import ImageUpload from "@/components/event/image-upload";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
 import firebase from "@/firebase/config";
 import useRoleData from "@/hooks/use-role";
+import { useToast } from "@/hooks/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import AddCalendarForm from "./add-calendar-form";
+import { handleImageFileChanged } from "./utils";
 
-const AddCalendar = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    organization: "",
-    description: "",
-    profileId: "vike",
-    email: "",
-    admins: [],
-    subscribers: [],
-    events: [],
-  });
+const formSchema = z.object({
+  name: z.string().min(1, "Calendar name is required"),
+  organization: z.string().min(1, "Organization is required"),
+  description: z.string().min(1, "Description is required"),
+});
+
+const AddCalendar = ({ onClose }) => {
   const [profile64, setProfile64] = useState(vikeLogo);
   const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [openSnackbar, setOpenSnackbar] = useState(false);
   const { groups } = useRoleData();
+  const { toast } = useToast();
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
-  };
-
-  const handleDateChange = (field, date) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [field]: date ? date.toISOString() : null,
-    }));
-  };
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      organization: "",
+      description: "",
+    },
+  });
 
   const handleProfileUpload = (event) => {
     const file = event.target.files[0];
@@ -51,123 +45,90 @@ const AddCalendar = () => {
     handleImageFileChanged(file, (uri) => setProfile64(uri));
   };
 
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpenSnackbar(false);
-  };
-
-  const displayMessage = (message) => {
-    setMessage(message);
-    setOpenSnackbar(true);
-  };
-
-  const submitCalendar = (id = "vike") => {
-    const calendarData = {
-      ...formData,
-      profileId: id,
-      email: firebase.auth.currentUser.email,
-    };
-
-    firebase.database
-      .ref("/calendars")
-      .push(calendarData)
-      .then(() => {
-        setUploading(false);
-        displayMessage("Calendar added successfully");
-        resetForm();
-      })
-      .catch((error) => {
-        console.error(error);
-        displayMessage("Failed to add calendar");
-      });
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (formData.name !== "" && formData.organization !== "") {
-      saveImage("Profiles", profile64);
-    } else {
-      displayMessage("Please fill in all required fields");
-    }
-  };
-
-  const saveImage = (ref, image) => {
-    if (image !== vikeLogo) {
+  const onSubmit = async (data) => {
+    try {
       setUploading(true);
-      displayMessage("Uploading Image...");
-      const firebaseStorageRef = firebase.storage.ref(ref);
-      const id = Date.now().toString();
-      const imageRef = firebaseStorageRef.child(id + ".png");
+      
+      // Handle image upload if changed
+      let profileId = "vike";
+      if (profile64 !== vikeLogo) {
+        profileId = await saveImage("Profiles", profile64);
+      }
 
-      const i = image.indexOf("base64,");
-      const buffer = Buffer.from(image.slice(i + 7), "base64");
-      const file = new File([buffer], id);
+      // Prepare calendar data
+      const calendarData = {
+        ...data,
+        profileId,
+        email: firebase.auth.currentUser.email,
+        admins: [],
+        subscribers: [],
+        events: [],
+      };
 
-      imageRef
-        .put(file)
-        .then(() => {
-          return imageRef.getDownloadURL();
-        })
-        .then((url) => {
-          submitCalendar(id);
-        })
-        .catch((error) => {
-          console.log(error);
-          displayMessage("Error Uploading Image");
-        });
-    } else {
-      submitCalendar();
+      // Save to database
+      await firebase.database.ref("/calendars").push(calendarData);
+      
+      toast({
+        title: "Success",
+        description: "Calendar created successfully",
+      });
+      
+      onClose();
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to create calendar",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      organization: "",
-      description: "",
-      profileId: "vike",
-      email: "",
-    });
-    setProfile64(vikeLogo);
+  const saveImage = async (ref, image) => {
+    const firebaseStorageRef = firebase.storage.ref(ref);
+    const id = Date.now().toString();
+    const imageRef = firebaseStorageRef.child(id + ".png");
+
+    const i = image.indexOf("base64,");
+    const buffer = Buffer.from(image.slice(i + 7), "base64");
+    const file = new File([buffer], id);
+
+    await imageRef.put(file);
+    await imageRef.getDownloadURL();
+    
+    return id;
   };
 
   return (
     <Card>
-      <CardContent>
+      <CardHeader>
         <CardTitle>Create Calendar</CardTitle>
-        <form onSubmit={handleSubmit}>
-          <div className="flex flex-col items-center pt-2">
-            <div className="w-full h-full rounded-lg overflow-hidden">
-              <ImageUpload
-                image64={profile64}
-                onImageUpload={handleProfileUpload}
-                onImageDrop={handleProfileDrop}
-                style={{ width: "100px", height: "100px", objectFit: "cover" }}
-              />
-            </div>
-            <div className="w-full">
-              <AddCalendarForm
-                formData={formData}
-                groups={groups}
-                handleInputChange={handleInputChange}
-                handleDateChange={handleDateChange}
-                setFormData={setFormData}
-              />
-            </div>
-            <Button
-              onClick={handleSubmit}
-              variant="contained"
-              color="primary"
-              disabled={uploading}
-            >
-              Create Calendar
-            </Button>
-          </div>
-        </form>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col items-center space-y-4">
+          <ImageUpload
+            image64={profile64}
+            onImageUpload={handleProfileUpload}
+            onImageDrop={handleProfileDrop}
+            className="w-24 h-24 rounded-full"
+          />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
+              <AddCalendarForm groups={groups} />
+              <div className="flex justify-end">
+                <Button 
+                  type="submit"
+                  disabled={uploading}
+                >
+                  {uploading ? "Creating..." : "Create Calendar"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
       </CardContent>
-      <CardFooter>{/* Custom Snackbar or notification component */}</CardFooter>
     </Card>
   );
 };

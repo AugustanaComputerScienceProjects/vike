@@ -2,21 +2,39 @@
 import { Badge } from "@/components/ui";
 import { EVENT_STATUS } from "@/lib/types";
 import React from "react";
-import { toTitleCase } from "./util";
 
 const Guests = ({ event }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case EVENT_STATUS.GOING:
-        return "green";
+        return "success";
       case EVENT_STATUS.CHECKED_IN:
-        return "blue";
+        return "info";
       case EVENT_STATUS.INVITED:
-        return "yellow";
+        return "warning";
       case EVENT_STATUS.NOT_GOING:
-        return "red";
+        return "error";
+      case EVENT_STATUS.WAITLISTED:
+        return "secondary";
       default:
-        return "gray";
+        return "default";
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case EVENT_STATUS.GOING:
+        return "Going";
+      case EVENT_STATUS.CHECKED_IN:
+        return "Checked In";
+      case EVENT_STATUS.INVITED:
+        return "Invited";
+      case EVENT_STATUS.NOT_GOING:
+        return "Not Going";
+      case EVENT_STATUS.WAITLISTED:
+        return "Waitlisted";
+      default:
+        return "Unknown";
     }
   };
 
@@ -39,10 +57,10 @@ const Guests = ({ event }) => {
                 )}
               </div>
               <Badge
-                label={toTitleCase(userDetails.status)}
-                color={getStatusColor(userDetails.status)}
-                variant="outlined"
-              />
+                variant={getStatusColor(userDetails.status)}
+              >
+                {getStatusLabel(userDetails.status)}
+              </Badge>
             </div>
           ))}
         </div>

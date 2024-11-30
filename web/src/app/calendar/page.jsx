@@ -14,52 +14,51 @@ const Calendars = () => {
   const [isAddCalendarFormOpen, setIsAddCalendarFormOpen] = useState(false);
   const router = useRouter();
 
+  const handleCalendarClick = (calendarId) => {
+    router.push(`/calendar/${calendarId}`);
+  };
+
   const renderCalendarSection = (calendars) => {
     return (
-      <div className="flex flex-wrap mt-2 justify-between items-center mx-auto p-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
         {calendars.map((calendar) => (
           <CalendarCard
             key={calendar.key}
             calendar={calendar}
-            onClick={() => router.push(`/calendar-manage/${calendar.key}`)}
+            onClick={() => handleCalendarClick(calendar.key)}
           />
         ))}
       </div>
     );
   };
 
-  const handleAddCalendarClick = () => {
-    setIsAddCalendarFormOpen(true);
-  };
-
-  const handleAddCalendarFormClose = () => {
-    setIsAddCalendarFormOpen(false);
-    refreshCalendars();
-  };
-
   return (
-    <div className="container mx-auto p-12">
-      <div className="flex flex-row justify-between items-center">
-        <div className="text-2xl font-bold">Calendars</div>
+    <div className="container mx-auto p-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Calendars</h1>
         <Dialog>
           <DialogTrigger asChild>
-            <Button onClick={handleAddCalendarClick}>Add Calendar</Button>
+            <Button>Add Calendar</Button>
           </DialogTrigger>
           <DialogContent>
-            <AddCalendar onClose={handleAddCalendarFormClose} />
+            <AddCalendar onClose={() => {
+              setIsAddCalendarFormOpen(false);
+              refreshCalendars();
+            }} />
           </DialogContent>
         </Dialog>
       </div>
+
       {loading ? (
-        <div className="flex flex-col space-y-3 mt-2  mx-auto p-12">
-          {[...Array(8)].map((e, i) => (
-            <Skeleton className="h-[125px] w-full rounded-xl" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+          {[...Array(6)].map((_, i) => (
+            <Skeleton key={i} className="h-[200px] w-full rounded-xl" />
           ))}
         </div>
       ) : calendars.length > 0 ? (
         renderCalendarSection(calendars)
       ) : (
-        <div className="text-center">No calendars found</div>
+        <div className="text-center mt-8">No calendars found</div>
       )}
     </div>
   );
