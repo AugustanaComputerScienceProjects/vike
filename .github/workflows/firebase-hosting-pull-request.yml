@@ -54,7 +54,10 @@ jobs:
         run: npx firebase-tools@latest experiments:enable webframeworks
 
       - name: Deploy to Firebase
-        run: npx firebase deploy --only hosting --token "$FIREBASE_TOKEN"
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_OSL_EVENTS_APP }}
+          projectId: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_OSL_EVENTS_APP }}
-          PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
