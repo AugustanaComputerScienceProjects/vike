@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "deploy": "next build && firebase deploy --only hosting"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
@@ -53,9 +53,11 @@
     "zod": "^3.23.6"
   },
   "devDependencies": {
+    "@types/react": "18.3.12",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "typescript": "5.7.2"
   }
 }
