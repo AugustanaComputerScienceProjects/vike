@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import firebase from "@/firebase/config";
+import { EVENT_STATUS } from "@/lib/types";
 import { format } from "date-fns";
 import {
     Calendar,
@@ -29,7 +30,6 @@ import {
 import Image from "next/image";
 import { QRCodeSVG } from 'qrcode.react';
 import { useState } from "react";
-import { EVENT_STATUS } from "../events/utils";
 import { generateUniqueTicketId } from "./utils";
 
 const TicketDialog = ({ showTicket, setShowTicket, event }) => {
