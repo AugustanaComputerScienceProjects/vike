@@ -41,18 +41,42 @@ class Event {
     tags,
     weblink_url
   ) {
-    this.event_id = event_id;
-    this.description = description;
-    this.duration = duration;
-    this.email = email;
-    this.telephone = telephone;
-    this.imgid = imgid;
-    this.location = location;
-    this.name = name;
-    this.organization = organization;
-    this.startDate = startDate;
-    this.tags = tags;
-    this.weblink_url = weblink_url;
+    // Required fields
+    this.description = description || "";
+    this.duration = duration || 60;
+    this.email = email || "";
+    this.imgid = imgid || "default";
+    this.location = location || "";
+    this.name = name || "";
+    this.organization = organization || "";
+    this.startDate = this.formatDate(startDate);
+    this.endDate = this.calculateEndDate(this.startDate, duration);
+    this.tags = Array.isArray(tags) ? tags.join(',') : tags || "";
+    
+    // Optional fields
+    this.calendar = "";
+    this.webLink = weblink_url || "";
+    this.telephone = telephone || "";
+    
+    // If latitude/longitude available
+    if (this.latitude) delete this.latitude;
+    if (this.longitude) delete this.longitude;
+  }
+
+  formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  }
+
+  calculateEndDate(startDate, duration) {
+    const date = new Date(startDate);
+    date.setMinutes(date.getMinutes() + (duration || 60));
+    return this.formatDate(date);
   }
 }
 
@@ -85,58 +109,84 @@ function generateTags(title, description) {
   return tags;
 }
 
+// Add this helper function to check if date is within range
+function isWithinOneMonth(dateStr) {
+  const eventDate = new Date(dateStr);
+  const now = new Date();
+  const oneMonthFromNow = new Date();
+  oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
+  
+  return eventDate >= now && eventDate <= oneMonthFromNow;
+}
+
+// Update the parseXML function
 const parseXML = async (event_item_list) => {
   const event_arr = [];
   const db = admin.database().ref("/current-events/");
 
   for (const item of event_item_list) {
-    const description_block = cheerio.load(item.description[0]);
-
-    const timeElement = description_block("time");
-    const descriptionText = timeElement.next("p").text();
-
-    const locationUrl = description_block('a[href*="google.com/maps/place/"]').attr("href") || "";
-    const latLng = extractLatLngFromLocation(locationUrl);
-
-    const buildingName = description_block("p[role='article'] span").text();
-    const address_parts = description_block("p.address span")
-      .map((idx, el) => description_block(el).text())
-      .get()
-      .filter(part => part.trim() !== "");
-    const fullAddress = address_parts.join(", ");
-
-    const eventTitle = item.title[0];
-
-    const existingEventSnapshot = await db
-      .orderByChild("name")
-      .equalTo(eventTitle)
-      .once("value");
-
-    if (!existingEventSnapshot.exists()) {
-      const event = new Event(
-        item.guid[0]._.split(" ")[0],
-        descriptionText,
-        60,
-        description_block('a[href*="mailto:"]').text() || "",
-        description_block('a[href*="tel:"]').text() || "",
-        "default",
-        buildingName + ", " + fullAddress,
-        eventTitle,
-        "",
-        description_block("time").attr("datetime") || "",
-        generateTags(eventTitle, descriptionText),
-        item.link[0]
-      );
-
-      if (latLng) {
-        event.latitude = latLng.lat;
-        event.longitude = latLng.lng;
+    try {
+      const description_block = cheerio.load(item.description[0]);
+      const eventTitle = item.title[0];
+      
+      // Get event date early to check if we should process this event
+      const eventDateTime = description_block("time").attr("datetime");
+      if (!eventDateTime || !isWithinOneMonth(eventDateTime)) {
+        console.log(`Skipping event "${eventTitle}" - outside 1 month window`);
+        continue;
       }
 
-      event_arr.push(event);
-      await db.push(event);
+      // Check for existing event
+      const existingEventSnapshot = await db
+        .orderByChild("name")
+        .equalTo(eventTitle)
+        .once("value");
+
+      if (!existingEventSnapshot.exists()) {
+        const timeElement = description_block("time");
+        const descriptionText = timeElement.next("p").text() || "";
+
+        const locationUrl = description_block('a[href*="google.com/maps/place/"]').attr("href") || "";
+        const latLng = extractLatLngFromLocation(locationUrl);
+
+        const buildingName = description_block("p[role='article'] span").text();
+        const address_parts = description_block("p.address span")
+          .map((idx, el) => description_block(el).text())
+          .get()
+          .filter(part => part.trim() !== "");
+        const fullAddress = address_parts.join(", ");
+
+        const event = new Event(
+          item.guid[0]._.split(" ")[0],
+          descriptionText,
+          60,
+          description_block('a[href*="mailto:"]').text() || "",
+          description_block('a[href*="tel:"]').text() || "",
+          "default",
+          (buildingName + ", " + fullAddress).trim(),
+          eventTitle,
+          "",
+          eventDateTime,
+          generateTags(eventTitle, descriptionText),
+          item.link[0]
+        );
+
+        if (latLng) {
+          event.latitude = latLng.lat;
+          event.longitude = latLng.lng;
+        }
+
+        event_arr.push(event);
+        await db.push(event);
+        console.log(`Added event: "${eventTitle}" for date ${eventDateTime}`);
+      }
+    } catch (error) {
+      console.error(`Error parsing event ${item?.title?.[0]}:`, error);
+      continue;
     }
   }
+  
+  console.log(`Successfully processed ${event_arr.length} events within 1 month window`);
   return { events: event_arr };
 };
 
@@ -327,37 +377,3 @@ exports.emailNotifyTrigger = functions.database
       });
   });
 
-exports.migrateOldEvents = functions.https.onRequest(async (req, res) => {
-  const db = admin.database();
-  console.log("Starting migration of old events");
-
-  try {
-    const cutoffDate = new Date('2024-11-29');
-    const snapshot = await db.ref("/current-events").once("value");
-    const promises = [];
-
-    snapshot.forEach((child) => {
-      const event = child.val();
-      const eventStartDate = new Date(event.startDate);
-      
-      if (eventStartDate < cutoffDate) {
-        console.log("Moving Event:", event.name);
-        promises.push(db.ref(`/past-events/${child.key}`).set(event));
-        promises.push(db.ref(`/current-events/${child.key}`).remove());
-        
-        if (event.imgid !== "default") {
-          promises.push(
-            admin.storage().bucket().file(`Images/${event.imgid}.jpg`).delete()
-          );
-        }
-      }
-    });
-
-    await Promise.all(promises);
-    console.log("Migration completed successfully");
-    res.status(200).send("Migration completed successfully");
-  } catch (error) {
-    console.error("Error in migrateOldEvents:", error);
-    res.status(500).send("Error during migration: " + error.message);
-  }
-});
