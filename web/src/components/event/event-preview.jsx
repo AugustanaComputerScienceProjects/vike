@@ -94,7 +94,6 @@ const EventPreview = ({ event, onClose }) => {
     };
 
     await eventRef.update(updatedEvent);
-    setIsRegistered(true);
     alert("Registration successful!");
   };
 
