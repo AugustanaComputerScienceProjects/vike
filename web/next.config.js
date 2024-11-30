@@ -1,10 +1,7 @@
 const { withSentryConfig } = require("@sentry/nextjs");
 
 const nextConfig = {
-  output: "export",
-  experimental: {
-    webpackBuildWorker: true,
-  },
+  trailingSlash: true,
   images: {
     unoptimized: true,
     remotePatterns: [

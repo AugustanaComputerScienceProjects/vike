@@ -27,7 +27,7 @@ class Firebase {
 
   // Signs in the user via Google through a pop-up
   signIn = () => {
-    var provider = new app.auth.GoogleAuthProvider();
+    var provider = new firebase.auth.GoogleAuthProvider();
     this.auth
       .signInWithPopup(provider)
       .then((result) => {

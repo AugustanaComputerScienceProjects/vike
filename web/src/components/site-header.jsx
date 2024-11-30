@@ -1,24 +1,26 @@
 "use client";
 import { siteConfig } from "@/config/site";
 import firebase from "@/firebase/config";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MainNav } from "./main-nav";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "./ui/button";
 
 export const SiteHeader = () => {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState("");
 
   const signInOrOut = () => {
-    if (!user) {
-      firebase.signIn();
-    } else {
+    if (firebase.auth.currentUser) {
       firebase.signOut().then(() => {
         alert("You've signed out.");
-        history.push("/");
-        window.location.reload();
+        router.push("/");
+        router.refresh();
       });
+    } else {
+      firebase.signIn();
     }
   };
 
