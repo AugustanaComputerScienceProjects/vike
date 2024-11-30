@@ -4,7 +4,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useState } from "react";
 import EventPreview from "./event-preview";
 
 const EventCard = ({ event }) => {
@@ -58,7 +58,7 @@ const EventCard = ({ event }) => {
           </Button>
           <Button
             variant="outline"
-            onClick={() => navigateTo(`event/manage/${event.key}`)}
+            onClick={() => navigateTo(`/event/manage/${event.key}`)}
           >
             Manage
           </Button>

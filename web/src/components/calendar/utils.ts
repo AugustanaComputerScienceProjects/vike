@@ -12,21 +12,47 @@ export const addHours = (date: Date, hours: number): Date => {
 };
 
 export const handleImageFileChanged = (
-  theFile: File,
-  onFinish: (uri: string) => void
-): void => {
-  Resizer.imageFileResizer(
-    theFile,
-    2160,
-    1080,
-    "JPEG",
-    100,
-    0,
-    (uri: string) => {
-      onFinish(uri);
-    },
-    "base64"
-  );
+  file: File | null,
+  onSuccess: (uri: string) => void,
+  onError?: (error: Error) => void
+) => {
+  if (!file) {
+    onError?.(new Error("No file selected"));
+    return;
+  }
+
+  // Validate file type
+  if (!file.type.startsWith('image/')) {
+    onError?.(new Error("Please upload an image file"));
+    return;
+  }
+
+  // Validate file size (e.g., 5MB max)
+  const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+  if (file.size > maxSize) {
+    onError?.(new Error("File size too large. Maximum size is 5MB"));
+    return;
+  }
+
+  try {
+    Resizer.imageFileResizer(
+      file,
+      800, // max width
+      800, // max height
+      "JPEG",
+      80, // quality
+      0, // rotation
+      (uri) => {
+        onSuccess(uri as string);
+      },
+      "base64",
+      400, // min width
+      400, // min height
+    );
+  } catch (error) {
+    console.error("Error resizing image:", error);
+    onError?.(error instanceof Error ? error : new Error("Failed to process image"));
+  }
 };
 
 export const generateUniqueTicketId = (

@@ -15,7 +15,11 @@ import { cn } from "@/lib/utils";
 import { TimePicker } from "./time-picker";
 
 export function DateTimePicker({ value, onChange }: { value: Date, onChange: (date: Date) => void }) {
-  const [date, setDate] = React.useState();
+  const [date, setDate] = React.useState(value);
+
+  React.useEffect(() => {
+    onChange(date);
+  }, [date, onChange]);
 
   return (
     <Popover>

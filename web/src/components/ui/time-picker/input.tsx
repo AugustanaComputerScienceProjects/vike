@@ -1,12 +1,26 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-
 import { cn } from "@/lib/utils";
 import React from "react";
 import { getArrowByType, getDateByType, setDateByType } from "./utils";
 
-const TimePickerInput = React.forwardRef(
+interface TimePickerInputProps {
+  className?: string;
+  type?: string;
+  value?: string;
+  id?: string;
+  name?: string;
+  date?: Date;
+  setDate: (date: Date) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  picker: "hours" | "minutes" | "seconds";
+  onLeftFocus?: () => void;
+  onRightFocus?: () => void;
+}
+
+const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>(
   (
     {
       className,
@@ -25,7 +39,7 @@ const TimePickerInput = React.forwardRef(
     },
     ref
   ) => {
-    const [flag, setFlag] = React.useState(false);
+    const [flag, setFlag] = React.useState<boolean>(false);
 
     React.useEffect(() => {
       if (flag) {
@@ -42,7 +56,7 @@ const TimePickerInput = React.forwardRef(
       [date, picker]
     );
 
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Tab") return;
       e.preventDefault();
       if (e.key === "ArrowRight") onRightFocus?.();
