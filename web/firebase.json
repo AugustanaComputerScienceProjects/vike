@@ -3,6 +3,7 @@
     "source": "functions"
   },
   "hosting": {
+    "site": "osl-events-app",
     "source": ".",
     "ignore": [
       "firebase.json",

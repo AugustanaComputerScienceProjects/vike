@@ -8,12 +8,14 @@ import "firebase/compat/storage";
 
 // Config to initialize Firebase
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+  apiKey: "AIzaSyAIS1uFiAJTVABCxu_QnjGKw6-3nh5L0lU",
+  authDomain: "osl-events-app.firebaseapp.com",
+  databaseURL: "https://osl-events-app.firebaseio.com",
+  projectId: "osl-events-app",
+  storageBucket: "osl-events-app.appspot.com",
+  messagingSenderId: "559059413195",
+  appId: "1:559059413195:web:0d1a1c031a71c497b8934e",
+  measurementId: "G-VMZ9SHGQWY"
 };
 
 class Firebase {
