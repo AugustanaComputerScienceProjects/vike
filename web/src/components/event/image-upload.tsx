@@ -8,6 +8,7 @@ interface ImageUploadProps {
   onImageDrop: (event: React.DragEvent<HTMLDivElement>) => void;
   className?: string;
   isUploading?: boolean;
+  priority?: boolean;
 }
 
 const ImageUpload = ({ 
@@ -15,9 +16,11 @@ const ImageUpload = ({
   onImageUpload, 
   onImageDrop, 
   className,
-  isUploading = false 
+  isUploading = false,
+  priority = false
 }: ImageUploadProps) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -35,6 +38,10 @@ const ImageUpload = ({
     setIsDragging(false);
   };
 
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <div
       className={`flex flex-col justify-center items-center relative border-2 border-dashed rounded-lg transition-colors ${
@@ -44,16 +51,16 @@ const ImageUpload = ({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
     >
-      {!image64 && (
+      {(!image64 || imageError) && (
         <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
           <ImageIcon className="h-12 w-12 text-gray-400 mb-2" />
           <p className="text-sm text-gray-600">
-            Drag and drop an image here or click to upload
+            {imageError ? "Failed to load image. Click to upload a new one." : "Drag and drop an image here or click to upload"}
           </p>
         </div>
       )}
       
-      {image64 && (
+      {image64 && !imageError && (
         <div className="relative w-full h-full">
           <Image 
             src={image64} 
@@ -61,6 +68,8 @@ const ImageUpload = ({
             fill
             className="object-cover rounded-lg"
             sizes="(max-width: 768px) 100vw, 50vw"
+            priority={priority}
+            onError={handleImageError}
           />
         </div>
       )}
