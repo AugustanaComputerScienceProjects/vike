@@ -47,6 +47,5 @@ jobs:
           channelId: live
           projectId: osl-events-app
           entryPoint: "web"
-          target: osl-events-app
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
