@@ -2,24 +2,27 @@
   "functions": {
     "source": "functions"
   },
-  "hosting": {
-    "site": "osl-events-app",
-    "source": ".",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
+  "hosting": [
+    {
+      "target": "osl-events-app",
+      "site": "osl-events-app",
+      "source": ".",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "frameworksBackend": {
+        "region": "us-central1"
       }
-    ],
-    "frameworksBackend": {
-      "region": "us-central1"
     }
-  },
+  ],
   "emulators": {
     "functions": {
       "port": 5001
