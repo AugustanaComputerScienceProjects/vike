@@ -1,5 +1,12 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   Bold,
+  Heading1,
+  Heading2,
+  Heading3,
   Italic,
   List,
   ListOrdered,
@@ -8,111 +15,129 @@ import {
   Undo,
 } from "lucide-react";
 import React from "react";
-import MenuItem from "./menu-item";
 
 const MenuBar = ({ editor }) => {
+  if (!editor) {
+    return null;
+  }
+
   const headingItems = [
     {
-      icon: <span className="font-bold text-sm">H1</span>,
+      icon: <Heading1 className="h-4 w-4" />,
       title: "Heading 1",
       action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
       isActive: editor.isActive("heading", { level: 1 }),
-      value: "heading1",
-      ariaLabel: "Toggle Heading 1",
     },
     {
-      icon: <span className="font-bold text-sm">H2</span>,
+      icon: <Heading2 className="h-4 w-4" />,
       title: "Heading 2",
       action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
       isActive: editor.isActive("heading", { level: 2 }),
-      value: "heading2",
-      ariaLabel: "Toggle Heading 2",
     },
     {
-      icon: <span className="font-bold text-sm">H3</span>,
+      icon: <Heading3 className="h-4 w-4" />,
       title: "Heading 3",
       action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
       isActive: editor.isActive("heading", { level: 3 }),
-      value: "heading3",
-      ariaLabel: "Toggle Heading 3",
     },
   ];
 
   const items = [
     {
-      icon: <Bold className="h-4 w-4 shrink-0" />,
+      icon: <Bold className="h-4 w-4" />,
       title: "Bold",
       action: () => editor.chain().focus().toggleBold().run(),
       isActive: editor.isActive("bold"),
-      value: "bold",
-      ariaLabel: "Toggle Bold",
     },
     {
-      icon: <Italic className="h-4 w-4 shrink-0" />,
+      icon: <Italic className="h-4 w-4" />,
       title: "Italic",
       action: () => editor.chain().focus().toggleItalic().run(),
       isActive: editor.isActive("italic"),
-      value: "italic",
-      ariaLabel: "Toggle Italic",
     },
     {
-      icon: <List className="h-4 w-4 shrink-0" />,
+      icon: <List className="h-4 w-4" />,
       title: "Bullet List",
       action: () => editor.chain().focus().toggleBulletList().run(),
       isActive: editor.isActive("bulletList"),
-      value: "bulletList",
-      ariaLabel: "Toggle Bullet List",
     },
     {
-      icon: <ListOrdered className="h-4 w-4 shrink-0" />,
+      icon: <ListOrdered className="h-4 w-4" />,
       title: "Ordered List",
       action: () => editor.chain().focus().toggleOrderedList().run(),
       isActive: editor.isActive("orderedList"),
-      value: "orderedList",
-      ariaLabel: "Toggle Ordered List",
     },
     {
-      icon: <Quote className="h-4 w-4 shrink-0" />,
+      icon: <Quote className="h-4 w-4" />,
       title: "Blockquote",
       action: () => editor.chain().focus().toggleBlockquote().run(),
       isActive: editor.isActive("blockquote"),
-      value: "blockquote",
-      ariaLabel: "Toggle Blockquote",
     },
+  ];
+
+  const historyItems = [
     {
-      icon: <Undo className="h-4 w-4 shrink-0" />,
+      icon: <Undo className="h-4 w-4" />,
       title: "Undo",
       action: () => editor.chain().focus().undo().run(),
-      value: "undo",
-      ariaLabel: "Undo",
+      isDisabled: !editor.can().undo(),
     },
     {
-      icon: <Redo className="h-4 w-4 shrink-0" />,
+      icon: <Redo className="h-4 w-4" />,
       title: "Redo",
       action: () => editor.chain().focus().redo().run(),
-      value: "redo",
-      ariaLabel: "Redo",
+      isDisabled: !editor.can().redo(),
     },
   ];
 
   return (
-    <div className="flex flex-wrap gap-1">
-      {headingItems.map((item, index) => (
-        <MenuItem key={index} {...item} />
-      ))}
-      <div
-        className="h-full bg-gray-300 mx-0.5 my-1"
-        style={{ width: "1px" }}
-      />
-      {items.map((item, index) => (
-        <React.Fragment key={index}>
-          {item.type === "divider" ? (
-            <div className="w-full h-px bg-gray-300 my-2" />
-          ) : (
-            <MenuItem {...item} />
-          )}
-        </React.Fragment>
-      ))}
+    <div className="border-b p-1 flex flex-wrap gap-1">
+      <div className="flex items-center gap-1">
+        {headingItems.map((item, index) => (
+          <Button
+            key={index}
+            onClick={item.action}
+            variant={item.isActive ? "secondary" : "ghost"}
+            size="sm"
+            title={item.title}
+          >
+            {item.icon}
+          </Button>
+        ))}
+      </div>
+
+      <Separator orientation="vertical" className="mx-1 h-6" />
+
+      <div className="flex items-center gap-1">
+        {items.map((item, index) => (
+          <Button
+            key={index}
+            onClick={item.action}
+            variant={item.isActive ? "secondary" : "ghost"}
+            size="sm"
+            title={item.title}
+          >
+            {item.icon}
+          </Button>
+        ))}
+      </div>
+
+      <Separator orientation="vertical" className="mx-1 h-6" />
+
+      <div className="flex items-center gap-1">
+        {historyItems.map((item, index) => (
+          <Button
+            key={index}
+            onClick={item.action}
+            variant="ghost"
+            size="sm"
+            title={item.title}
+            disabled={item.isDisabled}
+          >
+            {item.icon}
+          </Button>
+        ))}
+      </div>
     </div>
   );
 };

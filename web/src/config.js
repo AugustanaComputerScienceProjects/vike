@@ -1,11 +1,10 @@
-import fire from "firebase";
-import app from "firebase/app";
-import "firebase/auth";
-import "firebase/database";
-import "firebase/storage";
+import { initializeApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getDatabase } from "firebase/database";
+import { getStorage } from "firebase/storage";
 
 // Config to initialize Firebase
-let config = {
+const config = {
   apiKey: "AIzaSyBFTh3ZprCrzReAlVDeGcNN8WzijuDU6DI",
   authDomain: "osl-events-app.firebaseapp.com",
   databaseURL: "https://osl-events-app.firebaseio.com",
@@ -16,35 +15,28 @@ let config = {
 
 class Firebase {
   constructor() {
-    let app = fire.initializeApp(config);
-    this.database = app.database();
-    this.storage = app.storage();
-    this.auth = app.auth();
+    const app = initializeApp(config);
+    this.database = getDatabase(app);
+    this.storage = getStorage(app);
+    this.auth = getAuth(app);
     this.adminSignedIn = false;
   }
 
   // Signs in the user via Google through a pop-up
-  signIn = () => {
-    var provider = new app.auth.GoogleAuthProvider();
-    this.auth
-      .signInWithPopup(provider)
-      .then(function(result) {
-        // var token = result.credential.accessToken;
-        var user = result.user;
-        this.adminSignedIn = true;
-        console.log(user.email);
-      })
-      .catch(function(error) {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        var email = error.email;
-        var credential = error.credential;
-        console.log("Error Signing in...");
-        console.log(errorCode);
-        console.log(errorMessage);
-        console.log(email);
-        console.log(credential);
-      });
+  signIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(this.auth, provider);
+      const user = result.user;
+      this.adminSignedIn = true;
+      console.log(user.email);
+    } catch (error) {
+      console.log("Error Signing in...");
+      console.log(error.code);
+      console.log(error.message);
+      console.log(error.email);
+      console.log(error.credential);
+    }
   };
 
   // Signs out the current user
