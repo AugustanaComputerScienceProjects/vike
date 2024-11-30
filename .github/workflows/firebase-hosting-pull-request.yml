@@ -59,5 +59,6 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_OSL_EVENTS_APP }}
           projectId: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          entryPoint: "./web"
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
