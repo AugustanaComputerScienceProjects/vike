@@ -64,7 +64,7 @@ const GroupsPage = () => {
     setAdding(true);
   };
 
-  const filteredGroups = groups.filter(([key, group]) =>
+  const filteredGroups = groups.filter(([_, group]) =>
     group.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
   );
 

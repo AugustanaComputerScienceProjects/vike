@@ -5,11 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import firebase from "@/firebase/config";
+import { EventGuest } from "@/firebase/types";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { format } from "date-fns";
 import { Search } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { toTitleCase } from "../../manage/[eventId]/util";
 import { EVENT_STATUS } from "./utils";
@@ -23,7 +24,6 @@ const CheckInPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const qrRef = useRef(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const CheckInPage = () => {
         if (fetchedEvent.guests) {
           setGuests(
             Object.entries(fetchedEvent.guests).map(
-              ([userHandle, guestData]: [string, any]) => ({
+              ([userHandle, guestData]: [string, EventGuest]) => ({
                 userHandle,
                 status: guestData.status || EVENT_STATUS.GOING
               })

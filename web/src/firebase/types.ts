@@ -11,12 +11,12 @@ export interface Calendar {
   description: string;
   profileId: string;
   profileUrl?: string;
-  eventsCalendar?: Record<string, CalendarEvent>;
+  eventsCalendar?: Record<string, Event>;
   admins?: Record<string, boolean>;
   subscribers?: Record<string, boolean>;
 }
 
-export interface CalendarEvent {
+export interface Event {
   id?: string;
   name: string;
   description: string;
@@ -69,7 +69,7 @@ export interface Demographics {
 
 export interface DatabaseStructure {
   calendars: Record<string, Calendar>;
-  "current-events": Record<string, CalendarEvent>;
+  "current-events": Record<string, Event>;
   admin: Record<string, boolean>;
   leaders: Record<string, {
     groups: Record<string, boolean>;

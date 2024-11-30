@@ -1,9 +1,9 @@
 import firebase from "@/firebase/config";
-import { CalendarEvent } from "@/firebase/types";
+import { Event } from "@/firebase/types";
 import { useEffect, useState } from "react";
 
 const useCalendarEvents = (calendarId: string) => {
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchEvents = async () => {
@@ -12,7 +12,7 @@ const useCalendarEvents = (calendarId: string) => {
         `/calendars/${calendarId}/eventsCalendar`
       );
       const snapshot = await eventsRef.once("value");
-      const eventsData = snapshot.val() as Record<string, CalendarEvent>;
+      const eventsData = snapshot.val() as Record<string, Event>;
 
       if (eventsData) {
         const eventsArray = Object.entries(eventsData).map(([id, data]) => ({

@@ -1,52 +1,20 @@
 "use client";
 
 import ImageUpload from "@/components/event/image-upload";
-import { addHours, roundToNearestHalfHour } from "@/components/event/utils";
 import firebase from "@/firebase/config";
 import useRoleData from "@/hooks/use-role";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { addMinutes, differenceInMinutes, format, parseISO } from "date-fns";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import ManageEventForm from "./manage-form";
 
-const formSchema = z.object({
-  eventName: z.string().min(2).max(50),
-  eventDate: z.date(),
-  eventType: z.string(),
-});
-
 const Overview = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    startDate: roundToNearestHalfHour(new Date()),
-    endDate: addHours(roundToNearestHalfHour(new Date()), 1),
-    location: "",
-    organization: "",
-    imgid: "default",
-    description: "",
-    webLink: "",
-    tags: [],
-    email: "",
-  });
-  const [uploading, setUploading] = useState(false);
 
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      eventName: "",
-      eventDate: new Date(),
-      eventType: "",
-    },
-  });
 
   const [image64, setImage64] = useState(null);
   const [currImage, setCurrImage] = useState(null);
   const [event, setEvent] = useState(null);
-  const { databaseTags, groups, adminSignedIn, leaderSignedIn } = useRoleData();
-  const router = useRouter();
+  const { databaseTags, groups } = useRoleData();
   const { eventId } = useParams();
 
   useEffect(() => {
@@ -94,30 +62,9 @@ const Overview = () => {
       [name]: value,
     }));
   };
-  const handleDateChange = (field, date) => {
-    setEvent((prevEvent) => ({
-      ...prevEvent,
-      [field]: date ? format(date, "yyyy-MM-dd HH:mm") : null,
-    }));
-  };
-
-  const handleCancelEvent = async () => {
-    if (
-      window.confirm(
-        "Cancel and permanently delete this event. This operation cannot be undone. Are you sure you want to cancel this event?"
-      )
-    ) {
-      const eventRef = firebase.database.ref(`/current-events/${eventId}`);
-      await eventRef.remove();
-      alert("Event canceled successfully!");
-      router.push("/events");
-    }
-  };
 
   const saveImage = (ref, image) => {
-    if (image !== defaultImage) {
-      setUploading(true);
-      displayMessage("Uploading Image...");
+    if (image !== currImage) {
       const firebaseStorageRef = firebase.storage.ref(ref);
       const id = Date.now().toString();
       const imageRef = firebaseStorageRef.child(id + ".jpg");
@@ -131,12 +78,11 @@ const Overview = () => {
         .then(() => {
           return imageRef.getDownloadURL();
         })
-        .then((url) => {
+        .then(() => {
           submitEvent(id);
         })
         .catch((error) => {
           console.log(error);
-          displayMessage("Error Uploading Image");
         });
     } else {
       submitEvent();
@@ -163,12 +109,9 @@ const Overview = () => {
       .ref(`/current-events/${eventId}`)
       .update(eventData)
       .then(() => {
-        setUploading(false);
-        displayMessage("Event Updated");
       })
       .catch((error) => {
         console.log(error);
-        displayMessage("Error Updating Event");
       });
   };
 
@@ -188,7 +131,7 @@ const Overview = () => {
         submitEvent(event.imgid);
       }
     } else {
-      displayMessage("Required fields are not filled in.");
+      alert("Required fields are not filled in.");
     }
   };
 
@@ -196,12 +139,12 @@ const Overview = () => {
     <div className="container mx-auto p-4">
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <ImageUpload image64={image64} onImageUpload={handleImageUpload} />
+          <ImageUpload image64={image64} onImageUpload={handleImageUpload} onImageDrop={handleImageUpload} className="w-full" />
           <ManageEventForm
-            formData={formData}
+            event={event}
             groups={groups}
             databaseTags={databaseTags}
-            handleInputChange={handleInputChange}
+            onSubmit={handleInputChange}
           />
         </div>
       </form>

@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import React, { useState } from "react";
+import { useState } from "react";
 
 export function AddUserForm({ roles, groups, onAddUser }) {
   const [email, setEmail] = useState("");
@@ -63,11 +63,9 @@ export function AddUserForm({ roles, groups, onAddUser }) {
               Group
             </Label>
             <DataTableFacetedFilter
-              id="group"
               column={{ setFilterValue: setGroup }}
               title="Group"
               options={groups}
-              className="col-span-3"
             />
           </div>
         )}

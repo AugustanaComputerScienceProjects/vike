@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { TimePicker } from "./time-picker";
 
-export function DateTimePicker() {
+export function DateTimePicker({ value, onChange }: { value: Date, onChange: (date: Date) => void }) {
   const [date, setDate] = React.useState();
 
   return (

@@ -18,7 +18,6 @@ import {
 
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { z } from "zod";
 import LocationField from "../form/location-field";
 import { Button } from "../ui/button";
 import MultiSelector from "../ui/multi-selector";
@@ -26,20 +25,20 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { TimePicker } from "../ui/time-picker/time-picker";
 import { addHours } from "./utils";
 
-const formSchema = z.object({
-  name: z.string().min(2).max(50),
-  startDate: z.date(),
-  endDate: z.date(),
-  location: z.string(),
-  organization: z.string(),
-  tags: z.array(z.string()),
-  webLink: z.string().optional(),
-  description: z.string(),
-});
+// const formSchema = z.object({
+//   name: z.string().min(2).max(50),
+//   startDate: z.date(),
+//   endDate: z.date(),
+//   location: z.string(),
+//   organization: z.string(),
+//   tags: z.array(z.string()),
+//   webLink: z.string().optional(),
+//   description: z.string(),
+// });
 
-const onSubmit = (data) => {
-  console.log(data);
-};
+// const onSubmit = (data) => {
+//   console.log(data);
+// };
 
 const AddEventForm = ({ form, groups, databaseTags }) => {
   const handleStartDateChange = (date) => {

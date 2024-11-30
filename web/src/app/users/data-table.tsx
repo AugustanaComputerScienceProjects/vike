@@ -57,12 +57,16 @@ export function DataTable({ columns, data, roles, groups }) {
     debugColumns: true,
   });
 
+  const handleAddUser = () => {
+    console.log("Add User");
+  };
+
   return (
     <div>
       <div className="flex flex-1 items-center space-x-2">
         <Input
           placeholder="Filter emails..."
-          value={table.getColumn("email")?.getFilterValue() ?? ""}
+          value={table.getColumn("email")?.getFilterValue() as string ?? ""}
           onChange={(event) =>
             table.getColumn("email")?.setFilterValue(event.target.value)
           }
@@ -84,7 +88,7 @@ export function DataTable({ columns, data, roles, groups }) {
           />
         )}
 
-        <Dialog className="max-w-4xl mx-auto">
+        <Dialog>
           <DialogTrigger className="font-bold py-2 px-4">
             Add User
           </DialogTrigger>
@@ -95,7 +99,7 @@ export function DataTable({ columns, data, roles, groups }) {
                 Add a new user to the system.
               </DialogDescription>
             </DialogHeader>
-            <AddUserForm roles={roles} groups={groups} />
+            <AddUserForm roles={roles} groups={groups} onAddUser={handleAddUser} />
           </DialogContent>
         </Dialog>
       </div>

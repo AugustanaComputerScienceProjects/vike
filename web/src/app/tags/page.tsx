@@ -11,11 +11,7 @@ import { useEffect, useState } from "react";
 
 const TagsPage = () => {
   const [tags, setTags] = useState([]);
-  const [groups, setGroups] = useState([]);
-  const [key, setKey] = useState("");
-  const [data, setData] = useState("");
   const [adding, setAdding] = useState(false);
-  const [type, setType] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [newTag, setNewTag] = useState("");
 
@@ -42,15 +38,12 @@ const TagsPage = () => {
     setAdding(false);
   };
 
-  const handleChange = (event) => {
-    setData(event.target.value);
-  };
 
   const deleteTag = (key) => {
     firebase.database.ref(`/tags/${key}`).remove();
   };
 
-  const addAction = (ref, type) => {
+  const addAction = () => {
     setAdding(true);
   };
 
@@ -59,8 +52,7 @@ const TagsPage = () => {
   };
 
   const handleNewTagChange = (event) => {
-    const { name, value } = event.target;
-    setNewTag(value);
+    setNewTag(event.target.value);
   };
 
   const handleCreateTag = () => {
@@ -73,7 +65,7 @@ const TagsPage = () => {
     setAdding(false);
   };
 
-  const filteredTags = tags.filter(([key, tag]) =>
+  const filteredTags = tags.filter(([_, tag]) =>
     tag.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
   );
 
@@ -93,7 +85,7 @@ const TagsPage = () => {
         <Button
           size="sm"
           variant="default"
-          onClick={() => addAction("/tags", "Tag")}
+          onClick={addAction}
         >
           <Plus className="mr-2 w-4 h-4" />
           Add Tag

@@ -1,3 +1,4 @@
+import { Event } from "@/firebase/types";
 import { format } from "date-fns";
 import Resizer from "react-image-file-resizer";
 
@@ -48,8 +49,8 @@ export const CALENDAR_STATUS = {
   NOT_SUBSCRIBED: "NOT_SUBSCRIBED",
 };
 
-export const groupEventsByDate = (events: any[]): Record<string, any[]> => {
-  const groupedEvents: Record<string, any[]> = {};
+export const groupEventsByDate = (events: Event[]): Record<string, Event[]> => {
+  const groupedEvents: Record<string, Event[]> = {};
   events.forEach((event) => {
     const eventDate = new Date(event.startDate);
     const dateKey = format(eventDate, "yyyy-MM-dd");

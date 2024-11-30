@@ -38,7 +38,7 @@ const SearchEvents = ({ calendarId, onEventAdd }) => {
         // Filter out events that are already in the calendar
         const availableEvents = Object.entries(eventsData)
           .filter(([id]) => !existingEvents[id])
-          .map(([id, data]: [string, any]) => ({
+          .map(([id, data]) => ({
             id,
             ...(data as Record<string, unknown>),
           }));

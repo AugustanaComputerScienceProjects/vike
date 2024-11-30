@@ -1,20 +1,20 @@
 "use client";
 import { Badge } from "@/components/ui";
-import { EVENT_STATUS } from "@/lib/types";
-import React from "react";
+import { BadgeProps } from "@/components/ui/badge";
+import { Event, EventStatus } from "@/firebase/types";
 
-const Guests = ({ event }) => {
-  const getStatusColor = (status) => {
+const Guests = ({ event }: { event: Event }) => {
+  const getStatusColor = (status: EventStatus) => {
     switch (status) {
-      case EVENT_STATUS.GOING:
+      case EventStatus.GOING:
         return "success";
-      case EVENT_STATUS.CHECKED_IN:
+      case EventStatus.CHECKED_IN:
         return "info";
-      case EVENT_STATUS.INVITED:
+      case EventStatus.INVITED:
         return "warning";
-      case EVENT_STATUS.NOT_GOING:
+      case EventStatus.NOT_GOING:
         return "error";
-      case EVENT_STATUS.WAITLISTED:
+      case EventStatus.WAITLISTED:
         return "secondary";
       default:
         return "default";
@@ -23,15 +23,15 @@ const Guests = ({ event }) => {
 
   const getStatusLabel = (status) => {
     switch (status) {
-      case EVENT_STATUS.GOING:
+      case EventStatus.GOING:
         return "Going";
-      case EVENT_STATUS.CHECKED_IN:
+      case EventStatus.CHECKED_IN:
         return "Checked In";
-      case EVENT_STATUS.INVITED:
+      case EventStatus.INVITED:
         return "Invited";
-      case EVENT_STATUS.NOT_GOING:
+      case EventStatus.NOT_GOING:
         return "Not Going";
-      case EVENT_STATUS.WAITLISTED:
+      case EventStatus.WAITLISTED:
         return "Waitlisted";
       default:
         return "Unknown";
@@ -57,7 +57,7 @@ const Guests = ({ event }) => {
                 )}
               </div>
               <Badge
-                variant={getStatusColor(userDetails.status)}
+                variant={getStatusColor(userDetails.status) as BadgeProps["variant"]}
               >
                 {getStatusLabel(userDetails.status)}
               </Badge>

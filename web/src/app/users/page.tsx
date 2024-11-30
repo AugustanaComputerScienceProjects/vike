@@ -1,21 +1,13 @@
 "use client";
 
 import useUsers from "@/hooks/use-users";
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
+import { useMemo } from "react";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 
 const UsersPage = () => {
-  const [email, setEmail] = useState("");
-  const [organization, setOrganization] = useState("");
-  const [demographicsFile, setDemographicsFile] = useState(null);
-  const [data, setData] = useState([]);
-  const { users, usersTableData } = useUsers();
+  const { users } = useUsers();
 
-  const [adding, setAdding] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [deleting, setDeleting] = useState(false);
 
   const roles = useMemo(() => {
     const roleSet = new Set(users.map((user) => user.role));
@@ -36,28 +28,6 @@ const UsersPage = () => {
     }));
   }, [users]);
 
-  const handleEmailChange = (event) => {
-    setEmail(event.target.value);
-  };
-
-  const handleDeleteUser = async () => {
-    // Delete user logic here
-    toast("User deleted successfully");
-  };
-
-  const handleSaveUser = async () => {
-    // Save user logic here
-    toast("User added successfully");
-  };
-
-  const handleFileUpload = (data) => {
-    setDemographicsFile(data);
-  };
-
-  const handleUploadLeaders = async () => {
-    // Upload leaders logic here
-    toast("Leaders uploaded successfully");
-  };
 
   return (
     <div className="container mx-auto my-8">

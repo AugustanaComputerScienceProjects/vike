@@ -6,7 +6,7 @@ import EventCard from "@/components/event/event-card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import useEvents from "@/hooks/use-events";
 const Events = () => {
-  const { events, loading, refreshEvents } = useEvents();
+  const { events, loading } = useEvents();
 
   const groupEventsByDate = (events) => {
     const groupedEvents = {};

@@ -13,11 +13,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DateTimePicker } from "@/components/ui/time-picker/date-time-picker";
+import { Event } from "@/firebase/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(50),
   startDate: z.date(),
@@ -29,7 +29,7 @@ const formSchema = z.object({
   description: z.string().min(1, "Description is required"),
 });
 
-const ManageEventForm = ({ event, onSubmit, groups, databaseTags }) => {
+const ManageEventForm = ({ event, onSubmit, groups, databaseTags }: { event: Event, onSubmit: (data: z.infer<typeof formSchema>) => void, groups: string[], databaseTags: string[] }) => {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,7 +52,7 @@ const ManageEventForm = ({ event, onSubmit, groups, databaseTags }) => {
         endDate: new Date(event.endDate),
         location: event.location,
         organization: event.organization,
-        tags: event.tags?.split(",") || [],
+        tags: event.tags || [],
         webLink: event.webLink || "",
         description: event.description || "",
       });
@@ -165,7 +165,8 @@ const ManageEventForm = ({ event, onSubmit, groups, databaseTags }) => {
             <FormItem>
               <FormLabel>Tags</FormLabel>
               <Select
-                value={field.value}
+                // @ts-ignore
+                value={field.value }
                 onValueChange={(value) => field.onChange([...field.value, value])}
                 multiple
               >

@@ -7,11 +7,9 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import useCalendars from "@/hooks/use-calendars";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
 
 const Calendars = () => {
   const { calendars, loading, refreshCalendars } = useCalendars();
-  const [isAddCalendarFormOpen, setIsAddCalendarFormOpen] = useState(false);
   const router = useRouter();
 
   const handleCalendarClick = (calendarId) => {
@@ -41,10 +39,7 @@ const Calendars = () => {
             <Button>Add Calendar</Button>
           </DialogTrigger>
           <DialogContent>
-            <AddCalendar onClose={() => {
-              setIsAddCalendarFormOpen(false);
-              refreshCalendars();
-            }} />
+            <AddCalendar onClose={() => refreshCalendars()} />
           </DialogContent>
         </Dialog>
       </div>

@@ -93,7 +93,7 @@ const ManageEventPage = () => {
         </TabsList>
 
         <TabsContent value="overview">
-          <Overview event={event} setEvent={setEvent} />
+          <Overview />
         </TabsContent>
         <TabsContent value="guests">
           <Guests event={event} />
