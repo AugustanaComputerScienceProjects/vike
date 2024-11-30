@@ -1,4 +1,3 @@
-import { DataTableFacetedFilter } from "@/components/table/faceted-filter";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -10,20 +9,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useGroups } from "@/hooks/use-groups";
 import { useState } from "react";
 
-export function AddUserForm({ roles, groups, onAddUser }) {
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("");
-  const [group, setGroup] = useState("");
+interface AddUserFormProps {
+  roles: { label: string; value: string }[];
+  onAddUser: (data: { email: string; role: string; group?: string }) => Promise<void>;
+  initialData?: { email: string; role: string; group?: string };
+}
 
-  const handleAddUser = () => {
-    onAddUser({ email, role, group });
-    setEmail("");
-    setRole("");
-    setGroup("");
+export function AddUserForm({ roles, onAddUser, initialData }: AddUserFormProps) {
+  const { groups } = useGroups();
+  const [email, setEmail] = useState(initialData?.email || "");
+  const [role, setRole] = useState(initialData?.role || "");
+  const [selectedGroup, setSelectedGroup] = useState(initialData?.group || "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleAddUser = async () => {
+    if (!email || !role) return;
+    
+    setIsSubmitting(true);
+    try {
+      await onAddUser({ email, role, group: selectedGroup });
+      if (!initialData) {
+        setEmail("");
+        setRole("");
+        setSelectedGroup("");
+      }
+    } catch (error) {
+      console.error("Failed to add user:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-  console.log(role);
 
   return (
     <>
@@ -44,8 +62,11 @@ export function AddUserForm({ roles, groups, onAddUser }) {
           <Label htmlFor="role" className="text-right">
             Role
           </Label>
-          <Select onValueChange={(value) => setRole(value)} defaultValue={role}>
-            <SelectTrigger className="w-full">
+          <Select 
+            onValueChange={(value) => setRole(value)} 
+            defaultValue={role}
+          >
+            <SelectTrigger>
               <SelectValue placeholder="Role" />
             </SelectTrigger>
             <SelectContent>
@@ -62,16 +83,32 @@ export function AddUserForm({ roles, groups, onAddUser }) {
             <Label htmlFor="group" className="text-right">
               Group
             </Label>
-            <DataTableFacetedFilter
-              column={{ setFilterValue: setGroup }}
-              title="Group"
-              options={groups}
-            />
+            <Select 
+              value={selectedGroup} 
+              onValueChange={setSelectedGroup}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select group" />
+              </SelectTrigger>
+              <SelectContent>
+                {groups.map((group) => (
+                  <SelectItem key={group.name} value={group.name}>
+                    {group.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
       </div>
       <DialogFooter>
-        <Button onClick={handleAddUser}>Add User</Button>
+        <Button 
+          onClick={handleAddUser} 
+          disabled={isSubmitting || !email || !role}
+          className="w-full"
+        >
+          {isSubmitting ? "Adding..." : "Add User"}
+        </Button>
       </DialogFooter>
     </>
   );

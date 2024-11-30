@@ -308,8 +308,8 @@ const ManageEventForm = ({
                   </FormControl>
                   <SelectContent>
                     {groups.map((group, index) => (
-                      <SelectItem key={`group-${index}-${group}`} value={group}>
-                        {group}
+                      <SelectItem key={`group-${index}-${group.name}`} value={group.name}>
+                        {group.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

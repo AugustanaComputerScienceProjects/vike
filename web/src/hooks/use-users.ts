@@ -2,13 +2,23 @@ import firebase from "@/firebase/config";
 import { UserRole } from "@/firebase/types";
 import { useEffect, useState } from "react";
 
+const decodeGroup = (codedGroup: string): string => {
+  let group = codedGroup;
+  group = group.replace(/\*%&/g, ".");
+  group = group.replace(/@%\*/g, "$");
+  group = group.replace(/\*<=/g, "[");
+  group = group.replace(/<@\+/g, "]");
+  group = group.replace(/!\*>/g, "#");
+  group = group.replace(/!<\^/g, "/");
+  return group;
+};
+
 const useUsers = () => {
   const [admins, setAdmins] = useState<string[]>([]);
   const [leaders, setLeaders] = useState<string[]>([]);
   const [groups, setGroups] = useState<string[]>([]);
   const [users, setUsers] = useState<UserRole[]>([]);
   const [groupLeaders, setGroupLeaders] = useState<Map<string, string[]>>(new Map());
-  console.log("groupLeaders", groupLeaders);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -110,7 +120,75 @@ const useUsers = () => {
     }
   }, [admins, leaders, groups, groupLeaders]);
 
-  return { users };
+  const addUser = async (userData: { email: string; role: string; group?: string }) => {
+    const { email, role, group } = userData;
+    const formattedEmail = email.replace(".", ",");
+
+    if (role === "Admin") {
+      await firebase.database.ref(`/admin/${formattedEmail}`).set(true);
+    } else if (role === "Leader" && group) {
+      const codedGroup = codeGroup(group);
+      await firebase.database.ref(`/leaders/${formattedEmail}`).set(true);
+      await firebase.database
+        .ref(`/groups-to-leaders/${codedGroup}/leaders/${formattedEmail}`)
+        .set(true);
+    }
+  };
+
+  const editUser = async (oldData: UserRole, newData: { role: string; group?: string }) => {
+    const { role, group } = newData;
+    const formattedEmail = oldData.email.replace(".", ",");
+
+    // Remove old role
+    if (oldData.role === "Admin") {
+      await firebase.database.ref(`/admin/${formattedEmail}`).remove();
+    } else if (oldData.role === "Leader" && oldData.group) {
+      const oldCodedGroup = codeGroup(oldData.group);
+      await firebase.database
+        .ref(`/groups-to-leaders/${oldCodedGroup}/leaders/${formattedEmail}`)
+        .remove();
+      await firebase.database.ref(`/leaders/${formattedEmail}`).remove();
+    }
+
+    // Add new role
+    if (role === "Admin") {
+      await firebase.database.ref(`/admin/${formattedEmail}`).set(true);
+    } else if (role === "Leader" && group) {
+      const newCodedGroup = codeGroup(group);
+      await firebase.database.ref(`/leaders/${formattedEmail}`).set(true);
+      await firebase.database
+        .ref(`/groups-to-leaders/${newCodedGroup}/leaders/${formattedEmail}`)
+        .set(true);
+    }
+  };
+
+  const codeGroup = (uncodedGroup: string): string => {
+    let group = uncodedGroup;
+    const replacements = {
+      ".": "*%&",
+      "$": "@%*",
+      "[": "*&@",
+      "]": "<@+",
+      "#": "!*>",
+      "/": "!<^",
+    };
+
+    Object.entries(replacements).forEach(([char, replacement]) => {
+      group = group.replaceAll(char, replacement);
+    });
+
+    return group;
+  };
+
+  return { 
+    users, 
+    addUser, 
+    editUser, 
+    codeGroup,
+    decodeGroup,
+    isLoading: false,
+    error: null
+  };
 };
 
 export default useUsers;

@@ -7,7 +7,7 @@ import {
 import { cn } from "@/lib/utils";
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import { Check, MapPin, X } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import usePlacesAutocomplete, {
   getGeocode,
   getLatLng,
@@ -23,16 +23,13 @@ import {
 } from "../ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
-const libraries = ["places"];
-
 const LocationField = ({ form, control, name, label, placeholder }) => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
-    libraries,
+    libraries: ["places"] as const,
   });
 
-  const [selected, setSelected] = useState(null);
-  console.log("selected", selected);
+  const [selected, setSelected] = useState<{ lat: number; lng: number } | null>(null);
 
   if (!isLoaded) return <div>Loading...</div>;
   if (loadError) return <div>Error loading maps</div>;
@@ -41,7 +38,7 @@ const LocationField = ({ form, control, name, label, placeholder }) => {
     <FormField
       control={control}
       name={name}
-      render={({ field }) => (
+      render={() => (
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>
@@ -61,7 +58,6 @@ const LocationField = ({ form, control, name, label, placeholder }) => {
               options={{
                 disableDefaultUI: true,
                 disableDoubleClickZoom: true,
-                disableScrollwheelZoom: true,
               }}
             >
               <Marker position={selected} />
@@ -88,8 +84,7 @@ const Location = ({ form, name, placeholder, selected, setSelected }) => {
     ready,
     value,
     setValue,
-    suggestions: { status, data },
-    clearSuggestions,
+    suggestions: { data },
   } = usePlacesAutocomplete();
 
   const handleSelect = async (address) => {
@@ -107,7 +102,7 @@ const Location = ({ form, name, placeholder, selected, setSelected }) => {
   };
 
   return (
-    <Popover className="w-full" open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           ref={inputRef}
@@ -143,9 +138,9 @@ const Location = ({ form, name, placeholder, selected, setSelected }) => {
             <CommandEmpty>No options found.</CommandEmpty>
 
             <CommandGroup>
-              {data.map(({ placeId, description }) => (
+              {data.map(({ description }) => (
                 <CommandItem
-                  key={placeId}
+                  key={description}
                   value={description}
                   onSelect={(value) => handleSelect(value)}
                 >
@@ -153,7 +148,7 @@ const Location = ({ form, name, placeholder, selected, setSelected }) => {
                   <Check
                     className={cn(
                       "ml-auto h-4 w-4",
-                      placeId === value ? "opacity-100" : "opacity-0"
+                      description === value ? "opacity-100" : "opacity-0"
                     )}
                   />
                 </CommandItem>

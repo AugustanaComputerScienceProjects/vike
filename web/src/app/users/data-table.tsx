@@ -31,7 +31,22 @@ import {
 import { useState } from "react";
 import { AddUserForm } from "./add-user-form";
 
-export function DataTable({ columns, data, roles, groups }) {
+interface DataTableProps {
+  columns: any[];
+  data: any[];
+  roles: { label: string; value: string }[];
+  groups: { label: string; value: string }[];
+  onAddUser: (data: any) => Promise<void>;
+  onEditUser: (oldData: any, newData: any) => Promise<void>;
+}
+
+export function DataTable({ 
+  columns, 
+  data, 
+  roles, 
+  groups, 
+  onAddUser, 
+}: DataTableProps) {
   const [sorting, setSorting] = useState([]);
   const [rowSelection, setRowSelection] = useState({});
   const [columnFilters, setColumnFilters] = useState([]);
@@ -51,14 +66,15 @@ export function DataTable({ columns, data, roles, groups }) {
       sorting,
       columnFilters,
       rowSelection,
-    },
-    debugTable: true,
-    debugHeaders: true,
-    debugColumns: true,
+    }
   });
 
-  const handleAddUser = () => {
-    console.log("Add User");
+  const handleAddUser = async (userData) => {
+    try {
+      await onAddUser(userData);
+    } catch (error) {
+      console.error("Failed to add user:", error);
+    }
   };
 
   return (
@@ -67,7 +83,7 @@ export function DataTable({ columns, data, roles, groups }) {
         <Input
           placeholder="Filter emails..."
           value={table.getColumn("email")?.getFilterValue() as string ?? ""}
-          onChange={(event) =>
+          onChange={(event) => 
             table.getColumn("email")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
@@ -99,7 +115,10 @@ export function DataTable({ columns, data, roles, groups }) {
                 Add a new user to the system.
               </DialogDescription>
             </DialogHeader>
-            <AddUserForm roles={roles} groups={groups} onAddUser={handleAddUser} />
+            <AddUserForm 
+              roles={roles} 
+              onAddUser={handleAddUser}
+            />
           </DialogContent>
         </Dialog>
       </div>

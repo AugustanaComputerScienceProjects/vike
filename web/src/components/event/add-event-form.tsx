@@ -16,11 +16,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Group } from "@/hooks/use-groups";
 import { UseFormReturn } from "react-hook-form";
 
 interface AddEventFormProps {
   form: UseFormReturn<any>;
-  groups: string[];
+  groups: Group[];
   tags: string[];
   isSubmitting: boolean;
   groupsLoading: boolean;
@@ -130,8 +131,8 @@ const AddEventForm = ({
                 </FormControl>
                 <SelectContent>
                   {groups.map((group) => (
-                    <SelectItem key={`org-${group}`} value={group}>
-                      {group}
+                    <SelectItem key={`org-${group.name}`} value={group.name}>
+                      {group.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
