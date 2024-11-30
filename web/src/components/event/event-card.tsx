@@ -1,17 +1,18 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Event } from "@/firebase/types";
 import { format } from "date-fns";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import EventPreview from "./event-preview";
 
-const EventCard = ({ event }) => {
+const EventCard = ({ event }: { event: Event }) => {
   const [openPreview, setOpenPreview] = useState(false);
   const router = useRouter();
 
-  const navigateTo = (path) => {
+  const navigateTo = (path: string) => {
     router.push(path);
   };
 

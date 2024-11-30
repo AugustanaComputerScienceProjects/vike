@@ -39,7 +39,7 @@ const formSchema = z.object({
   path: ["endDate"],
 });
 
-type FormData = z.infer<typeof formSchema>;
+export type FormData = z.infer<typeof formSchema>;
 
 const ManageEventForm = ({ 
   event, 

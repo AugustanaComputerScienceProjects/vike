@@ -4,10 +4,11 @@ import SearchEvents from "@/components/event/search-events";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Event } from "@/firebase/types";
 import useCalendarEvents from "@/hooks/use-calendar-events";
 import { format } from "date-fns";
 import { Plus, Search } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { groupEventsByDate } from "./utils";
 
 const CalendarEvents = ({ calendarId }) => {
@@ -15,7 +16,7 @@ const CalendarEvents = ({ calendarId }) => {
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  const renderEventSection = (date, events) => {
+  const renderEventSection = (date: string, events: Event[]) => {
     const eventDate = new Date(date);
     return (
       <div key={date} className="relative">
@@ -34,8 +35,6 @@ const CalendarEvents = ({ calendarId }) => {
             <div key={event.id} className="px-6 py-4">
               <EventCard 
                 event={event}
-                onDelete={refreshEvents}
-                showActions
               />
             </div>
           ))}
@@ -93,7 +92,7 @@ const CalendarEvents = ({ calendarId }) => {
           ) : events.length > 0 ? (
             <div className="divide-y">
               {Object.entries(groupEventsByDate(events))
-                .sort(([a], [b]) => new Date(a) - new Date(b))
+                .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
                 .map(([date, events]) => renderEventSection(date, events))}
             </div>
           ) : (

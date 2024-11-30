@@ -33,6 +33,13 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { generateUniqueTicketId } from "./utils";
 
+interface EventPreviewProps {
+  event: Event;
+  onClose?: () => void;
+  onDelete?: () => Promise<void>;
+  showActions?: boolean;
+}
+
 interface TicketDialogProps {
   showTicket: boolean;
   setShowTicket: (show: boolean) => void;
@@ -88,12 +95,7 @@ const TicketDialog = ({ showTicket, setShowTicket, event }: TicketDialogProps) =
   );
 };
 
-interface EventPreviewProps {
-  event: Event;
-  onClose: () => void;
-}
-
-const EventPreview = ({ event, onClose }: EventPreviewProps) => {
+const EventPreview = ({ event, onClose, onDelete, showActions = false }: EventPreviewProps) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoadingImage, setIsLoadingImage] = useState(true);
   const [showTicket, setShowTicket] = useState(false);
@@ -203,6 +205,18 @@ const EventPreview = ({ event, onClose }: EventPreviewProps) => {
     );
 
     window.open(googleUrl.toString(), "_blank");
+  };
+
+  const handleDelete = async () => {
+    if (!onDelete) return;
+
+    try {
+      await onDelete();
+      toast.success("Event deleted successfully");
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      toast.error("Failed to delete event");
+    }
   };
 
   return (
@@ -327,9 +341,21 @@ const EventPreview = ({ event, onClose }: EventPreviewProps) => {
               Add to Calendar
             </Button>
           </div>
-          <Button variant="outline" onClick={onClose}>
-            Close
-          </Button>
+          <div className="flex gap-2">
+            {showActions && onDelete && (
+              <Button 
+                variant="destructive" 
+                onClick={handleDelete}
+              >
+                Delete
+              </Button>
+            )}
+            {onClose && (
+              <Button variant="outline" onClick={onClose}>
+                Close
+              </Button>
+            )}
+          </div>
         </CardFooter>
       </Card>
       <TicketDialog

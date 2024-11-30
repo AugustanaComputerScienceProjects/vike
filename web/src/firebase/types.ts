@@ -32,7 +32,10 @@ export interface Event {
   webLink: string;
   tags: string;       // Comma-separated string
   email: string;
-  guests?: Record<string, any>;
+  guests?: Record<string, {
+    status: EventStatus;
+    ticketId: string; // Format: "{userId}--{eventId}-{timestamp}"
+  }>;
   createdAt?: string;
   updatedAt?: string;
 }

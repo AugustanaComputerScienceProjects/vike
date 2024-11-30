@@ -38,7 +38,7 @@ const AddEventForm = ({
   tagsLoading,
   handleStartDateChange,
   onSubmit 
-}: AddEventFormProps) => {
+}: AddEventFormProps): JSX.Element => {
   return (
     <Form {...form}>
       <form 

@@ -2,11 +2,11 @@
 
 import { Card } from "@/components/ui/card";
 import { Event } from "@/firebase/types";
-import ManageEventForm from "./manage-form";
+import ManageEventForm, { FormData } from "./manage-form";
 
 interface OverviewProps {
   event: Event;
-  onSubmit: (data: any) => Promise<void>;
+  onSubmit: (data: FormData) => Promise<void>;
   isSubmitting?: boolean;
 }
 
