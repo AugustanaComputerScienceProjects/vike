@@ -18,19 +18,23 @@ export interface Calendar {
 
 export interface Event {
   id?: string;
+  key?: string;
   name: string;
   description: string;
-  startDate: string;
-  endDate: string;
+  startDate: string;  // Format: "YYYY-MM-DD HH:mm"
+  endDate: string;    // Format: "YYYY-MM-DD HH:mm"
   duration: number;
   location: string;
   organization: string;
   imgid: string;
-  imageUrl?: string;
-  webLink?: string;
-  tags: string[];
+  image?: string;     // Full URL
+  imageUrl?: string;  // Full URL
+  webLink: string;
+  tags: string;       // Comma-separated string
   email: string;
-  guests?: Record<string, EventGuest>;
+  guests?: Record<string, any>;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface EventGuest {

@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import firebase from "@/firebase/config";
-import { EventStatus } from "@/firebase/types";
+import { Event, EventStatus } from "@/firebase/types";
 import { format } from "date-fns";
 import {
   Calendar,
@@ -29,12 +29,19 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { QRCodeSVG } from 'qrcode.react';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { generateUniqueTicketId } from "./utils";
 
-const TicketDialog = ({ showTicket, setShowTicket, event }) => {
-  const currentUserHandle = firebase.auth.currentUser.email.split("@")[0];
-  const ticketInfo = event.guests?.[currentUserHandle];
+interface TicketDialogProps {
+  showTicket: boolean;
+  setShowTicket: (show: boolean) => void;
+  event: Event;
+}
+
+const TicketDialog = ({ showTicket, setShowTicket, event }: TicketDialogProps) => {
+  const currentUserHandle = firebase.auth.currentUser?.email?.split("@")[0];
+  const ticketInfo = currentUserHandle ? event.guests?.[currentUserHandle] : null;
 
   if (!ticketInfo) {
     return (
@@ -65,7 +72,6 @@ const TicketDialog = ({ showTicket, setShowTicket, event }) => {
             value={ticketInfo.ticketId}
             size={200}
             level="H"
-            includeMargin={true}
           />
           <div className="mt-4 text-center">
             <h3 className="font-semibold">{event.name}</h3>
@@ -82,48 +88,93 @@ const TicketDialog = ({ showTicket, setShowTicket, event }) => {
   );
 };
 
-const EventPreview = ({ event, onClose }) => {
-  const currentUserHandle = firebase.auth.currentUser.email.split("@")[0];
-  const eventGuest = event.guests
-    ? Object.entries(event.guests).find(
-        ([userHandle, _]) => userHandle === currentUserHandle
-      )
-    : [];
+interface EventPreviewProps {
+  event: Event;
+  onClose: () => void;
+}
 
+const EventPreview = ({ event, onClose }: EventPreviewProps) => {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isLoadingImage, setIsLoadingImage] = useState(true);
   const [showTicket, setShowTicket] = useState(false);
+
+  const currentUserHandle = firebase.auth.currentUser?.email?.split("@")[0];
+  const eventGuest = currentUserHandle && event.guests
+    ? Object.entries(event.guests).find(
+        ([userHandle]) => userHandle === currentUserHandle
+      )
+    : undefined;
+
   const status = eventGuest?.[1]?.status;
   const isRegistered = status === EventStatus.GOING || status === EventStatus.CHECKED_IN;
 
-  const handleRegister = async () => {
-    const ticketId = generateUniqueTicketId(currentUserHandle, event.key);
-    const eventRef = firebase.database.ref(`/current-events/${event.key}`);
+  useEffect(() => {
+    const loadImage = async () => {
+      if (!event.imgid || event.imgid === "default") {
+        setIsLoadingImage(false);
+        return;
+      }
 
-    const updatedEvent = {
-      ...event,
-      guests: {
-        ...event.guests,
-        [currentUserHandle]: {
-          ticketId,
-          status: EventStatus.GOING,
-        },
-      },
+      try {
+        const url = await firebase.storage
+          .ref("Images")
+          .child(`${event.imgid}.jpg`)
+          .getDownloadURL();
+        setImageUrl(url);
+      } catch (error) {
+        console.error("Error loading event image:", error);
+      } finally {
+        setIsLoadingImage(false);
+      }
     };
 
-    await eventRef.update(updatedEvent);
-    alert("Registration successful!");
+    loadImage();
+  }, [event.imgid]);
+
+  const handleRegister = async () => {
+    if (!currentUserHandle) {
+      toast.error("Please sign in to register for events");
+      return;
+    }
+
+    try {
+      const ticketId = generateUniqueTicketId(currentUserHandle, event.key);
+      const eventRef = firebase.database.ref(`/current-events/${event.key}`);
+
+      const updatedEvent = {
+        ...event,
+        guests: {
+          ...event.guests,
+          [currentUserHandle]: {
+            ticketId,
+            status: EventStatus.GOING,
+          },
+        },
+      };
+
+      await eventRef.update(updatedEvent);
+      toast.success("Registration successful!");
+    } catch (error) {
+      console.error("Error registering:", error);
+      toast.error("Failed to register. Please try again.");
+    }
   };
 
   const handleCancelRegistration = async () => {
-    const eventRef = firebase.database.ref(
-      `/current-events/${event.key}/guests/${currentUserHandle}`
-    );
+    if (!currentUserHandle) {
+      toast.error("Please sign in to manage registrations");
+      return;
+    }
 
     try {
+      const eventRef = firebase.database.ref(
+        `/current-events/${event.key}/guests/${currentUserHandle}`
+      );
       await eventRef.update({ status: EventStatus.NOT_GOING });
-      alert("Registration cancelled successfully.");
+      toast.success("Registration cancelled successfully");
     } catch (error) {
-      console.error("Error cancelling registration: ", error);
-      alert("Failed to cancel registration.");
+      console.error("Error cancelling registration:", error);
+      toast.error("Failed to cancel registration");
     }
   };
 
@@ -131,14 +182,13 @@ const EventPreview = ({ event, onClose }) => {
     const startDate = new Date(event.startDate);
     const endDate = new Date(event.endDate);
 
-    const formatDateForGoogle = (date) => {
+    const formatDateForGoogle = (date: Date) => {
       return date
         .toISOString()
         .replace(/[-:]/g, "")
         .replace(/\.\d{3}/, "");
     };
 
-    // Create Google Calendar URL
     const googleUrl = new URL("https://calendar.google.com/calendar/render");
     googleUrl.searchParams.append("action", "TEMPLATE");
     googleUrl.searchParams.append("text", event.name);
@@ -159,13 +209,16 @@ const EventPreview = ({ event, onClose }) => {
     <>
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader className="relative h-[200px] p-0">
-          {event.imageUrl ? (
+          {isLoadingImage ? (
+            <div className="w-full h-full bg-gray-100 animate-pulse" />
+          ) : imageUrl ? (
             <Image
-              src={event.imageUrl}
+              src={imageUrl}
               alt={event.name}
               fill
               className="object-cover rounded-t-lg"
               sizes="(max-width: 768px) 100vw, 50vw"
+              priority
             />
           ) : (
             <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -217,11 +270,11 @@ const EventPreview = ({ event, onClose }) => {
               </div>
             )}
 
-            {event.tags && (
+            {event.tags && event.tags.length > 0 && (
               <div className="mt-4">
                 <h3 className="font-semibold mb-2">Tags</h3>
                 <div className="flex flex-wrap gap-2">
-                  {event.tags.split(",").map((tag) => (
+                  {(Array.isArray(event.tags) ? event.tags : [event.tags]).map((tag) => (
                     <span
                       key={tag}
                       className="px-2 py-1 bg-gray-100 rounded-full text-sm"

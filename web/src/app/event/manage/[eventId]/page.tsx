@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import firebase from "@/firebase/config";
+import { Event } from "@/firebase/types";
 import useRoleData from "@/hooks/use-role";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -12,8 +13,9 @@ import Overview from "./overview";
 import { toTitleCase } from "./util";
 
 const ManageEventPage = () => {
-  const [event, setEvent] = useState(null);
+  const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { eventId } = useParams();
   const { adminSignedIn, leaderSignedIn } = useRoleData();
@@ -47,23 +49,52 @@ const ManageEventPage = () => {
       return;
     }
 
-    if (window.confirm("Are you sure you want to cancel this event?")) {
-      try {
-        const eventRef = firebase.database.ref(`/current-events/${eventId}`);
-        await eventRef.remove();
-        
-        // Delete event image if it exists
-        if (event.imgid && event.imgid !== "default") {
-          const imageRef = firebase.storage.ref("Images").child(`${event.imgid}.jpg`);
-          await imageRef.delete();
-        }
-        
-        toast.success("Event canceled successfully!");
-        router.push("/events");
-      } catch (error) {
-        console.error("Error canceling event:", error);
-        toast.error("Error canceling event");
+    if (!window.confirm("Are you sure you want to cancel this event?")) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const eventRef = firebase.database.ref(`/current-events/${eventId}`);
+      await eventRef.remove();
+      
+      // Delete event image if it exists
+      if (event?.imgid && event.imgid !== "default") {
+        const imageRef = firebase.storage.ref("Images").child(`${event.imgid}.jpg`);
+        await imageRef.delete();
       }
+      
+      toast.success("Event canceled successfully!");
+      router.push("/events");
+    } catch (error) {
+      console.error("Error canceling event:", error);
+      toast.error("Error canceling event");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdateEvent = async (data) => {
+    if (!adminSignedIn && !leaderSignedIn) {
+      toast.error("You don't have permission to update events");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const eventRef = firebase.database.ref(`/current-events/${eventId}`);
+      await eventRef.update({
+        ...data,
+        lastUpdated: new Date().toISOString(),
+      });
+      
+      toast.success("Event updated successfully!");
+      setEvent((prev) => ({ ...prev, ...data }));
+    } catch (error) {
+      console.error("Error updating event:", error);
+      toast.error("Error updating event");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -75,15 +106,27 @@ const ManageEventPage = () => {
     return null;
   }
 
+  if (!adminSignedIn && !leaderSignedIn) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="text-center text-red-500">
+          You don't have permission to manage this event
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-4 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{toTitleCase(event.name)}</h1>
-        {(adminSignedIn || leaderSignedIn) && (
-          <Button variant="destructive" onClick={handleCancelEvent}>
-            Cancel Event
-          </Button>
-        )}
+        <Button 
+          variant="destructive" 
+          onClick={handleCancelEvent}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Canceling..." : "Cancel Event"}
+        </Button>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
@@ -93,7 +136,11 @@ const ManageEventPage = () => {
         </TabsList>
 
         <TabsContent value="overview">
-          <Overview />
+          <Overview 
+            event={event} 
+            onSubmit={handleUpdateEvent}
+            isSubmitting={isSubmitting}
+          />
         </TabsContent>
         <TabsContent value="guests">
           <Guests event={event} />
