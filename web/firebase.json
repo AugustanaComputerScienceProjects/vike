@@ -4,7 +4,7 @@
   },
   "hosting": {
     "site": "osl-events-app",
-    "public": ".next",
+    "source": ".",
     "ignore": [
       "firebase.json",
       "**/.*",
