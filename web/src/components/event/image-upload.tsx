@@ -7,48 +7,74 @@ interface ImageUploadProps {
   onImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onImageDrop: (event: React.DragEvent<HTMLDivElement>) => void;
   className?: string;
+  isUploading?: boolean;
 }
 
-const ImageUpload = ({ image64, onImageUpload, onImageDrop, className }: ImageUploadProps) => {
+const ImageUpload = ({ 
+  image64, 
+  onImageUpload, 
+  onImageDrop, 
+  className,
+  isUploading = false 
+}: ImageUploadProps) => {
   const [isDragging, setIsDragging] = useState(false);
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    onImageDrop(e);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
 
   return (
     <div
-      className={`w-full h-[300px] flex justify-center items-center relative mt-4 mb-8 border-2 border-dashed rounded-lg transition-colors ${
+      className={`flex flex-col justify-center items-center relative border-2 border-dashed rounded-lg transition-colors ${
         isDragging ? 'border-primary bg-primary/5' : 'border-gray-300'
       } ${className}`}
-      onDrop={(e) => {
-        e.preventDefault();
-        setIsDragging(false);
-        onImageDrop(e);
-      }}
-      onDragOver={(e) => {
-        e.preventDefault();
-        setIsDragging(true);
-      }}
-      onDragLeave={(e) => {
-        e.preventDefault();
-        setIsDragging(false);
-      }}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
     >
+      {!image64 && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+          <ImageIcon className="h-12 w-12 text-gray-400 mb-2" />
+          <p className="text-sm text-gray-600">
+            Drag and drop an image here or click to upload
+          </p>
+        </div>
+      )}
+      
       {image64 && (
         <div className="relative w-full h-full">
           <Image 
             src={image64} 
             alt="Event" 
             fill
-            className="object-contain"
+            className="object-cover rounded-lg"
             sizes="(max-width: 768px) 100vw, 50vw"
           />
         </div>
       )}
-      <label className="absolute bottom-2 right-2 bg-primary text-primary-foreground px-4 py-2 rounded-md cursor-pointer hover:bg-primary/90 transition-colors">
+
+      <label className={`absolute bottom-2 right-2 bg-primary text-primary-foreground px-4 py-2 rounded-md cursor-pointer hover:bg-primary/90 transition-colors ${
+        isUploading ? 'opacity-50 cursor-not-allowed' : ''
+      }`}>
         <ImageIcon className="h-6 w-6" />
         <input 
           type="file" 
           accept="image/*"
           onChange={onImageUpload}
-          className="hidden" 
+          className="hidden"
+          disabled={isUploading}
         />
       </label>
     </div>

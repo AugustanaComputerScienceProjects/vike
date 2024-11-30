@@ -1,22 +1,4 @@
 import defaultImage from "@/assets/default.jpg";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import firebase from "@/firebase/config";
 import { Event } from "@/firebase/types";
 import { useGroups } from "@/hooks/use-groups";
@@ -28,6 +10,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { roundToNearestHalfHour } from "../calendar/utils";
+import AddEventForm from "./add-event-form";
 import ImageUpload from "./image-upload";
 
 const formSchema = z.object({
@@ -72,6 +55,38 @@ const AddEvent = ({ calendarId, onSuccess }: AddEventProps) => {
     },
   });
 
+  const handleStartDateChange = (value: string) => {
+    const startDate = new Date(value);
+    const endDate = addHours(startDate, 1);
+    form.setValue("startDate", value);
+    form.setValue("endDate", format(endDate, "yyyy-MM-dd'T'HH:mm"));
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setImage64(base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleImageDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setImage64(base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const saveImage = async (image: string): Promise<string> => {
     if (image === defaultImage.src) {
       return "default";
@@ -107,16 +122,12 @@ const AddEvent = ({ calendarId, onSuccess }: AddEventProps) => {
       return timestamp;
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast({
-        title: "Error",
-        description: "Failed to upload image",
-        variant: "destructive",
-      });
-      throw error;
+      throw new Error('Failed to upload image');
     }
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    if (isSubmitting) return;
 
     // Validate required fields
     if (!data.name || !data.location || !data.organization) {
@@ -124,6 +135,7 @@ const AddEvent = ({ calendarId, onSuccess }: AddEventProps) => {
         title: "Error",
         description: "Required fields are not filled in",
         variant: "destructive",
+        duration: 3000,
       });
       return;
     }
@@ -138,6 +150,17 @@ const AddEvent = ({ calendarId, onSuccess }: AddEventProps) => {
       const startDate = new Date(data.startDate);
       const endDate = new Date(data.endDate);
       const duration = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60));
+
+      // Validate end date is after start date
+      if (endDate <= startDate) {
+        toast({
+          title: "Error",
+          description: "End date must be after start date",
+          variant: "destructive",
+          duration: 3000,
+        });
+        return;
+      }
 
       // Create event data
       const eventData: Event = {
@@ -190,56 +213,31 @@ const AddEvent = ({ calendarId, onSuccess }: AddEventProps) => {
           .set(eventWithKey);
       }
 
+      // Show success toast before resetting form
       toast({
         title: "Success",
         description: "Event created successfully",
+        duration: 3000,
       });
-      
-      form.reset();
-      setImage64(defaultImage.src);
-      onSuccess?.();
+
+      // Small delay before resetting form to ensure toast is visible
+      setTimeout(() => {
+        form.reset();
+        setImage64(defaultImage.src);
+        onSuccess?.();
+      }, 100);
+
     } catch (error) {
       console.error('Error creating event:', error);
       toast({
         title: "Error",
-        description: "Failed to create event",
+        description: error instanceof Error ? error.message : "Failed to create event",
         variant: "destructive",
+        duration: 5000,
       });
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setImage64(base64String);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleImageDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const file = event.dataTransfer.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setImage64(base64String);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleStartDateChange = (value: string) => {
-    const startDate = new Date(value);
-    const endDate = addHours(startDate, 1);
-    form.setValue("startDate", value);
-    form.setValue("endDate", format(endDate, "yyyy-MM-dd'T'HH:mm"));
   };
 
   return (
@@ -251,218 +249,30 @@ const AddEvent = ({ calendarId, onSuccess }: AddEventProps) => {
         </p>
       </div>
 
-      <div className="flex justify-center">
-        <ImageUpload
-          image64={image64}
-          onImageUpload={handleImageUpload}
-          onImageDrop={handleImageDrop}
-          className="w-full h-[200px] object-cover rounded-lg"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <ImageUpload
+            image64={image64}
+            onImageUpload={handleImageUpload}
+            onImageDrop={handleImageDrop}
+            className="w-full h-[400px] md:h-[600px] object-cover rounded-lg"
+            isUploading={isSubmitting}
+          />
+        </div>
+
+        <div className="space-y-4">
+          <AddEventForm
+            form={form}
+            groups={groups}
+            tags={tags}
+            isSubmitting={isSubmitting}
+            groupsLoading={groupsLoading}
+            tagsLoading={tagsLoading}
+            handleStartDateChange={handleStartDateChange}
+            onSubmit={onSubmit}
+          />
+        </div>
       </div>
-
-      <Form {...form}>
-        <form 
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit(onSubmit)(e);
-          }} 
-          className="space-y-4"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-            }
-          }}
-        >
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Event Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter event name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="startDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Start Date</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="datetime-local" 
-                      {...field} 
-                      onChange={(e) => handleStartDateChange(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="endDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>End Date</FormLabel>
-                  <FormControl>
-                    <Input type="datetime-local" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <FormField
-            control={form.control}
-            name="location"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Location</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter location" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="organization"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Organization</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder={groupsLoading ? "Loading..." : "Select organization"} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {groups.map((group) => (
-                      <SelectItem key={`org-${group}`} value={group}>
-                        {group}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Contact Email</FormLabel>
-                <FormControl>
-                  <Input type="email" placeholder="Enter contact email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="webLink"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Web Link (Optional)</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter web link" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea 
-                    placeholder="Enter event description"
-                    className="min-h-[100px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="tags"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tags</FormLabel>
-                <Select
-                  onValueChange={(value) => field.onChange([...field.value, value])}
-                  value={field.value[field.value.length - 1] || ""}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder={tagsLoading ? "Loading..." : "Select tags"} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {tags.map((tag) => (
-                      <SelectItem key={`tag-${tag}`} value={tag}>
-                        {tag}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {field.value.map((tag, index) => (
-                    <div
-                      key={`selected-${tag}-${index}`}
-                      className="bg-primary/10 text-primary px-2 py-1 rounded-md flex items-center gap-1"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newTags = [...field.value];
-                          newTags.splice(index, 1);
-                          field.onChange(newTags);
-                        }}
-                        className="text-primary hover:text-primary/80"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <Button 
-            type="submit" 
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Creating..." : "Create Event"}
-          </Button>
-        </form>
-      </Form>
     </div>
   );
 };

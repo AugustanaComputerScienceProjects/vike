@@ -1,234 +1,253 @@
-import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import Editor from "../editor/editor";
-import { Input } from "../ui/input";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { UseFormReturn } from "react-hook-form";
 
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import LocationField from "../form/location-field";
-import { Button } from "../ui/button";
-import MultiSelector from "../ui/multi-selector";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { TimePicker } from "../ui/time-picker/time-picker";
-import { addHours } from "./utils";
+interface AddEventFormProps {
+  form: UseFormReturn<any>;
+  groups: string[];
+  tags: string[];
+  isSubmitting: boolean;
+  groupsLoading: boolean;
+  tagsLoading: boolean;
+  handleStartDateChange: (value: string) => void;
+  onSubmit: (data: any) => Promise<void>;
+}
 
-// const formSchema = z.object({
-//   name: z.string().min(2).max(50),
-//   startDate: z.date(),
-//   endDate: z.date(),
-//   location: z.string(),
-//   organization: z.string(),
-//   tags: z.array(z.string()),
-//   webLink: z.string().optional(),
-//   description: z.string(),
-// });
-
-// const onSubmit = (data) => {
-//   console.log(data);
-// };
-
-const AddEventForm = ({ form, groups, databaseTags }) => {
-  const handleStartDateChange = (date) => {
-    const newStartDate = date;
-    const newEndDate = addHours(newStartDate, 1);
-    form.setValue("startDate", newStartDate);
-    form.setValue("endDate", newEndDate);
-  };
-
+const AddEventForm = ({ 
+  form, 
+  groups, 
+  tags, 
+  isSubmitting,
+  groupsLoading,
+  tagsLoading,
+  handleStartDateChange,
+  onSubmit 
+}: AddEventFormProps) => {
   return (
-    <div className="space-y-8">
-      <FormField
-        control={form.control}
-        name="name"
-        render={({ field }) => (
-          <FormItem>
-            <FormControl>
-              <Input placeholder="Event Name" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="startDate"
-        render={({ field }) => (
-          <FormItem className="flex flex-row justify-between gap-2">
-            <FormLabel className="text-left flex items-center">
-              Start Date
-            </FormLabel>
-            <Popover>
+    <Form {...form}>
+      <form 
+        onSubmit={form.handleSubmit(onSubmit)} 
+        className="space-y-4"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
+            e.preventDefault();
+          }
+        }}
+      >
+        {/* Event Name */}
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Event Name</FormLabel>
               <FormControl>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "justify-start text-left font-normal",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {field.value ? (
-                      format(field.value, "PPP HH:mm")
-                    ) : (
-                      <span>Pick start date</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
+                <Input placeholder="Enter event name" {...field} />
               </FormControl>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={field.value}
-                  onSelect={(date) => {
-                    handleStartDateChange(date);
-                  }}
-                  initialFocus
-                />
-                <div className="p-3 border-t border-border">
-                  <TimePicker
-                    setDate={(date) => handleStartDateChange(date)}
-                    date={field.value}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Date Fields */}
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="startDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Start Date</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="datetime-local" 
+                    {...field} 
+                    onChange={(e) => handleStartDateChange(e.target.value)}
                   />
-                </div>
-              </PopoverContent>
-            </Popover>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <FormField
-        control={form.control}
-        name="endDate"
-        render={({ field }) => (
-          <FormItem className="flex flex-row justify-between gap-2 !mt-0">
-            <FormLabel className="text-left flex items-center">
-              End Date
-            </FormLabel>
-            <Popover>
+          <FormField
+            control={form.control}
+            name="endDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>End Date</FormLabel>
+                <FormControl>
+                  <Input type="datetime-local" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Location */}
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location</FormLabel>
               <FormControl>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "justify-start text-left font-normal",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {field.value ? (
-                      format(field.value, "PPP HH:mm")
-                    ) : (
-                      <span>Pick end date</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
+                <Input placeholder="Enter location" {...field} />
               </FormControl>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={field.value}
-                  onSelect={field.onChange}
-                  initialFocus
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Organization */}
+        <FormField
+          control={form.control}
+          name="organization"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Organization</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={groupsLoading ? "Loading..." : "Select organization"} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {groups.map((group) => (
+                    <SelectItem key={`org-${group}`} value={group}>
+                      {group}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Email */}
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Contact Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="Enter contact email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Web Link */}
+        <FormField
+          control={form.control}
+          name="webLink"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Web Link (Optional)</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter web link" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Description */}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Enter event description"
+                  className="min-h-[100px]"
+                  {...field}
                 />
-                <div className="p-3 border-t border-border">
-                  <TimePicker setDate={field.onChange} date={field.value} />
-                </div>
-              </PopoverContent>
-            </Popover>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <LocationField
-        form={form}
-        control={form.control}
-        name="location"
-        label="Location"
-        placeholder="Enter location"
-      />
-      <FormField
-        control={form.control}
-        name="organization"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Organization</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select organization" />
-                </SelectTrigger>
               </FormControl>
-              <SelectContent>
-                {groups.map((group, index) => (
-                  <SelectItem key={index} value={group}>
-                    {group}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="tags"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Tags</FormLabel>
-            <FormControl>
-              <MultiSelector
-                value={field.value}
-                onChange={field.onChange}
-                options={databaseTags.map((tag) => ({
-                  label: tag,
-                  value: tag,
-                }))}
-                placeholder="Select tags..."
-                emptyIndicator={
-                  <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                    No tags found.
-                  </p>
-                }
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <FormField
-        control={form.control}
-        name="description"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Description</FormLabel>
-            <FormControl>
-              <Editor
-                {...field}
-                content={field.value}
-                onUpdate={(newDescription) => {
-                  field.onChange(newDescription);
-                }}
-              />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-    </div>
+        {/* Tags */}
+        <FormField
+          control={form.control}
+          name="tags"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tags</FormLabel>
+              <Select
+                onValueChange={(value) => field.onChange([...field.value, value])}
+                value={field.value[field.value.length - 1] || ""}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={tagsLoading ? "Loading..." : "Select tags"} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {tags.map((tag) => (
+                    <SelectItem key={`tag-${tag}`} value={tag}>
+                      {tag}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {field.value.map((tag: string, index: number) => (
+                  <div
+                    key={`selected-${tag}-${index}`}
+                    className="bg-primary/10 text-primary px-2 py-1 rounded-md flex items-center gap-1"
+                  >
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newTags = [...field.value];
+                        newTags.splice(index, 1);
+                        field.onChange(newTags);
+                      }}
+                      className="text-primary hover:text-primary/80"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button 
+          type="submit" 
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Creating..." : "Create Event"}
+        </Button>
+      </form>
+    </Form>
   );
 };
 
