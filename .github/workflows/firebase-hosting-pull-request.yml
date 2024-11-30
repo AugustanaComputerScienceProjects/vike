@@ -44,6 +44,11 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
+      - name: Setup Firebase CLI
+        run: |
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_OSL_EVENTS_APP }}' > ${{ github.workspace }}/service-account.json
+          export GOOGLE_APPLICATION_CREDENTIALS="${{ github.workspace }}/service-account.json"
+
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
@@ -53,3 +58,4 @@ jobs:
           entryPoint: "web"
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/service-account.json
