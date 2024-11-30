@@ -17,10 +17,13 @@ jobs:
           project: vike-web
       - uses: actions/checkout@v3
       - run: yarn install --frozen-lockfile && yarn build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - name: Deploy to Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_OSL_EVENTS_APP }}"
           projectId: osl-events-app
+          expires: 7d # Optional: Set preview expiration
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
