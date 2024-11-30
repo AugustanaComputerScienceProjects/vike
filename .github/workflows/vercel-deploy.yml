@@ -33,7 +33,7 @@ jobs:
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: team_NMAs0PpXz0830ALH0kYmwkyT
-          vercel-project-id: prj_Ft4iEi7IETpwRPw46eTlXF84Dqv0
+          vercel-project-id: prj_Y1BPQmr0eg0CZYB5MS0oNL6Vth9h
           working-directory: web
           vercel-args: ${{ github.event_name == 'push' && '--prod' || '' }}
           scope: osleventsappaugustanaedus-projects
