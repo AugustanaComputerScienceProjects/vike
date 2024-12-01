@@ -112,7 +112,18 @@ const EventPreview = ({ event, onClose, onDelete, showActions = false }: EventPr
 
   useEffect(() => {
     const loadImage = async () => {
+      setIsLoadingImage(true);
+      
+      // If event already has imageUrl from the hook, use that
+      if (event.imageUrl) {
+        setImageUrl(event.imageUrl);
+        setIsLoadingImage(false);
+        return;
+      }
+
+      // Otherwise, try to load it
       if (!event.imgid || event.imgid === "default") {
+        setImageUrl(null);
         setIsLoadingImage(false);
         return;
       }
@@ -120,18 +131,19 @@ const EventPreview = ({ event, onClose, onDelete, showActions = false }: EventPr
       try {
         const url = await firebase.storage
           .ref("Images")
-          .child(`${event.imgid}.jpg`)
+          .child(event.imgid.endsWith('.jpg') ? event.imgid : `${event.imgid}.jpg`)
           .getDownloadURL();
         setImageUrl(url);
       } catch (error) {
         console.error("Error loading event image:", error);
+        setImageUrl(null);
       } finally {
         setIsLoadingImage(false);
       }
     };
 
     loadImage();
-  }, [event.imgid]);
+  }, [event.imgid, event.imageUrl]);
 
   const handleRegister = async () => {
     if (!currentUserHandle) {
