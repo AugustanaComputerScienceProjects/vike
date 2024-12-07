@@ -34,7 +34,7 @@ export default function RootLayout({
             <div className="flex-1">{children}</div>
           </div>
         </ThemeProvider>
-        <Toaster />
+        <Toaster richColors />
       </body>
     </html>
   );

@@ -4,38 +4,38 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import firebaseApp from "@/firebase/config";
-import useRoleData from "@/hooks/use-role";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
-const checkInService = {
-  async verifyStudentId(studentId) {
-    try {
-      const idRef = firebaseApp.database.ref('id-to-email').child(studentId);
-      const snapshot = await idRef.once('value');
-      
-      if (snapshot.exists()) {
-        return snapshot.val();
-      }
-      
-      // If not found in id-to-email, check demographics
-      const demoRef = firebaseApp.database.ref('demographics').child(studentId);
-      const demoSnapshot = await demoRef.once('value');
-      
-      if (demoSnapshot.exists()) {
-        return studentId; // Return the ID itself if it exists in demographics
-      }
-      
-      return null;
-    } catch (error) {
-      console.error('Error verifying student ID:', error);
-      throw error;
+const verifyStudentId = async (studentId: string) => {
+  try {
+    const idRef = firebaseApp.database.ref('id-to-email').child(studentId);
+    const snapshot = await idRef.once('value');
+    
+    if (snapshot.exists()) {
+      return snapshot.val();
     }
-  },
+    
+    const demoRef = firebaseApp.database.ref('demographics').child(studentId);
+    const demoSnapshot = await demoRef.once('value');
+    
+    if (demoSnapshot.exists()) {
+      return studentId;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error verifying student ID:', error);
+    throw error;
+  }
+};
 
-  async checkInToPepsico(email, checkInTime) {
+const checkInToPepsico = async (email: string) => {
     try {
       const pepsicoRef = firebaseApp.database.ref('pepsico');
       const snapshot = await pepsicoRef.once('value');
+      const checkInTime = new Date().toLocaleTimeString();
+
       
       snapshot.forEach((child) => {
         const eventKey = child.key;
@@ -49,95 +49,89 @@ const checkInService = {
     } catch (error) {
       console.error('Error checking in to Pepsico:', error);
       throw error;
-    }
   }
 };
 
 export default function PepsicoCheckIn() {
   const [studentId, setStudentId] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
   const inputRef = useRef(null);
-  const { adminSignedIn, leaderSignedIn } = useRoleData();
-  const [userText, setUserText] = useState("");
+  const lastKeyTime = useRef(0);
+  const keyBuffer = useRef("");
 
   useEffect(() => {
-    const unsubscribe = firebaseApp.auth.onAuthStateChanged((user) => {
-      if (user) {
-        if (!adminSignedIn && !leaderSignedIn) {
-          setUserText(`${user.email} (Student)`);
-        } else if (adminSignedIn) {
-          setUserText(`${user.email} (Admin)`);
-        } else {
-          setUserText(`${user.email} (Leader)`);
-        }
-      } else {
-        setUserText("");
+    const handleGlobalKeyPress = (e: KeyboardEvent) => {
+      if (!keyBuffer.current && e.key !== ';') {
+        return;
       }
-    });
 
-    return () => unsubscribe();
-  }, [adminSignedIn, leaderSignedIn]);
+      const currentTime = new Date().getTime();
+      
+      if (currentTime - lastKeyTime.current > 150) {
+        keyBuffer.current = "";
+      }
+      
+      lastKeyTime.current = currentTime;
+      keyBuffer.current += e.key;
+
+
+      if (keyBuffer.current.startsWith(';') && keyBuffer.current.length > 1) {
+        inputRef.current?.focus();
+      }
+
+      if (keyBuffer.current.startsWith(';') && keyBuffer.current.includes('=') && keyBuffer.current.endsWith('?')) {
+        const fullSwipe = keyBuffer.current;
+        keyBuffer.current = "";
+        setStudentId(fullSwipe);
+        handleSubmit(new Event('submit'));
+      }
+    };
+
+    document.addEventListener('keypress', handleGlobalKeyPress);
+    return () => document.removeEventListener('keypress', handleGlobalKeyPress);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!studentId || loading) return;
     setLoading(true);
 
     try {
       let processedId = studentId;
-      if (processedId[0] === ';' && processedId.length === 16) {
-        processedId = processedId.slice(3, 10);
-      } else if (!isNaN(Number(processedId[0]))) {
-        while (processedId.length < 7) {
-          processedId = '0' + processedId;
+      
+      if (processedId.startsWith(';')) {
+        const idPart = processedId.split('=')[0];
+        if (idPart) {
+          processedId = idPart.replace(';', '').slice(-7);
         }
+      } else if (!isNaN(Number(processedId))) {
+        processedId = processedId.padStart(7, '0').slice(-7);
       }
 
-      const email = await checkInService.verifyStudentId(processedId);
+      const email = await verifyStudentId(processedId);
       
       if (email) {
-        const checkInTime = new Date().toLocaleTimeString();
-        await checkInService.checkInToPepsico(email, checkInTime);
-        setMessage(`${email} has been checked in`);
+        await checkInToPepsico(email);
+        toast.success(`${email} has been checked in`);
       } else {
-        setMessage("Not a student/faculty");
+        toast.error("Not a student/faculty");
       }
     } catch (error) {
       console.error('Check-in error:', error);
-      setMessage("Failed to check in");
+      toast.error("Failed to check in");
     } finally {
       setStudentId("");
       setLoading(false);
-      inputRef.current?.focus();
-    }
-  };
-
-  const handleSignInOut = () => {
-    if (firebaseApp.auth.currentUser) {
-      firebaseApp.signOut();
-    } else {
-      firebaseApp.signIn();
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container h-14 flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Pepsico Check-In</h1>
-          <div className="flex items-center gap-4">
-            {userText && (
-              <span className="text-sm text-muted-foreground">{userText}</span>
-            )}
-            <Button 
-              variant="outline" 
-              onClick={handleSignInOut}
-              className="h-8"
-            >
-              {firebaseApp.auth.currentUser ? "Sign Out" : "Sign In"}
-            </Button>
-          </div>
-        </div>
+    <div className="bg-background">
+      <div className="container h-14 flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Pepsico Check-In</h1>
       </div>
 
       <div className="container max-w-md mx-auto py-8">
@@ -151,22 +145,12 @@ export default function PepsicoCheckIn() {
               onChange={(e) => setStudentId(e.target.value)}
               autoFocus
               disabled={loading}
-              onKeyDown={(e) => e.key === 'Enter' && handleSubmit(e)}
             />
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Checking in..." : "Check In"}
             </Button>
           </form>
         </Card>
-        {message && (
-          <div className={`mt-4 p-4 rounded-md ${
-            message.includes("checked in") 
-              ? "bg-green-100 text-green-800" 
-              : "bg-red-100 text-red-800"
-          }`}>
-            {message}
-          </div>
-        )}
       </div>
     </div>
   );
