@@ -26,7 +26,7 @@ const CheckInPage = () => {
   const [scannerKey, setScannerKey] = useState(0);
   const [lastScannedCode, setLastScannedCode] = useState<string | null>(null);
   const [scannerEnabled, setScannerEnabled] = useState(true);
-
+  const [cameraError, setCameraError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -93,7 +93,7 @@ const CheckInPage = () => {
     };
   }, [eventId]);
 
-  const handleGuestClick = (guest) => {
+  const handleGuestClick = (guest: { userHandle: string; status; string }) => {
     setSelectedGuest(guest);
   };
 
@@ -131,8 +131,8 @@ const CheckInPage = () => {
   const handleQRScan = useCallback(async (result) => {
     if (!result || isLoading || !scannerEnabled) return;
     
-    const code = result.text || result;
-    if (code === lastScannedCode) return; 
+    const code = typeof result === 'string' ? result : result.text; 
+    if (!code || code === lastScannedCode) return; 
     
     try {
       setScannerEnabled(false); // Temporarily disable scanner
@@ -173,25 +173,50 @@ const CheckInPage = () => {
   const renderScanner = () => {
     if (!openQRScanner) return null;
     
+    if (cameraError){
+      return (
+        <div className="aspect-square bg-gray-100 flex flex-col items-center justify-center rounded-md p-4">
+          <p className="text-red-500 text-center mb-4">{cameraError}</p>
+          <Button 
+            onClick={() => {
+              setCameraError(null);
+              setScannerKey(prev => prev + 1);
+            }}
+            variant="outline"
+            >
+              Retry Camera 
+            </Button>
+        </div>
+      );
+    }
+
     return (
-      <Scanner
-        key={scannerKey}
-        onResult={handleQRScan}
-        onError={(error) => {
-          if (!error?.message?.includes('interrupted by a new load request')) {
-            console.error(error?.message);
-          }
-        }}
-        options={{
-          delayBetweenScanSuccess: 1000,
-          delayBetweenScanAttempts: 1000,
-          constraints: {
-            facingMode: "environment"
-          }
-        }}
-      />
-    );
-  };
+      <div className="rounded-md overflow-hidden">
+        <Scanner
+          key={scannerKey}
+          onResult={handleQRScan}
+          onError={(error) => {
+            if (error?.message?.includes('Permission denied')) {
+              setCameraError("Camera access was denied. Please allow camera permissions.");
+            } else if (error?.message?.includes('Could not start video source')) {
+              setCameraError("Camera not found. Please connect a camera.");
+            } else if (error?.message) {
+              setCameraError(error.message);
+            }
+          }}
+          options={{
+            delayBetweenScanSuccess: 2000,
+            delayBetweenScanAttempts: 1000,
+            constraints: {
+              facingMode: "environment",
+              width: {ideal:1280},
+              height: {ideal:720},
+            },
+          }}
+        />
+        </div>
+      );
+    };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -278,6 +303,7 @@ const CheckInPage = () => {
               setScannerKey(prev => prev + 1);
               setLastScannedCode(null);
               setScannerEnabled(true);
+              setCameraError(null);
             }
           }}
         >
