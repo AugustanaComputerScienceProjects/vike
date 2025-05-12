@@ -38,6 +38,9 @@ export interface Event {
   }>;
   createdAt?: string;
   updatedAt?: string;
+  repeatFrequency?: 'daily' | 'weekly' | 'monthly';
+  repeatUntil?: string;
+  repeatDays?: string[];
 }
 
 export interface EventGuest {

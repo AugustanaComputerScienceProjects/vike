@@ -5,7 +5,7 @@ import { useGroups } from "@/hooks/use-groups";
 import { useTags } from "@/hooks/use-tags";
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addHours, format } from "date-fns";
+import { addHours, format, parseISO } from "date-fns";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -24,6 +24,25 @@ const formSchema = z.object({
   webLink: z.string().default(""),
   tags: z.array(z.string()).default([]),
   email: z.string().email("Invalid email address"),
+  repeatFrequency: z.enum(["daily", "weekly", "monthly"]).optional(),
+  repeatUntil: z.string().optional(),
+  repeatDays: z.array(z.string()).optional(),
+}).refine(data => {
+  if (data.repeatFrequency && !data.repeatUntil) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Repeat until date is required when repeat is enabled",
+  path: ["repeatUntil"]
+}).refine(data => {
+  if (data.repeatFrequency === 'weekly' && (!data.repeatDays || data.repeatDays.length === 0)) {
+    return false;
+  }
+  return true;
+}, {
+  message: "At least one day must be selected for weekly repeats",
+  path: ["repeatDays"]
 });
 
 interface AddEventProps {
@@ -95,11 +114,9 @@ const AddEvent = ({ calendarId, onSuccess }: AddEventProps) => {
     try {
       const timestamp = Date.now().toString();
       const imageRef = firebase.storage.ref("Images").child(`${timestamp}.jpg`);
-
-      // Remove the data:image/jpeg;base64, prefix
       const base64Data = image.split(',')[1];
       
-      // Convert base64 to blob
+      // Convert base64 to ArrayBuffer
       const byteCharacters = atob(base64Data);
       const byteArrays = [];
       
@@ -111,47 +128,29 @@ const AddEvent = ({ calendarId, onSuccess }: AddEventProps) => {
           byteNumbers[i] = slice.charCodeAt(i);
         }
         
-        const byteArray = new Uint8Array(byteNumbers);
-        byteArrays.push(byteArray);
+        byteArrays.push(new Uint8Array(byteNumbers));
       }
       
       const blob = new Blob(byteArrays, { type: 'image/jpeg' });
-      
-      // Upload image
       await imageRef.put(blob);
       return timestamp;
     } catch (error) {
       console.error('Error uploading image:', error);
-      throw new Error('Failed to upload image');
+      throw new Error('Failed to upload image: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     if (isSubmitting) return;
 
-    // Validate required fields
-    if (!data.name || !data.location || !data.organization) {
-      toast({
-        title: "Error",
-        description: "Required fields are not filled in",
-        variant: "destructive",
-        duration: 3000,
-      });
-      return;
-    }
-
     try {
       setIsSubmitting(true);
-
-      // Upload image and get ID
       const imgid = await saveImage(image64);
 
-      // Calculate duration
-      const startDate = new Date(data.startDate);
-      const endDate = new Date(data.endDate);
+      const startDate = parseISO(data.startDate);
+      const endDate = parseISO(data.endDate);
       const duration = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60));
 
-      // Validate end date is after start date
       if (endDate <= startDate) {
         toast({
           title: "Error",
@@ -162,70 +161,50 @@ const AddEvent = ({ calendarId, onSuccess }: AddEventProps) => {
         return;
       }
 
-      // Create event data
       const eventData: Event = {
+        ...data,
         name: data.name,
         description: data.description,
-        startDate: format(startDate, "yyyy-MM-dd HH:mm"),
-        endDate: format(endDate, "yyyy-MM-dd HH:mm"),
+        startDate: format(startDate, "yyyy-MM-dd'T'HH:mm"),
+        endDate: format(endDate, "yyyy-MM-dd'T'HH:mm"),
         duration,
         location: data.location,
         organization: data.organization,
         imgid,
-        webLink: data.webLink || "",
+        webLink: data.webLink,
         tags: data.tags.join(','),
         email: data.email,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        repeatFrequency: data.repeatFrequency,
+        repeatUntil: data.repeatUntil ? format(parseISO(data.repeatUntil), "yyyy-MM-dd'T'HH:mm") : undefined,
+        repeatDays: data.repeatDays,
       };
 
-      // If we have an image URL, add it
       if (image64 !== defaultImage.src) {
-        const imageRef = firebase.storage.ref("Images").child(`${imgid}.jpg`);
-        const imageUrl = await imageRef.getDownloadURL();
-        eventData.image = imageUrl;
+        const imageUrl = await firebase.storage.ref(`Images/${imgid}.jpg`).getDownloadURL();
         eventData.imageUrl = imageUrl;
       }
 
-      console.log("Event data created:", eventData);
+      const newEventRef = await firebase.database.ref("/current-events").push(eventData);
+      const eventWithKey = { ...eventData, id: newEventRef.key, key: newEventRef.key };
 
-      // Save to current-events first
-      const newEventRef = await firebase.database
-        .ref("/current-events")
-        .push(eventData);
+      await firebase.database.ref(`/current-events/${newEventRef.key}`).set(eventWithKey);
 
-      // Add the generated key to the event data
-      const eventWithKey = {
-        ...eventData,
-        id: newEventRef.key,
-        key: newEventRef.key,
-      };
-
-      // Update the event with its key
-      await firebase.database
-        .ref(`/current-events/${newEventRef.key}`)
-        .set(eventWithKey);
-
-      // Then update the calendar
       if (calendarId) {
-        await firebase.database
-          .ref(`/calendars/${calendarId}/eventsCalendar/${newEventRef.key}`)
+        await firebase.database.ref(`/calendars/${calendarId}/eventsCalendar/${newEventRef.key}`)
           .set(eventWithKey);
       }
 
-      // Show success toast before resetting form
       toast({
         title: "Success",
         description: "Event created successfully",
         duration: 3000,
       });
 
-      // Small delay before resetting form to ensure toast is visible
-      setTimeout(() => {
-        form.reset();
-        setImage64(defaultImage.src);
-        onSuccess?.();
-      }, 100);
+      form.reset();
+      setImage64(defaultImage.src);
+      onSuccess?.();
 
     } catch (error) {
       console.error('Error creating event:', error);

@@ -12,6 +12,26 @@ const EventCard = ({ event }: { event: Event }) => {
   const [openPreview, setOpenPreview] = useState(false);
   const router = useRouter();
 
+  const getRecurrenceMessage = () => {
+    if (!event.repeatFrequency || !event.repeatUntil) return null;
+    
+    const formattedEndDate = format(new Date(event.repeatUntil), "MMM d, yyyy");
+    const startDate = new Date(event.startDate);
+    
+    switch(event.repeatFrequency) {
+      case 'daily':
+        return `Repeats daily until ${formattedEndDate}`;
+      case 'weekly':
+        const days = event.repeatDays?.join(', ') || '';
+        return `Repeats every ${days} until ${formattedEndDate}`;
+      case 'monthly':
+        const dayOfMonth = format(startDate, "do");
+        return `Repeats monthly on the ${dayOfMonth} until ${formattedEndDate}`;
+      default:
+        return null;
+    }
+  };
+
   const navigateTo = (path: string) => {
     router.push(path);
   };
@@ -19,6 +39,8 @@ const EventCard = ({ event }: { event: Event }) => {
   const togglePreview = () => {
     setOpenPreview(!openPreview);
   };
+
+  const recurrenceMessage = getRecurrenceMessage();
 
   return (
     <>
@@ -30,10 +52,17 @@ const EventCard = ({ event }: { event: Event }) => {
                 <p className="text-sm text-gray-500">
                   {format(new Date(event.startDate), "h:mm a")}
                 </p>
+                  
                 <h6 className="text-lg font-semibold">{event.name}</h6>
                 <p className="text-sm text-gray-500">
                   {event.location || "Location Missing"}
                 </p>
+                
+                {recurrenceMessage && (
+                  <div className="mt-2 text-xs text-blue-500">
+                    {recurrenceMessage}
+                  </div>
+                )}
               </div>
             </div>
             <div className="col-span-5 md:col-span-3 my-1 mr-1 relative w-[150px] h-[150px]">

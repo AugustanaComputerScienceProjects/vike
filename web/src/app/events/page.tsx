@@ -14,15 +14,53 @@ const Events = () => {
   const { currentEvents, pastEvents, loading } = useEvents(user?.email || "");
   const [showPastEvents, setShowPastEvents] = useState(false);
 
+  const generateRecurringDates = (event) => {
+    if (!event.repeatFrequency || !event.repeatUntil) return [event.startDate];
+    
+    const dates = [];
+    let currentDate = new Date(event.startDate);
+    const endDate = new Date(event.repeatUntil);
+    
+    while (currentDate <= endDate) {
+      dates.push(new Date(currentDate));
+      
+      switch(event.repeatFrequency) {
+        case 'daily':
+          currentDate.setDate(currentDate.getDate() + 1);
+          break;
+        case 'weekly':
+          currentDate.setDate(currentDate.getDate() + 7);
+          break;
+        case 'monthly':
+          currentDate.setMonth(currentDate.getMonth() + 1);
+          // Handle same-day-of-month logic
+          const originalDate = new Date(event.startDate).getDate();
+          currentDate.setDate(originalDate);
+          break;
+      }
+    }
+    
+    return dates;
+  };
+
   const groupEventsByDate = (events) => {
     const groupedEvents = {};
     events.forEach((event) => {
-      const eventDate = new Date(event.startDate);
-      const dateKey = format(eventDate, "yyyy-MM-dd");
-      if (!groupedEvents[dateKey]) {
-        groupedEvents[dateKey] = [];
-      }
-      groupedEvents[dateKey].push(event);
+
+      const eventDates = generateRecurringDates(event);
+
+      eventDates.forEach((eventDate) => {
+        const dateKey = format(eventDate, "yyyy-MM-dd");
+        if (!groupedEvents[dateKey]) {
+          groupedEvents[dateKey] = [];
+        }
+        // Clone the event with the specific occurrence date
+        groupedEvents[dateKey].push({
+          ...event,
+          occurrenceDate: dateKey,
+          originalStartDate: event.startDate
+        });
+      });
     });
     return groupedEvents;
   };
